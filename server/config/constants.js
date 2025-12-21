@@ -26,7 +26,7 @@ module.exports = {
     SMTP_PASS: process.env.SMTP_PASS,
 
     // Frontend URL (for CORS)
-    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
 
     // Rate Limiting
     RATE_LIMIT_WINDOW: 15 * 60 * 1000, // 15 minutes

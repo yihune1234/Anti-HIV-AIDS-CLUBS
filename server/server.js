@@ -13,6 +13,9 @@ const advisorRoutes = require('./modules/advisors/advisor.routes');
 const peerEducatorRoutes = require('./modules/peerEducators/peerEducator.routes');
 const eventRoutes = require('./modules/events/event.routes');
 const anonymousQuestionRoutes = require('./modules/anonymousQuestions/anonymousQuestion.routes');
+const galleryRoutes = require('./modules/gallery/gallery.routes');
+const resourceRoutes = require('./modules/resources/resource.routes');
+const storyRoutes = require('./modules/stories/story.routes');
 
 // Load environment variables
 require('dotenv').config();
@@ -28,7 +31,7 @@ app.use(helmet()); // Set security headers
 
 // CORS Configuration
 app.use(cors({
-    origin: constants.FRONTEND_URL || 'http://localhost:3000',
+    origin: constants.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
     optionsSuccessStatus: 200
 }));
@@ -73,7 +76,10 @@ app.use('/api/members', memberRoutes);
 app.use('/api/advisors', advisorRoutes);
 app.use('/api/peer-educators', peerEducatorRoutes);
 app.use('/api/events', eventRoutes);
-app.use('/api/questions', anonymousQuestionRoutes);
+app.use('/api/anonymous-questions', anonymousQuestionRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/resources', resourceRoutes);
+app.use('/api/stories', storyRoutes);
 
 // Welcome Route
 app.get('/', (req, res) => {

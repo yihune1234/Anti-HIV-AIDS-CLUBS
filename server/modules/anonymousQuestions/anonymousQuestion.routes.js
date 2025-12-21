@@ -8,13 +8,14 @@ const { createQuestionSchema, answerQuestionSchema, updateQuestionSchema } = req
 // Public routes
 router.post('/', validate(createQuestionSchema), anonymousQuestionController.createQuestion);
 router.get('/', anonymousQuestionController.getAllQuestions);
+
+// Protected routes (admin/advisor only) - must come before :id to prevent shadowing
+router.get('/stats', authenticate, authorize('admin', 'advisor'), anonymousQuestionController.getQuestionStats);
+
 router.get('/:id', anonymousQuestionController.getQuestionById);
 router.post('/:id/helpful', anonymousQuestionController.markHelpful);
 
-// Protected routes (admin/advisor only)
 router.use(authenticate);
-
-router.get('/stats', authorize('admin', 'advisor'), anonymousQuestionController.getQuestionStats);
 router.post('/:id/answer', authorize('admin', 'advisor'), validate(answerQuestionSchema), anonymousQuestionController.answerQuestion);
 router.put('/:id', authorize('admin'), validate(updateQuestionSchema), anonymousQuestionController.updateQuestion);
 router.delete('/:id', authorize('admin'), anonymousQuestionController.deleteQuestion);

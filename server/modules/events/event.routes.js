@@ -9,13 +9,13 @@ const { createEventSchema, updateEventSchema } = require('./event.validation');
 router.get('/', eventController.getAllEvents);
 router.get('/:id', eventController.getEventById);
 
-// Protected routes
+// Protected routes (higher priority routes first)
 router.use(authenticate);
 
+router.get('/stats', authorize('admin'), eventController.getEventStats);
 router.post('/:id/register', eventController.registerForEvent);
 
 // Admin/Organizer routes
-router.get('/stats', authorize('admin'), eventController.getEventStats);
 router.post('/', authorize('admin'), validate(createEventSchema), eventController.createEvent);
 router.put('/:id', authorize('admin'), validate(updateEventSchema), eventController.updateEvent);
 router.delete('/:id', authorize('admin'), eventController.deleteEvent);

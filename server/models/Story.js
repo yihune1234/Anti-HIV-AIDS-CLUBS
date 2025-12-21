@@ -147,7 +147,7 @@ storySchema.virtual('approvedComments').get(function () {
 });
 
 // Generate slug from title before saving
-storySchema.pre('save', function (next) {
+storySchema.pre('save', function () {
   if (this.isModified('title') && !this.slug) {
     this.slug = this.title
       .toLowerCase()
@@ -156,7 +156,6 @@ storySchema.pre('save', function (next) {
       .replace(/-+/g, '-')
       .trim();
   }
-  next();
 });
 
 module.exports = mongoose.model('Story', storySchema);

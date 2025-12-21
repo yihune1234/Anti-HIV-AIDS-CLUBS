@@ -42,7 +42,7 @@ class EventService {
 
             const skip = (page - 1) * limit;
             const events = await Event.find(query)
-                .populate('organizers advisors')
+                .populate(['organizers', 'advisors'])
                 .skip(skip)
                 .limit(limit)
                 .sort({ startDate: -1 });

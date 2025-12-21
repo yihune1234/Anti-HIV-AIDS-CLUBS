@@ -1,4 +1,8 @@
 const mongoose = require('mongoose');
+// Ensure models are registered for population
+require('./Member');
+require('./Advisor');
+require('./User');
 
 const eventSchema = new mongoose.Schema({
   title: {

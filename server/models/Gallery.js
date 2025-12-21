@@ -135,11 +135,10 @@ gallerySchema.virtual('totalComments').get(function () {
 });
 
 // Set cover image to first image if not set
-gallerySchema.pre('save', function (next) {
+gallerySchema.pre('save', function () {
   if (!this.coverImage && this.images && this.images.length > 0) {
     this.coverImage = this.images[0].url;
   }
-  next();
 });
 
 module.exports = mongoose.model('Gallery', gallerySchema);

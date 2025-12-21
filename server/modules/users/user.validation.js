@@ -1,6 +1,16 @@
 const Joi = require('joi');
 
 // Register validation
+/**
+ * Validation schema for user registration.
+ * 
+ * Where to use:
+ * - POST /api/users/register
+ * 
+ * How to use:
+ * - Use with the `validate` middleware.
+ * - Example: `router.post('/register', validate(registerSchema), userController.register);`
+ */
 const registerSchema = Joi.object({
     username: Joi.string()
         .min(3)
@@ -52,6 +62,16 @@ const registerSchema = Joi.object({
 });
 
 // Login validation
+/**
+ * Validation schema for user login.
+ * 
+ * Where to use:
+ * - POST /api/users/login
+ * 
+ * How to use:
+ * - Use with the `validate` middleware.
+ * - Example: `router.post('/login', validate(loginSchema), userController.login);`
+ */
 const loginSchema = Joi.object({
     email: Joi.string()
         .email()
@@ -70,6 +90,16 @@ const loginSchema = Joi.object({
 });
 
 // Update profile validation
+/**
+ * Validation schema for updating user profile.
+ * 
+ * Where to use:
+ * - PUT /api/users/profile
+ * 
+ * How to use:
+ * - Use with the `validate` middleware.
+ * - Example: `router.put('/profile', validate(updateProfileSchema), userController.updateProfile);`
+ */
 const updateProfileSchema = Joi.object({
     firstName: Joi.string().trim().optional(),
     lastName: Joi.string().trim().optional(),
@@ -83,6 +113,16 @@ const updateProfileSchema = Joi.object({
 });
 
 // Change password validation
+/**
+ * Validation schema for changing password.
+ * 
+ * Where to use:
+ * - POST /api/users/change-password
+ * 
+ * How to use:
+ * - Use with the `validate` middleware.
+ * - Example: `router.post('/change-password', validate(changePasswordSchema), userController.changePassword);`
+ */
 const changePasswordSchema = Joi.object({
     currentPassword: Joi.string()
         .required()
@@ -99,6 +139,16 @@ const changePasswordSchema = Joi.object({
 });
 
 // Forgot password validation
+/**
+ * Validation schema for forgot password request.
+ * 
+ * Where to use:
+ * - POST /api/users/forgot-password
+ * 
+ * How to use:
+ * - Use with the `validate` middleware.
+ * - Example: `router.post('/forgot-password', validate(forgotPasswordSchema), userController.forgotPassword);`
+ */
 const forgotPasswordSchema = Joi.object({
     email: Joi.string()
         .email()
@@ -112,6 +162,16 @@ const forgotPasswordSchema = Joi.object({
 });
 
 // Reset password validation
+/**
+ * Validation schema for resetting password.
+ * 
+ * Where to use:
+ * - POST /api/users/reset-password
+ * 
+ * How to use:
+ * - Use with the `validate` middleware.
+ * - Example: `router.post('/reset-password', validate(resetPasswordSchema), userController.resetPassword);`
+ */
 const resetPasswordSchema = Joi.object({
     token: Joi.string()
         .required()
@@ -128,6 +188,16 @@ const resetPasswordSchema = Joi.object({
 });
 
 // Update role validation (admin only)
+/**
+ * Validation schema for updating user role.
+ * 
+ * Where to use:
+ * - PUT /api/users/:id/role
+ * 
+ * How to use:
+ * - Use with the `validate` middleware.
+ * - Example: `router.put('/:id/role', validate(updateRoleSchema), userController.updateUserRole);`
+ */
 const updateRoleSchema = Joi.object({
     role: Joi.string()
         .valid('admin', 'member', 'advisor', 'peer_educator')
