@@ -17,10 +17,10 @@ class GalleryService {
     async getGalleryById(id) {
         try {
             const gallery = await Gallery.findById(id)
-                .populate('uploadedBy', 'name email profilePicture')
+                .populate('uploadedBy', 'firstName lastName email profileImage')
                 .populate('relatedEvent', 'title startDate')
-                .populate('likes', 'name')
-                .populate('comments.user', 'name profilePicture');
+                .populate('likes', 'firstName lastName')
+                .populate('comments.user', 'firstName lastName profileImage');
 
             if (!gallery) throw new Error('Gallery not found');
             return gallery;
@@ -49,7 +49,7 @@ class GalleryService {
 
             const skip = (page - 1) * limit;
             const galleries = await Gallery.find(query)
-                .populate('uploadedBy', 'name')
+                .populate('uploadedBy', 'firstName lastName')
                 .skip(skip)
                 .limit(limit)
                 .sort({ date: -1 });
@@ -68,7 +68,7 @@ class GalleryService {
                 id,
                 { $set: data },
                 { new: true, runValidators: true }
-            ).populate('uploadedBy', 'name');
+            ).populate('uploadedBy', 'firstName lastName');
 
             if (!gallery) throw new Error('Gallery not found');
             return gallery;
@@ -119,7 +119,7 @@ class GalleryService {
             await gallery.save();
             // Return the new comment with populated user
             const updatedGallery = await Gallery.findById(id)
-                .populate('comments.user', 'name profilePicture');
+                .populate('comments.user', 'firstName lastName profileImage');
             const newComment = updatedGallery.comments[updatedGallery.comments.length - 1];
 
             return newComment;

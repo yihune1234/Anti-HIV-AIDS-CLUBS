@@ -63,6 +63,10 @@ const gallerySchema = new mongoose.Schema({
     city: {
       type: String,
       trim: true
+    },
+    address: {
+      type: String,
+      trim: true
     }
   },
   status: {

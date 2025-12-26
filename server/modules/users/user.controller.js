@@ -9,7 +9,7 @@ class UserController {
 
             // Generate JWT token
             const token = jwt.sign(
-                { id: user._id, role: user.role },
+                { id: user._id, roles: user.roles },
                 process.env.JWT_SECRET || 'your-secret-key',
                 { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
             );
@@ -53,7 +53,7 @@ class UserController {
 
             // Generate JWT token
             const token = jwt.sign(
-                { id: user._id, role: user.role },
+                { id: user._id, roles: user.roles },
                 process.env.JWT_SECRET || 'your-secret-key',
                 { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
             );

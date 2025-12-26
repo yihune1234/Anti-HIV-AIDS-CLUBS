@@ -18,6 +18,7 @@ const resourceSchema = new mongoose.Schema({
     enum: [
       'document',
       'video',
+      'image',
       'audio',
       'infographic',
       'presentation',
@@ -47,7 +48,7 @@ const resourceSchema = new mongoose.Schema({
       'Other'
     ]
   },
-  fileUrl: {
+  resourceUrl: {
     type: String,
     trim: true
   },
@@ -171,7 +172,35 @@ const resourceSchema = new mongoose.Schema({
     publicationYear: Number,
     edition: String,
     pageCount: Number,
-    duration: Number // for videos/audio in seconds
+    duration: Number // for videos/audio in minutes
+  },
+  // Training completion tracking
+  completions: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    completedAt: {
+      type: Date,
+      default: Date.now
+    },
+    timeSpent: {
+      type: Number, // in minutes
+      min: 0
+    },
+    feedback: {
+      type: String,
+      maxlength: 500
+    }
+  }],
+  isTrainingMaterial: {
+    type: Boolean,
+    default: false
+  },
+  downloadable: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true,
@@ -204,5 +233,33 @@ resourceSchema.virtual('fileSizeMB').get(function () {
   if (!this.fileSize) return 0;
   return (this.fileSize / (1024 * 1024)).toFixed(2);
 });
+
+// Virtual for completion count
+resourceSchema.virtual('completionCount').get(function () {
+  return this.completions ? this.completions.length : 0;
+});
+
+// Method to check if user completed this resource
+resourceSchema.methods.isCompletedBy = function(userId) {
+  return this.completions.some(c => c.user.toString() === userId.toString());
+};
+
+// Method to mark as completed by user
+resourceSchema.methods.markCompleted = function(userId, timeSpent, feedback) {
+  const existing = this.completions.find(c => c.user.toString() === userId.toString());
+  if (existing) {
+    existing.completedAt = new Date();
+    if (timeSpent) existing.timeSpent = timeSpent;
+    if (feedback) existing.feedback = feedback;
+  } else {
+    this.completions.push({
+      user: userId,
+      completedAt: new Date(),
+      timeSpent,
+      feedback
+    });
+  }
+  return this.save();
+};
 
 module.exports = mongoose.model('Resource', resourceSchema);

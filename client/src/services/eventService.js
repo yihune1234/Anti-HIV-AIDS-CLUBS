@@ -25,32 +25,20 @@ const eventService = {
     },
     // Admin: Create Event
     createEvent: async (eventData) => {
-        try {
-            const response = await api.post('/events', eventData);
-            return response.data;
-        } catch (error) {
-            throw error.response?.data?.message || 'Failed to create event';
-        }
+        const response = await api.post('/events', eventData);
+        return response.data;
     },
 
     // Admin: Update Event
     updateEvent: async (id, eventData) => {
-        try {
-            const response = await api.put(`/events/${id}`, eventData);
-            return response.data;
-        } catch (error) {
-            throw error.response?.data?.message || 'Failed to update event';
-        }
+        const response = await api.put(`/events/${id}`, eventData);
+        return response.data;
     },
 
     // Admin: Delete Event
     deleteEvent: async (id) => {
-        try {
-            const response = await api.delete(`/events/${id}`);
-            return response.data;
-        } catch (error) {
-            throw error.response?.data?.message || 'Failed to delete event';
-        }
+        const response = await api.delete(`/events/${id}`);
+        return response.data;
     }
 };
 

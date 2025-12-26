@@ -1,28 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import userService from '../../services/userService';
+import adminService from '../../services/adminService';
+
+const thStyle = {
+    padding: '1rem',
+    textAlign: 'left',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    color: '#555'
+};
+
+const tdStyle = {
+    padding: '1rem',
+    fontSize: '0.95rem'
+};
 
 const ManageMembers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        total: 0
+    });
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [searchTerm]);
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (page = 1) => {
         try {
-            const result = await userService.getAllUsers();
+            setLoading(true);
+            const result = await adminService.getAllUsers({
+                page,
+                limit: 20,
+                search: searchTerm
+            });
+
             if (result.success) {
-                // Assuming result.data.users is the array based on controller pattern
-                setUsers(result.data.users || []);
+                setUsers(result.data || []);
+                setPagination({
+                    currentPage: result.currentPage || 1,
+                    totalPages: result.totalPages || 1,
+                    total: result.total || 0
+                });
             } else {
-                setUsers([]);
-                setError('Failed to load users data format.');
+                setError('Failed to load users');
             }
         } catch (err) {
-            setError(err);
+            setError(err.message || 'Failed to fetch users');
         } finally {
             setLoading(false);
         }
@@ -31,56 +58,50 @@ const ManageMembers = () => {
     const handleDelete = async (userId) => {
         if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
             try {
-                await userService.deleteUser(userId);
+                await adminService.deleteUser(userId);
                 setUsers(users.filter(user => user._id !== userId));
             } catch (err) {
-                alert('Failed to delete user: ' + err);
+                alert('Failed to delete user: ' + err.message);
             }
         }
     };
 
-    const handleRoleChange = async (userId, newRole) => {
+    const handleRoleChange = async (userId, newRoles) => {
         try {
-            await userService.updateUserRole(userId, newRole);
+            await adminService.updateUserRoles(userId, [newRoles]);
             setUsers(users.map(user =>
-                user._id === userId ? { ...user, role: newRole } : user
+                user._id === userId ? { ...user, roles: [newRoles] } : user
             ));
         } catch (err) {
-            alert('Failed to update role: ' + err);
+            alert('Failed to update role: ' + err.message);
         }
     };
 
-    const handleToggleStatus = async (userId) => {
+    const handleToggleStatus = async (userId, currentStatus) => {
         try {
-            const result = await userService.toggleUserStatus(userId);
-            // Result usually returns the updated user, but let's blindly toggle for UI speed if we trust backend
+            await adminService.updateUserStatus(userId, {
+                isActive: !currentStatus
+            });
             setUsers(users.map(user =>
-                user._id === userId ? { ...user, isActive: !user.isActive } : user
+                user._id === userId ? { ...user, isActive: !currentStatus } : user
             ));
         } catch (err) {
-            alert('Failed to toggle status: ' + err);
+            alert('Failed to toggle status: ' + err.message);
         }
     };
-
-    const filteredUsers = users.filter(user =>
-        user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.username?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     if (loading) return <div className="text-center p-5">Loading members...</div>;
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <h2 style={{ color: '#1a1a2e', margin: 0 }}>Manage Members</h2>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
                     <input
                         type="text"
                         placeholder="Search members..."
                         className="form-control"
-                        style={{ paddingLeft: '2.5rem', minWidth: '300px' }}
+                        style={{ paddingLeft: '2.5rem', width: '100%' }}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -91,8 +112,8 @@ const ManageMembers = () => {
             {error && <div className="alert alert-danger mb-4" style={{ color: 'red' }}>{error}</div>}
 
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                <div className="table-responsive">
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
                             <tr>
                                 <th style={thStyle}>User</th>
@@ -103,8 +124,8 @@ const ManageMembers = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredUsers.length > 0 ? (
-                                filteredUsers.map(user => (
+                            {users.length > 0 ? (
+                                users.map(user => (
                                     <tr key={user._id} style={{ borderBottom: '1px solid #eee' }}>
                                         <td style={tdStyle}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -123,19 +144,21 @@ const ManageMembers = () => {
                                         </td>
                                         <td style={tdStyle}>
                                             <select
-                                                value={user.role}
+                                                value={user.roles?.[0] || 'member'}
                                                 onChange={(e) => handleRoleChange(user._id, e.target.value)}
                                                 style={{ padding: '0.3rem', borderRadius: '4px', border: '1px solid #ddd' }}
                                             >
-                                                <option value="user">Member</option>
+                                                <option value="member">Member</option>
                                                 <option value="peer_educator">Peer Educator</option>
                                                 <option value="advisor">Advisor</option>
+                                                <option value="moderator">Moderator</option>
+                                                <option value="content_manager">Content Manager</option>
                                                 <option value="admin">Admin</option>
                                             </select>
                                         </td>
                                         <td style={tdStyle}>
                                             <span
-                                                onClick={() => handleToggleStatus(user._id)}
+                                                onClick={() => handleToggleStatus(user._id, user.isActive)}
                                                 style={{
                                                     cursor: 'pointer',
                                                     padding: '0.25rem 0.6rem',
@@ -163,7 +186,7 @@ const ManageMembers = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#777' }}>
-                                        No members found matching your search.
+                                        No members found.
                                     </td>
                                 </tr>
                             )}
@@ -171,21 +194,29 @@ const ManageMembers = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '2rem' }}>
+                    <button
+                        className="btn btn-outline"
+                        disabled={pagination.currentPage === 1}
+                        onClick={() => fetchUsers(pagination.currentPage - 1)}
+                    >
+                        Previous
+                    </button>
+                    <span>Page {pagination.currentPage} of {pagination.totalPages}</span>
+                    <button
+                        className="btn btn-outline"
+                        disabled={pagination.currentPage === pagination.totalPages}
+                        onClick={() => fetchUsers(pagination.currentPage + 1)}
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
-};
-
-const thStyle = {
-    padding: '1rem',
-    textAlign: 'left',
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    color: '#555'
-};
-
-const tdStyle = {
-    padding: '1rem',
-    fontSize: '0.95rem'
 };
 
 export default ManageMembers;

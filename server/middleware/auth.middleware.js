@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const constants = require('../config/constants');
+
 // Authenticate user with JWT
 const authenticate = async (req, res, next) => {
     try {
@@ -20,7 +22,7 @@ const authenticate = async (req, res, next) => {
 
         try {
             // Verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || constants.JWT_SECRET || 'your-secret-key');
 
             // Get user from token
             const user = await User.findById(decoded.id).select('-password');
@@ -66,15 +68,46 @@ const authorize = (...roles) => {
             });
         }
 
-        if (!roles.includes(req.user.role)) {
+        // Support both single role (old) and roles array (new)
+        // Combine all possible sources of roles
+        const userRoles = new Set();
+
+        if (req.user.role) userRoles.add(req.user.role);
+        if (Array.isArray(req.user.roles)) {
+            req.user.roles.forEach(r => userRoles.add(r));
+        }
+
+        // Debugging (only in development)
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`[Auth] Checking access for user ${req.user.username}. Required: [${roles}], User has: [${Array.from(userRoles)}]`);
+        }
+
+        const hasRole = roles.some(role => userRoles.has(role));
+
+        if (!hasRole) {
             return res.status(403).json({
                 success: false,
-                message: 'You do not have permission to perform this action'
+                message: 'You do not have permission to perform this access'
             });
         }
 
         next();
     };
+};
+
+// Alias for better naming
+const restrictTo = authorize;
+
+// Check if user is admin
+const isAdmin = (req, res, next) => {
+    const userRoles = Array.isArray(req.user.roles) ? req.user.roles : [req.user.role];
+    if (!userRoles.includes('admin')) {
+        return res.status(403).json({
+            success: false,
+            message: 'Admin access required'
+        });
+    }
+    next();
 };
 
 // Optional authentication (doesn't fail if no token)
@@ -107,5 +140,8 @@ const optionalAuth = async (req, res, next) => {
 module.exports = {
     authenticate,
     authorize,
-    optionalAuth
+    optionalAuth,
+    protect: authenticate,
+    restrictTo,
+    isAdmin
 };

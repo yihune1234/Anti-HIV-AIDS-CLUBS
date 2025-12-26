@@ -14,7 +14,7 @@ const galleryService = {
         return response.data;
     },
     commentOnGalleryItem: async (id, text) => {
-        const response = await api.post(`/gallery/${id}/comments`, { text });
+        const response = await api.post(`/gallery/${id}/comments`, { content: text });
         return response.data;
     },
 

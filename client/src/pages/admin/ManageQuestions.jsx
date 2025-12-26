@@ -6,22 +6,25 @@ const ManageQuestions = () => {
     const [loading, setLoading] = useState(true);
     const [answeringId, setAnsweringId] = useState(null);
     const [answerText, setAnswerText] = useState('');
+    const [stats, setStats] = useState({ total: 0, pending: 0, answered: 0 });
 
     useEffect(() => {
         fetchQuestions();
+        fetchStats();
     }, []);
 
     const fetchQuestions = async () => {
         try {
             const response = await anonymousQuestionService.getAllQuestions();
-            // Assuming response structure similar to others
-            if (response.data && Array.isArray(response.data.questions)) {
-                setQuestions(response.data.questions);
-            } else if (response.data && Array.isArray(response.data)) {
-                setQuestions(response.data);
-            } else {
-                setQuestions([]);
+            let qs = [];
+            if (Array.isArray(response.data)) {
+                qs = response.data;
+            } else if (response.data && Array.isArray(response.data.questions)) {
+                qs = response.data.questions;
+            } else if (Array.isArray(response)) {
+                qs = response;
             }
+            setQuestions(qs);
         } catch (error) {
             console.error('Failed to fetch questions:', error);
         } finally {
@@ -29,97 +32,182 @@ const ManageQuestions = () => {
         }
     };
 
+    const fetchStats = async () => {
+        try {
+            const response = await anonymousQuestionService.getQuestionStats();
+            if (response.success && response.data) {
+                setStats(response.data);
+            }
+        } catch (error) {
+            console.warn('Could not fetch stats');
+        }
+    };
+
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this question?')) {
+        if (window.confirm('Permanently delete this question? This cannot be undone.')) {
             try {
                 await anonymousQuestionService.deleteQuestion(id);
                 setQuestions(questions.filter(q => q._id !== id));
+                fetchStats();
             } catch (error) {
-                alert('Failed to delete question: ' + error);
+                alert('Delete failed: ' + error);
             }
         }
     };
 
     const handleAnswerSubmit = async (id) => {
+        if (!answerText.trim()) return;
         try {
             await anonymousQuestionService.answerQuestion(id, answerText);
-            alert('Question answered successfully');
             setAnsweringId(null);
             setAnswerText('');
-            fetchQuestions(); // Refresh to see updated status
+            fetchQuestions();
+            fetchStats();
         } catch (error) {
-            alert('Failed to answer: ' + error);
+            alert('Submission failed: ' + error);
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return (
+        <div style={{ display: 'flex', height: '60vh', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="spinner-border text-danger"></div>
+        </div>
+    );
 
-    const pendingQuestions = questions.filter(q => !q.isAnswered);
-    const answeredQuestions = questions.filter(q => q.isAnswered);
+    const pendingQuestions = questions.filter(q => q.status === 'pending');
+    const answeredQuestions = questions.filter(q => q.status === 'answered');
 
     return (
-        <div>
-            <h2 style={{ marginBottom: '2rem' }}>Manage Anonymous Questions</h2>
+        <div style={{ animation: 'fadeIn 0.5s ease' }}>
+            <style>
+                {`
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                .q-card {
+                    background: white;
+                    border-radius: 20px;
+                    padding: clamp(1rem, 5vw, 2rem);
+                    margin-bottom: 2rem;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                    border: 1px solid #f0f0f0;
+                }
+                .status-badge {
+                    padding: 4px 12px;
+                    border-radius: 100px;
+                    font-size: 0.7rem;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    display: inline-block;
+                }
+                .questions-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr));
+                    gap: 2rem;
+                }
+                @media (max-width: 600px) {
+                    .questions-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                `}
+            </style>
 
-            <div className="mb-5">
-                <h3 style={{ borderBottom: '2px solid #D32F2F', paddingBottom: '0.5rem', display: 'inline-block' }}>Pending Questions</h3>
-                {pendingQuestions.length === 0 ? (
-                    <p className="text-muted mt-3">No pending questions.</p>
-                ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
-                        {pendingQuestions.map(q => (
-                            <div key={q._id} className="card">
-                                <p style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '0.5rem' }}>"{q.question}"</p>
-                                <div style={{ fontSize: '0.85rem', color: '#777', marginBottom: '1rem' }}>
-                                    Tag: {q.category || 'General'} • Submitted: {new Date(q.submittedAt || q.createdAt).toLocaleDateString()}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', flexWrap: 'wrap', gap: '1.5rem' }}>
+                <div>
+                    <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: '800', margin: 0 }}>Vulnerability Support</h2>
+                    <p style={{ color: '#666', margin: '0.5rem 0 0 0' }}>Manage and respond to anonymous student inquiries.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ background: '#FFF3E0', color: '#EF6C00', padding: '0.8rem 1.2rem', borderRadius: '15px', textAlign: 'center', minWidth: '100px' }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{stats.pending}</div>
+                        <div style={{ fontSize: '0.65rem', fontWeight: '700' }}>PENDING</div>
+                    </div>
+                    <div style={{ background: '#E8F5E9', color: '#2E7D32', padding: '0.8rem 1.2rem', borderRadius: '15px', textAlign: 'center', minWidth: '100px' }}>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800' }}>{stats.answered}</div>
+                        <div style={{ fontSize: '0.65rem', fontWeight: '700' }}>ANSWERED</div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="questions-grid">
+                {/* Pending Column */}
+                <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        📥 Incoming Questions <span className="badge bg-danger rounded-pill" style={{ fontSize: '0.7rem' }}>{pendingQuestions.length}</span>
+                    </h3>
+
+                    {pendingQuestions.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '4rem', background: '#f8f9fa', borderRadius: '20px', color: '#999' }}>
+                            All caught up! No pending questions.
+                        </div>
+                    ) : (
+                        pendingQuestions.map(q => (
+                            <div key={q._id} className="q-card">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                    <span className="status-badge" style={{ background: '#FFEBEE', color: '#C62828' }}>
+                                        {q.category}
+                                    </span>
+                                    <span style={{ fontSize: '0.8rem', color: '#999' }}>
+                                        {new Date(q.submittedAt || q.createdAt).toLocaleDateString()}
+                                    </span>
                                 </div>
+                                <p style={{ fontSize: '1.1rem', fontWeight: '600', color: '#1a1a2e', lineHeight: '1.5', marginBottom: '1.5rem', overflowWrap: 'break-word' }}>
+                                    "{q.question}"
+                                </p>
 
                                 {answeringId === q._id ? (
-                                    <div style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+                                    <div style={{ background: '#f8f9fa', padding: '1.5rem', borderRadius: '15px' }}>
                                         <textarea
                                             className="form-control"
                                             rows="4"
-                                            placeholder="Type your answer here..."
+                                            placeholder="Write a clear, supportive response..."
                                             value={answerText}
                                             onChange={e => setAnswerText(e.target.value)}
-                                            style={{ marginBottom: '1rem' }}
+                                            style={{ borderRadius: '12px', padding: '1rem', border: '1px solid #ddd', marginBottom: '1rem' }}
                                         ></textarea>
-                                        <div style={{ display: 'flex', gap: '1rem' }}>
-                                            <button className="btn btn-primary" onClick={() => handleAnswerSubmit(q._id)}>Submit Answer</button>
-                                            <button className="btn btn-outline" style={{ color: '#555', borderColor: '#ccc' }} onClick={() => setAnsweringId(null)}>Cancel</button>
+                                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                            <button className="btn btn-primary" onClick={() => handleAnswerSubmit(q._id)} disabled={!answerText.trim()}>Post Response</button>
+                                            <button className="btn btn-outline" style={{ color: '#555' }} onClick={() => setAnsweringId(null)}>Cancel</button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div style={{ display: 'flex', gap: '1rem' }}>
-                                        <button className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }} onClick={() => { setAnsweringId(q._id); setAnswerText(''); }}>Answer</button>
-                                        <button className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem', color: '#D32F2F', borderColor: '#ffcdd2' }} onClick={() => handleDelete(q._id)}>Delete</button>
+                                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                        <button className="btn btn-primary" style={{ borderRadius: '10px' }} onClick={() => { setAnsweringId(q._id); setAnswerText(''); }}>Answer</button>
+                                        <button className="btn btn-outline" style={{ borderRadius: '10px', color: '#C62828', borderColor: '#FFCDD2' }} onClick={() => handleDelete(q._id)}>Dismiss</button>
                                     </div>
                                 )}
                             </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+                        ))
+                    )}
+                </div>
 
-            <div>
-                <h3 style={{ borderBottom: '2px solid #1a1a2e', paddingBottom: '0.5rem', display: 'inline-block' }}>Answered History</h3>
-                {answeredQuestions.length === 0 ? (
-                    <p className="text-muted mt-3">No answered questions yet.</p>
-                ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
-                        {answeredQuestions.map(q => (
-                            <div key={q._id} className="card" style={{ backgroundColor: '#f9f9f9' }}>
-                                <p style={{ fontSize: '1.1rem', fontWeight: '500', marginBottom: '0.5rem' }}>Q: "{q.question}"</p>
-                                <div style={{ padding: '1rem', backgroundColor: 'white', borderRadius: '4px', borderLeft: '4px solid #4CAF50' }}>
-                                    <strong>A:</strong> {q.answer?.content}
+                {/* History Column */}
+                <div>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '1.5rem', opacity: 0.6 }}>Recently Answered</h3>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {answeredQuestions.length === 0 ? (
+                            <p style={{ color: '#ccc', textAlign: 'center' }}>No history yet.</p>
+                        ) : (
+                            answeredQuestions.slice(0, 10).map(q => (
+                                <div key={q._id} style={{ background: 'white', padding: '1.5rem', borderRadius: '15px', border: '1px solid #eee' }}>
+                                    <p style={{ fontSize: '0.9rem', fontWeight: '700', margin: '0 0 1rem 0', overflowWrap: 'break-word' }}>Q: {q.question.substring(0, 80)}...</p>
+                                    <div style={{ fontSize: '0.85rem', color: '#666', padding: '0.8rem', background: '#f0fdf4', borderRadius: '8px', borderLeft: '3px solid #4CAF50', overflowWrap: 'break-word' }}>
+                                        {q.answer?.content.substring(0, 100)}...
+                                    </div>
+                                    <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.7rem', color: '#999' }}>{new Date(q.updatedAt).toLocaleDateString()}</span>
+                                        <button
+                                            onClick={() => handleDelete(q._id)}
+                                            style={{ background: 'none', border: 'none', color: '#ff5252', fontSize: '0.7rem', cursor: 'pointer', fontWeight: '700' }}
+                                        >
+                                            DELETE
+                                        </button>
+                                    </div>
                                 </div>
-                                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <button className="btn" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', color: '#888' }} onClick={() => handleDelete(q._id)}>Remove from history</button>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     );

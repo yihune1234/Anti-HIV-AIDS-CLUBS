@@ -1,8 +1,8 @@
 import api from './api';
 
 const storyService = {
-    getAllStories: async () => {
-        const response = await api.get('/stories');
+    getAllStories: async (params) => {
+        const response = await api.get('/stories', { params });
         return response.data;
     },
     getStoryById: async (id) => {

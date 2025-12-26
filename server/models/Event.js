@@ -76,7 +76,7 @@ const eventSchema = new mongoose.Schema({
   },
   organizers: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Member'
+    ref: 'User'
   }],
   advisors: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -103,11 +103,14 @@ const eventSchema = new mongoose.Schema({
       type: String
     }
   }],
-  targetAudience: {
+  targetAudience: [{
     type: String,
-    enum: ['students', 'staff', 'community', 'all'],
-    default: 'all'
-  },
+    enum: ['students', 'staff', 'community', 'all', 'freshmen', 'sophomores', 'juniors', 'seniors']
+  }],
+  departments: [{
+    type: String,
+    trim: true
+  }],
   capacity: {
     type: Number,
     min: [1, 'Capacity must be at least 1']
@@ -228,13 +231,12 @@ eventSchema.virtual('durationHours').get(function () {
   return Math.abs(this.endDate - this.startDate) / 36e5;
 });
 
-// Validation: end date must be after start date
-eventSchema.pre('validate', function (next) {
-  if (this.endDate && this.startDate && this.endDate < this.startDate) {
-    next(new Error('End date must be after start date'));
-  } else {
-    next();
-  }
-});
+// // Validation: end date must be after start date
+// eventSchema.pre('validate', function (next) {
+//   if (this.endDate && this.startDate && this.endDate < this.startDate) {
+//     this.invalidate('endDate', 'End date must be after start date');
+//   }
+//   next();
+// });
 
 module.exports = mongoose.model('Event', eventSchema);

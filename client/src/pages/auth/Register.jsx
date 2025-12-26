@@ -9,8 +9,10 @@ const Register = () => {
         username: '',
         email: '',
         password: '',
-        department: '', // Added based on earlier context
-        year: '' // Added based on earlier context
+        department: '',
+        year: '',
+        studentId: '',
+        phoneNumber: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -36,7 +38,11 @@ const Register = () => {
         setLoading(false);
 
         if (success) {
-            if (user.role === 'admin' || user.role === 'advisor') {
+            // Check if user has admin role (support both single role and roles array)
+            const userRoles = Array.isArray(user.roles) ? user.roles : [user.role];
+            const isAdmin = userRoles.includes('admin');
+
+            if (isAdmin) {
                 navigate('/admin');
             } else {
                 navigate('/member');
@@ -47,8 +53,8 @@ const Register = () => {
     };
 
     return (
-        <div style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', padding: '2rem 0' }}>
-            <div className="card" style={{ maxWidth: '550px', width: '100%', padding: '2.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <div style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', padding: 'clamp(1rem, 5vw, 2rem)' }}>
+            <div className="card" style={{ maxWidth: '600px', width: '100%', padding: 'clamp(1.5rem, 5vw, 2.5rem)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <h2 style={{ fontSize: '1.8rem', color: '#1a1a2e', marginBottom: '0.5rem' }}>Join the Club</h2>
                     <p className="text-muted">Create an account to become a member</p>
@@ -61,15 +67,15 @@ const Register = () => {
                 )}
 
                 <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div style={{ flex: 1 }} className="form-group">
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1 1 250px' }} className="form-group">
                             <label className="form-label">First Name</label>
                             <input
                                 type="text" name="firstName" className="form-control" placeholder="John" required
                                 value={formData.firstName} onChange={handleChange}
                             />
                         </div>
-                        <div style={{ flex: 1 }} className="form-group">
+                        <div style={{ flex: '1 1 250px' }} className="form-group">
                             <label className="form-label">Last Name</label>
                             <input
                                 type="text" name="lastName" className="form-control" placeholder="Doe" required
@@ -95,19 +101,33 @@ const Register = () => {
                     </div>
 
                     {/* Dept/Year with improved spacing */}
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div style={{ flex: 1 }} className="form-group">
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        <div style={{ flex: '1 1 200px' }} className="form-group">
                             <label className="form-label">Department</label>
                             <input
-                                type="text" name="department" className="form-control" placeholder="Opt."
+                                type="text" name="department" className="form-control" placeholder="Computer Science"
                                 value={formData.department} onChange={handleChange}
                             />
                         </div>
-                        <div style={{ flex: 1 }} className="form-group">
-                            <label className="form-label">Year</label>
+                        <div style={{ flex: '1 1 200px' }} className="form-group">
+                            <label className="form-label">Year of Study</label>
                             <input
-                                type="text" name="year" className="form-control" placeholder="Opt."
-                                value={formData.year} onChange={handleChange}
+                                type="number" name="year" className="form-control" placeholder="3"
+                                value={formData.year} onChange={handleChange} min="1" max="7"
+                            />
+                        </div>
+                        <div style={{ flex: '1 1 200px' }} className="form-group">
+                            <label className="form-label">Student ID</label>
+                            <input
+                                type="text" name="studentId" className="form-control" placeholder="ETS0123/14"
+                                value={formData.studentId} onChange={handleChange}
+                            />
+                        </div>
+                        <div style={{ flex: '1 1 200px' }} className="form-group">
+                            <label className="form-label">Phone Number</label>
+                            <input
+                                type="tel" name="phoneNumber" className="form-control" placeholder="0911223344"
+                                value={formData.phoneNumber} onChange={handleChange}
                             />
                         </div>
                     </div>

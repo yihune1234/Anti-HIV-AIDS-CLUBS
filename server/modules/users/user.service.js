@@ -60,7 +60,7 @@ class UserService {
             const query = {};
 
             if (filters.role) {
-                query.role = filters.role;
+                query.roles = filters.role;
             }
 
             if (filters.isActive !== undefined) {
@@ -221,7 +221,7 @@ class UserService {
         try {
             const user = await User.findByIdAndUpdate(
                 userId,
-                { role },
+                { roles: Array.isArray(role) ? role : [role] },
                 { new: true, runValidators: true }
             ).select('-password');
 
@@ -285,9 +285,10 @@ class UserService {
             const verifiedUsers = await User.countDocuments({ isEmailVerified: true });
 
             const usersByRole = await User.aggregate([
+                { $unwind: '$roles' },
                 {
                     $group: {
-                        _id: '$role',
+                        _id: '$roles',
                         count: { $sum: 1 }
                     }
                 }

@@ -14,7 +14,7 @@ const createResourceSchema = Joi.object({
     title: Joi.string().required().max(200),
     description: Joi.string().required().max(1000),
     resourceType: Joi.string().valid(
-        'document', 'video', 'audio', 'infographic', 'presentation',
+        'document', 'video', 'image', 'audio', 'infographic', 'presentation',
         'link', 'book', 'article', 'toolkit', 'guideline', 'other'
     ).required(),
     category: Joi.string().valid(
@@ -23,7 +23,7 @@ const createResourceSchema = Joi.object({
         'Prevention', 'Treatment', 'Support Services', 'Research',
         'Training Materials', 'Other'
     ).required(),
-    fileUrl: Joi.string().allow('').when('resourceType', {
+    resourceUrl: Joi.string().allow('').when('resourceType', {
         is: Joi.valid('link', 'video', 'audio'),
         then: Joi.optional(),
         otherwise: Joi.optional() // Can be optional if externalUrl is provided
@@ -71,7 +71,7 @@ const updateResourceSchema = Joi.object({
     title: Joi.string().max(200),
     description: Joi.string().max(1000),
     resourceType: Joi.string().valid(
-        'document', 'video', 'audio', 'infographic', 'presentation',
+        'document', 'video', 'image', 'audio', 'infographic', 'presentation',
         'link', 'book', 'article', 'toolkit', 'guideline', 'other'
     ),
     category: Joi.string().valid(
@@ -80,7 +80,7 @@ const updateResourceSchema = Joi.object({
         'Prevention', 'Treatment', 'Support Services', 'Research',
         'Training Materials', 'Other'
     ),
-    fileUrl: Joi.string().allow(''),
+    resourceUrl: Joi.string().allow(''),
     externalUrl: Joi.string().uri().allow(''),
     fileName: Joi.string().allow(''),
     fileSize: Joi.number().min(0),

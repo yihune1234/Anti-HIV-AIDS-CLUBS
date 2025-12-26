@@ -29,16 +29,24 @@ const createEventSchema = Joi.object({
     organizers: Joi.array().items(Joi.string()).optional(),
     advisors: Joi.array().items(Joi.string()).optional(),
     speakers: Joi.array().items(speakerSchema).optional(),
-    targetAudience: Joi.string().valid('students', 'staff', 'community', 'all').optional(),
+    targetAudience: Joi.array().items(Joi.string().valid('students', 'staff', 'community', 'all', 'freshmen', 'sophomores', 'juniors', 'seniors')).optional(),
     capacity: Joi.number().min(1).optional(),
     registrationRequired: Joi.boolean().optional(),
     registrationDeadline: Joi.date().optional(),
+    status: Joi.string().valid('draft', 'published', 'ongoing', 'completed', 'cancelled').optional(),
     budget: Joi.object({
         estimated: Joi.number().min(0).optional(),
         actual: Joi.number().min(0).optional()
     }).optional(),
     tags: Joi.array().items(Joi.string().trim()).optional(),
-    isFeatured: Joi.boolean().optional()
+    isFeatured: Joi.boolean().optional(),
+    isPublic: Joi.boolean().optional(),
+    images: Joi.array().items(
+        Joi.object({
+            url: Joi.string().required(),
+            caption: Joi.string().allow('').max(200).optional()
+        })
+    ).optional()
 });
 
 const updateEventSchema = Joi.object({
@@ -52,7 +60,7 @@ const updateEventSchema = Joi.object({
     organizers: Joi.array().items(Joi.string()).optional(),
     advisors: Joi.array().items(Joi.string()).optional(),
     speakers: Joi.array().items(speakerSchema).optional(),
-    targetAudience: Joi.string().valid('students', 'staff', 'community', 'all').optional(),
+    targetAudience: Joi.array().items(Joi.string().valid('students', 'staff', 'community', 'all', 'freshmen', 'sophomores', 'juniors', 'seniors')).optional(),
     capacity: Joi.number().min(1).optional(),
     status: Joi.string().valid('draft', 'published', 'ongoing', 'completed', 'cancelled').optional(),
     registrationRequired: Joi.boolean().optional(),
@@ -63,7 +71,13 @@ const updateEventSchema = Joi.object({
     }).optional(),
     tags: Joi.array().items(Joi.string().trim()).optional(),
     isFeatured: Joi.boolean().optional(),
-    isPublic: Joi.boolean().optional()
+    isPublic: Joi.boolean().optional(),
+    images: Joi.array().items(
+        Joi.object({
+            url: Joi.string().required(),
+            caption: Joi.string().allow('').max(200).optional()
+        })
+    ).optional()
 });
 
 module.exports = { createEventSchema, updateEventSchema };

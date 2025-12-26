@@ -92,6 +92,18 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const changePassword = async (passwords) => {
+        try {
+            await api.post('/users/change-password', passwords);
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Failed to change password'
+            };
+        }
+    };
+
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -99,7 +111,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, updateProfile, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, register, updateProfile, changePassword, logout, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );

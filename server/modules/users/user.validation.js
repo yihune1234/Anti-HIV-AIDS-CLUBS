@@ -56,6 +56,9 @@ const registerSchema = Joi.object({
         .messages({
             'string.pattern.base': 'Please provide a valid phone number (10-15 digits)'
         }),
+    department: Joi.string().trim().optional(),
+    year: Joi.number().min(1).max(7).optional(),
+    studentId: Joi.string().trim().optional(),
     role: Joi.string()
         .valid('admin', 'member', 'advisor', 'peer_educator')
         .optional()
@@ -103,6 +106,11 @@ const loginSchema = Joi.object({
 const updateProfileSchema = Joi.object({
     firstName: Joi.string().trim().optional(),
     lastName: Joi.string().trim().optional(),
+    username: Joi.string().min(3).max(50).trim().optional(),
+    department: Joi.string().trim().optional(),
+    year: Joi.number().min(1).max(7).optional(),
+    bio: Joi.string().max(500).optional(),
+    studentId: Joi.string().trim().optional(),
     phoneNumber: Joi.string()
         .pattern(/^[0-9]{10,15}$/)
         .optional()

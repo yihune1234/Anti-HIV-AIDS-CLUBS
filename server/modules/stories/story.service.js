@@ -21,12 +21,12 @@ class StoryService {
                 { $inc: { views: 1 } },
                 { new: true }
             )
-                .populate('author', 'name profilePicture') // Do not expose email/phone effectively if anonymous
-                .populate('reviewedBy', 'name')
-                .populate('likes', 'name')
+                .populate('author', 'firstName lastName profileImage') // Do not expose email/phone effectively if anonymous
+                .populate('reviewedBy', 'firstName lastName')
+                .populate('likes', 'firstName lastName')
                 .populate({
                     path: 'comments',
-                    populate: { path: 'user', select: 'name profilePicture' }
+                    populate: { path: 'user', select: 'firstName lastName profileImage' }
                 });
 
             if (!story) throw new Error('Story not found');
@@ -44,11 +44,11 @@ class StoryService {
     async getStoryBySlug(slug) {
         try {
             const story = await Story.findOne({ slug })
-                .populate('author', 'name profilePicture')
-                .populate('likes', 'name')
+                .populate('author', 'firstName lastName profileImage')
+                .populate('likes', 'firstName lastName')
                 .populate({
                     path: 'comments',
-                    populate: { path: 'user', select: 'name profilePicture' }
+                    populate: { path: 'user', select: 'firstName lastName profileImage' }
                 });
 
             if (!story) throw new Error('Story not found');
@@ -61,8 +61,12 @@ class StoryService {
     async getAllStories(filters = {}, page = 1, limit = 10) {
         try {
             const query = {};
-            if (filters.status) query.status = filters.status;
-            else query.status = 'published'; // Default to published only for public list
+            if (filters.status && filters.status !== 'all') {
+                query.status = filters.status;
+            } else if (!filters.status) {
+                query.status = 'published'; // Default to published only for public list
+            }
+            // if status is 'all', query.status is not set, meaning it will return all statuses
 
             if (filters.category) query.category = filters.category;
             if (filters.isFeatured !== undefined) query.isFeatured = filters.isFeatured;
@@ -78,7 +82,11 @@ class StoryService {
 
             const skip = (page - 1) * limit;
             const stories = await Story.find(query)
-                .populate('author', 'name profilePicture')
+                .populate('author', 'firstName lastName profileImage')
+                .populate({
+                    path: 'comments.user',
+                    select: 'firstName lastName profileImage'
+                })
                 .skip(skip)
                 .limit(limit)
                 .sort({ publishDate: -1 });
@@ -96,7 +104,7 @@ class StoryService {
                 id,
                 { $set: data },
                 { new: true, runValidators: true }
-            ).populate('author', 'name');
+            ).populate('author', 'firstName lastName profileImage');
 
             if (!story) throw new Error('Story not found');
             return story;
@@ -148,7 +156,7 @@ class StoryService {
             await story.save();
             // Return updated story or the comment
             const updatedStory = await Story.findById(id)
-                .populate('comments.user', 'name profilePicture');
+                .populate('comments.user', 'firstName lastName profileImage');
             return updatedStory.comments[updatedStory.comments.length - 1];
         } catch (error) {
             throw error;

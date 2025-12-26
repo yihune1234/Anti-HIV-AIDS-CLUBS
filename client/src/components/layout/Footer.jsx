@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../../assets/logo.png';
 
 const Footer = () => {
     return (
@@ -8,7 +9,10 @@ const Footer = () => {
                 <div className="footer-grid">
                     {/* Brand Section */}
                     <div>
-                        <h3 style={{ fontSize: '1.2rem', color: '#E53935', marginBottom: '0.5rem' }}>HU ANTI-HIV/AIDS CLUB</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
+                            <img src={logo} alt="Logo" style={{ height: '40px', width: 'auto', filter: 'brightness(1.2)' }} />
+                            <h3 style={{ fontSize: '1.2rem', color: '#E53935', margin: 0 }}>HU ANTI-HIV/AIDS CLUB</h3>
+                        </div>
                         <p style={{ color: '#aaaaaa', fontSize: '0.9rem', maxWidth: '300px' }}>
                             Dedicated to creating an HIV-free generation through education, support, and community engagement.
                         </p>
@@ -20,6 +24,7 @@ const Footer = () => {
                         <ul className="footer-links">
                             <li><Link to="/">Home</Link></li>
                             <li><Link to="/about">About Us</Link></li>
+                            <li><Link to="/developer">Developer</Link></li>
                             <li><Link to="/awareness">Awareness</Link></li>
                             <li><Link to="/login">Member Login</Link></li>
                         </ul>

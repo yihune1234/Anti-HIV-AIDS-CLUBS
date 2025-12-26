@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo.png';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -26,7 +27,10 @@ const Navbar = () => {
         <nav className="navbar">
             <div className="container navbar-container">
                 <div className="logo">
-                    <Link to="/" onClick={closeMenu}>Anti-HIV/AIDS Club</Link>
+                    <Link to="/" onClick={closeMenu} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img src={logo} alt="HU Anti-HIV/AIDS Club Logo" style={{ height: '40px', width: 'auto' }} />
+                        <span>Anti-HIV/AIDS Club</span>
+                    </Link>
                 </div>
 
                 {/* Hamburger Menu Button */}
@@ -42,7 +46,7 @@ const Navbar = () => {
 
                 {/* Navigation Links */}
                 <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-                    <NavLink to="/" onClick={closeMenu}>Home</NavLink>
+                    {!user && <NavLink to="/" onClick={closeMenu}>Home</NavLink>}
 
                     {!user ? (
                         <>
@@ -59,12 +63,14 @@ const Navbar = () => {
                         <>
                             <NavLink to="/member" end onClick={closeMenu}>Dashboard</NavLink>
                             <NavLink to="/member/events" onClick={closeMenu}>Events</NavLink>
+                            <NavLink to="/member/sessions" onClick={closeMenu}>Peer Education</NavLink>
+                            <NavLink to="/member/training" onClick={closeMenu}>Training</NavLink>
                             <NavLink to="/member/gallery" onClick={closeMenu}>Gallery</NavLink>
                             <NavLink to="/member/stories" onClick={closeMenu}>Stories</NavLink>
                             <NavLink to="/member/resources" onClick={closeMenu}>Resources</NavLink>
                             <NavLink to="/member/profile" onClick={closeMenu}>Profile</NavLink>
                             <div className="auth-buttons-mobile">
-                                <button onClick={handleLogout} className="btn btn-outline" style={{ width: '100%', borderColor: 'red', color: 'red' }}>Logout</button>
+                                <button onClick={handleLogout} className="btn btn-outline" style={{ width: '100%' }}>Logout</button>
                             </div>
                         </>
                     )}
@@ -78,9 +84,9 @@ const Navbar = () => {
                             <Link to="/register" className="btn btn-primary">Join Club</Link>
                         </>
                     ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>Hi, {user.firstName}</span>
-                            <button onClick={handleLogout} className="btn btn-outline" style={{ borderColor: 'red', color: 'red', padding: '0.4rem 1rem', fontSize: '0.9rem' }}>Logout</button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                            <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#555' }}>Hi, {user.firstName}</span>
+                            <button onClick={handleLogout} className="btn btn-outline btn-sm">Logout</button>
                         </div>
                     )}
                 </div>

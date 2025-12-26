@@ -1,11 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo.png';
 
 const AdminLayout = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth <= 1024;
+            setIsMobile(mobile);
+            if (!mobile) setIsSidebarOpen(true);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -16,8 +29,28 @@ const AdminLayout = () => {
         return location.pathname === path ? '#3b3b58' : 'transparent';
     };
 
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f4f6f8' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f4f6f8', position: 'relative' }}>
+            {/* Mobile Sidebar Overlay */}
+            {isMobile && isSidebarOpen && (
+                <div
+                    onClick={() => setIsSidebarOpen(false)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        zIndex: 999
+                    }}
+                />
+            )}
+
             {/* Sidebar */}
             <aside style={{
                 width: '260px',
@@ -25,49 +58,73 @@ const AdminLayout = () => {
                 color: 'white',
                 display: 'flex',
                 flexDirection: 'column',
-                position: 'fixed',
+                position: isMobile ? 'fixed' : 'fixed',
                 height: '100vh',
-                left: 0,
+                left: isSidebarOpen ? 0 : '-260px',
                 top: 0,
-                zIndex: 1000
+                zIndex: 1000,
+                transition: 'left 0.3s ease'
             }}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid #2a2a40' }}>
-                    <h2 style={{ fontSize: '1.2rem', margin: 0, color: '#E53935' }}>HIV/AIDS Club<br /><span style={{ color: 'white', fontSize: '1rem' }}>Admin Panel</span></h2>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid #2a2a40', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <img src={logo} alt="Logo" style={{ height: '45px', width: 'auto' }} />
+                        {isMobile && (
+                            <button
+                                onClick={toggleSidebar}
+                                style={{ background: 'transparent', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}
+                            >
+                                ✕
+                            </button>
+                        )}
+                    </div>
+                    <h2 style={{ fontSize: '1.1rem', margin: 0, color: '#E53935' }}>
+                        Anti-HIV/AIDS Club<br />
+                        <span style={{ color: 'white', fontSize: '0.9rem' }}>Admin Panel</span>
+                    </h2>
                 </div>
 
                 <nav style={{ flex: 1, padding: '1rem 0', overflowY: 'auto' }}>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                        <li>
-                            <Link to="/admin" style={{ ...navItemStyle, backgroundColor: isActive('/admin') }}>
-                                <span>📊</span> Dashboard
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/members" style={{ ...navItemStyle, backgroundColor: isActive('/admin/members') }}>
-                                <span>👥</span> Manage Members
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/events" style={{ ...navItemStyle, backgroundColor: isActive('/admin/events') }}>
-                                <span>📅</span> Manage Events
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/gallery" style={{ ...navItemStyle, backgroundColor: isActive('/admin/gallery') }}>
-                                <span>🖼️</span> Manage Gallery
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/stories" style={{ ...navItemStyle, backgroundColor: isActive('/admin/stories') }}>
-                                <span>📝</span> Manage Stories
-                            </Link>
-                        </li>
-                        <li>
-                            <Link to="/admin/questions" style={{ ...navItemStyle, backgroundColor: isActive('/admin/questions') }}>
-                                <span>❓</span> Anonymous Q&A
-                            </Link>
-                        </li>
-                        {/* Divider */}
+                        {[
+                            { path: '/admin', icon: '📊', label: 'Dashboard' },
+                            { path: '/admin/members', icon: '👥', label: 'Manage Members' },
+                            { path: '/admin/events', icon: '📅', label: 'Manage Events' },
+                            { path: '/admin/sessions', icon: '🎓', label: 'Peer Education' },
+                            { path: '/admin/training', icon: '📚', label: 'Training Content' },
+                            { path: '/admin/gallery', icon: '🖼️', label: 'Manage Gallery' },
+                            { path: '/admin/resources', icon: '📚', label: 'Manage Resources' },
+                            { path: '/admin/stories', icon: '📝', label: 'Manage Stories' },
+                            { path: '/admin/questions', icon: '❓', label: 'Anonymous Q&A' },
+                        ].map((item) => (
+                            <li key={item.path}>
+                                <Link
+                                    to={item.path}
+                                    onClick={() => isMobile && setIsSidebarOpen(false)}
+                                    style={{ ...navItemStyle, backgroundColor: isActive(item.path) }}
+                                >
+                                    <span>{item.icon}</span> {item.label}
+                                </Link>
+                            </li>
+                        ))}
+
+                        <li style={{ height: '1px', background: '#2a2a40', margin: '1rem 0' }}></li>
+
+                        {[
+                            { path: '/admin/content-approval', icon: '✅', label: 'Content Approval' },
+                            { path: '/admin/reports', icon: '📈', label: 'Reports' },
+                            { path: '/admin/settings', icon: '⚙️', label: 'System Settings' },
+                        ].map((item) => (
+                            <li key={item.path}>
+                                <Link
+                                    to={item.path}
+                                    onClick={() => isMobile && setIsSidebarOpen(false)}
+                                    style={{ ...navItemStyle, backgroundColor: isActive(item.path) }}
+                                >
+                                    <span>{item.icon}</span> {item.label}
+                                </Link>
+                            </li>
+                        ))}
+
                         <li style={{ height: '1px', background: '#2a2a40', margin: '1rem 0' }}></li>
 
                         <li>
@@ -95,9 +152,43 @@ const AdminLayout = () => {
             </aside>
 
             {/* Main Content Area */}
-            <main style={{ marginLeft: '260px', flex: 1, padding: '2rem' }}>
-                <Outlet />
-            </main>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginLeft: isMobile ? 0 : '260px', transition: 'margin-left 0.3s ease' }}>
+                {/* Admin Header */}
+                <header style={{
+                    height: '64px',
+                    backgroundColor: 'white',
+                    borderBottom: '1px solid #e0e0e0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0 1.5rem',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 900
+                }}>
+                    {isMobile && (
+                        <button
+                            onClick={toggleSidebar}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                fontSize: '1.5rem',
+                                cursor: 'pointer',
+                                marginRight: '1rem',
+                                color: '#1a1a2e'
+                            }}
+                        >
+                            ☰
+                        </button>
+                    )}
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1a1a2e' }}>
+                        {location.pathname.split('/').pop().replace('-', ' ').toUpperCase() || 'DASHBOARD'}
+                    </h3>
+                </header>
+
+                <main style={{ padding: isMobile ? '1rem' : '2rem', flex: 1, width: '100%', overflowX: 'hidden' }}>
+                    <Outlet />
+                </main>
+            </div>
         </div>
     );
 };
@@ -114,3 +205,4 @@ const navItemStyle = {
 };
 
 export default AdminLayout;
+

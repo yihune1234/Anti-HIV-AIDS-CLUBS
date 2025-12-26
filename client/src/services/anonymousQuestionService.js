@@ -41,7 +41,7 @@ const anonymousQuestionService = {
     // Admin: Answer Question
     answerQuestion: async (id, answer) => {
         try {
-            const response = await api.post(`/anonymous-questions/${id}/answer`, { answer });
+            const response = await api.post(`/anonymous-questions/${id}/answer`, { content: answer });
             return response.data;
         } catch (error) {
             throw error.response?.data?.message || 'Failed to answer question';

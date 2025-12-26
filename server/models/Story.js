@@ -10,7 +10,7 @@ const storySchema = new mongoose.Schema({
   content: {
     type: String,
     required: [true, 'Story content is required'],
-    maxlength: [5000, 'Content cannot exceed 5000 characters']
+    maxlength: [10000, 'Content cannot exceed 10000 characters']
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
@@ -45,7 +45,8 @@ const storySchema = new mongoose.Schema({
   },
   images: [{
     url: {
-      type: String
+      type: String,
+      required: true
     },
     caption: {
       type: String,
@@ -70,7 +71,7 @@ const storySchema = new mongoose.Schema({
   },
   reviewNotes: {
     type: String,
-    maxlength: [500, 'Review notes cannot exceed 500 characters']
+    maxlength: [1000, 'Review notes cannot exceed 1000 characters']
   },
   views: {
     type: Number,

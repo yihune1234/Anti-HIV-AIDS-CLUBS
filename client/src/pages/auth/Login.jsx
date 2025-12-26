@@ -19,7 +19,11 @@ const Login = () => {
         setLoading(false);
 
         if (success) {
-            if (user.role === 'admin' || user.role === 'advisor') {
+            // Check if user has admin role (support both single role and roles array)
+            const userRoles = Array.isArray(user.roles) ? user.roles : [user.role];
+            const isAdmin = userRoles.includes('admin');
+
+            if (isAdmin) {
                 navigate('/admin');
             } else {
                 navigate('/member');
@@ -30,8 +34,8 @@ const Login = () => {
     };
 
     return (
-        <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
-            <div className="card" style={{ maxWidth: '400px', width: '100%', padding: '2.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', padding: '1rem' }}>
+            <div className="card" style={{ maxWidth: '400px', width: '100%', padding: 'clamp(1.5rem, 5vw, 2.5rem)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <h2 style={{ fontSize: '1.8rem', color: '#1a1a2e', marginBottom: '0.5rem' }}>Welcome Back</h2>
                     <p className="text-muted">Login to access your member account</p>

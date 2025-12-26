@@ -93,7 +93,7 @@ class StoryController {
 
     async addComment(req, res, next) {
         try {
-            const result = await storyService.addComment(req.params.id, req.user._id, req.body.content);
+            const result = await storyService.addComment(req.params.id, req.user._id, req.body?.content);
             res.status(201).json({
                 success: true,
                 data: result
@@ -105,7 +105,7 @@ class StoryController {
 
     async approveStory(req, res, next) {
         try {
-            const story = await storyService.approveStory(req.params.id, req.user._id, req.body.reviewNotes);
+            const story = await storyService.approveStory(req.params.id, req.user._id, req.body?.reviewNotes);
             res.status(200).json({
                 success: true,
                 data: story

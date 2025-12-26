@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/utils/ScrollToTop';
 import MainLayout from './components/layout/MainLayout';
 import ProtectedRoute from './components/guard/ProtectedRoute';
 import Home from './pages/public/Home';
@@ -6,6 +7,7 @@ import About from './pages/public/About';
 import Vision from './pages/public/Vision';
 import Awareness from './pages/public/Awareness';
 import AnonymousQuestions from './pages/public/AnonymousQuestions';
+import Developer from './pages/public/Developer';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/member/Dashboard';
@@ -14,6 +16,8 @@ import Gallery from './pages/member/Gallery';
 import Stories from './pages/member/Stories';
 import Resources from './pages/member/Resources';
 import Profile from './pages/member/Profile';
+import PeerEducationSessions from './pages/member/PeerEducationSessions';
+import TrainingContent from './pages/member/TrainingContent';
 
 import AdminRoute from './components/guard/AdminRoute';
 import AdminLayout from './components/layout/AdminLayout';
@@ -21,12 +25,19 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageMembers from './pages/admin/ManageMembers';
 import ManageEvents from './pages/admin/ManageEvents';
 import ManageGallery from './pages/admin/ManageGallery';
+import ManageResources from './pages/admin/ManageResources';
 import ManageStories from './pages/admin/ManageStories';
 import ManageQuestions from './pages/admin/ManageQuestions';
+import ContentApproval from './pages/admin/ContentApproval';
+import SystemSettings from './pages/admin/SystemSettings';
+import Reports from './pages/admin/Reports';
+import ManageSessions from './pages/admin/ManageSessions';
+import ManageTrainingContent from './pages/admin/ManageTrainingContent';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route element={<MainLayout />}>
@@ -35,6 +46,7 @@ function App() {
           <Route path="/vision" element={<Vision />} />
           <Route path="/awareness" element={<Awareness />} />
           <Route path="/questions" element={<AnonymousQuestions />} />
+          <Route path="/developer" element={<Developer />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -45,7 +57,8 @@ function App() {
             <Route path="/member/gallery" element={<Gallery />} />
             <Route path="/member/stories" element={<Stories />} />
             <Route path="/member/resources" element={<Resources />} />
-            <Route path="/member/profile" element={<Profile />} />
+            <Route path="/member/sessions" element={<PeerEducationSessions />} />
+            <Route path="/member/training" element={<TrainingContent />} />
             <Route path="/member/profile" element={<Profile />} />
           </Route>
         </Route>
@@ -57,8 +70,14 @@ function App() {
             <Route path="/admin/members" element={<ManageMembers />} />
             <Route path="/admin/events" element={<ManageEvents />} />
             <Route path="/admin/gallery" element={<ManageGallery />} />
+            <Route path="/admin/resources" element={<ManageResources />} />
             <Route path="/admin/stories" element={<ManageStories />} />
             <Route path="/admin/questions" element={<ManageQuestions />} />
+            <Route path="/admin/sessions" element={<ManageSessions />} />
+            <Route path="/admin/training" element={<ManageTrainingContent />} />
+            <Route path="/admin/content-approval" element={<ContentApproval />} />
+            <Route path="/admin/settings" element={<SystemSettings />} />
+            <Route path="/admin/reports" element={<Reports />} />
           </Route>
         </Route>
 

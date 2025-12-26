@@ -37,7 +37,7 @@ const peerEducationSessionSchema = new mongoose.Schema({
   },
   educators: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'PeerEducator',
+    ref: 'User', // Changed from PeerEducator to User for simplicity
     required: true
   }],
   date: {
@@ -56,7 +56,7 @@ const peerEducationSessionSchema = new mongoose.Schema({
   },
   duration: {
     type: Number,
-    min: [15, 'Duration must be at least 15 minutes']
+    min: [1, 'Duration must be at least 1 minute']
   },
   location: {
     venue: {
@@ -81,18 +81,18 @@ const peerEducationSessionSchema = new mongoose.Schema({
       trim: true
     }
   },
-  targetAudience: {
+  targetAudience: [{
     type: String,
-    enum: ['freshmen', 'sophomores', 'juniors', 'seniors', 'all_students', 'specific_department', 'mixed'],
-    default: 'all_students'
-  },
-  department: {
+    enum: ['freshmen', 'sophomores', 'juniors', 'seniors', 'all_students', 'specific_department', 'mixed', 'staff', 'community']
+  }],
+  departments: [{
     type: String,
     trim: true
-  },
+  }],
   expectedParticipants: {
     type: Number,
-    min: [1, 'Expected participants must be at least 1']
+    min: [0, 'Expected participants cannot be negative'],
+    default: 0
   },
   actualParticipants: {
     type: Number,
@@ -102,11 +102,16 @@ const peerEducationSessionSchema = new mongoose.Schema({
   participants: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: 'User',
+      required: true
+    },
+    participationDate: {
+      type: Date,
+      default: Date.now
     },
     attended: {
       type: Boolean,
-      default: false
+      default: true // Auto-mark as attended when they participate
     },
     feedback: {
       rating: {
@@ -156,8 +161,8 @@ const peerEducationSessionSchema = new mongoose.Schema({
   }],
   status: {
     type: String,
-    enum: ['planned', 'confirmed', 'ongoing', 'completed', 'cancelled', 'postponed'],
-    default: 'planned'
+    enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
+    default: 'upcoming'
   },
   completionReport: {
     summary: {
@@ -266,7 +271,6 @@ peerEducationSessionSchema.pre('save', function (next) {
     const endMinutes = endHour * 60 + endMin;
     this.duration = endMinutes - startMinutes;
   }
-  next();
 });
 
 module.exports = mongoose.model('PeerEducationSession', peerEducationSessionSchema);

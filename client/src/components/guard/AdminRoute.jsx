@@ -10,12 +10,17 @@ const AdminRoute = () => {
     }
 
     // Check if user is logged in and has admin role
-    // user.role should match the backend enum values
-    if (user && (user.role === 'admin' || user.role === 'advisor')) {
+    // Support both single role and roles array
+    const hasAdminRole = user && (
+        user.role === 'admin' || 
+        (Array.isArray(user.roles) && user.roles.includes('admin'))
+    );
+
+    if (hasAdminRole) {
         return <Outlet />;
     }
 
-    // If logged in but not admin, redirect to member dashboard (or home)
+    // If logged in but not admin, redirect to member dashboard
     if (user) {
         return <Navigate to="/member" replace />;
     }

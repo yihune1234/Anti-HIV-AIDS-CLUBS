@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const peerEducatorSchema = new mongoose.Schema({
   member: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Member',
+    ref: 'User',
     required: [true, 'Member reference is required']
   },
   certificationDate: {
@@ -83,7 +83,7 @@ const peerEducatorSchema = new mongoose.Schema({
   },
   mentees: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Member'
+    ref: 'User'
   }],
   availability: {
     monday: { type: Boolean, default: false },

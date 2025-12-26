@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const connectDB = require('./config/database');
 const constants = require('./config/constants');
 const { errorHandler, notFound } = require('./middleware/error.middleware');
@@ -16,6 +17,10 @@ const anonymousQuestionRoutes = require('./modules/anonymousQuestions/anonymousQ
 const galleryRoutes = require('./modules/gallery/gallery.routes');
 const resourceRoutes = require('./modules/resources/resource.routes');
 const storyRoutes = require('./modules/stories/story.routes');
+const adminRoutes = require('./modules/admin/admin.routes');
+const uploadRoutes = require('./modules/upload/upload.routes');
+const sessionRoutes = require('./modules/peerEducationSessions/session.routes');
+const contentRoutes = require('./modules/trainingContent/content.routes');
 
 // Load environment variables
 require('dotenv').config();
@@ -27,7 +32,9 @@ const app = express();
 connectDB();
 
 // Security Middleware
-app.use(helmet()); // Set security headers
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // CORS Configuration
 app.use(cors({
@@ -36,10 +43,13 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 
+// Serve Uploads Directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Rate Limiting
 const limiter = rateLimit({
     windowMs: constants.RATE_LIMIT_WINDOW || 15 * 60 * 1000, // 15 minutes
-    max: constants.RATE_LIMIT_MAX_REQUESTS || 100, // Limit each IP to 100 requests per windowMs
+    max: constants.RATE_LIMIT_MAX_REQUESTS || 1000, // Limit each IP to 1000 requests per windowMs
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false
@@ -70,6 +80,23 @@ app.get('/health', (req, res) => {
     });
 });
 
+// Debug endpoint to check user authentication (development only)
+if (constants.NODE_ENV === 'development') {
+    const { protect } = require('./middleware/auth.middleware');
+    app.get('/api/debug/me', protect, (req, res) => {
+        res.status(200).json({
+            success: true,
+            user: {
+                id: req.user._id,
+                email: req.user.email,
+                username: req.user.username,
+                roles: req.user.roles,
+                isActive: req.user.isActive
+            }
+        });
+    });
+}
+
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/members', memberRoutes);
@@ -80,6 +107,10 @@ app.use('/api/anonymous-questions', anonymousQuestionRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/resources', resourceRoutes);
 app.use('/api/stories', storyRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/training-content', contentRoutes);
 
 // Welcome Route
 app.get('/', (req, res) => {

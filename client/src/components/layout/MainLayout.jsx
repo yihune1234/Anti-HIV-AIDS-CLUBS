@@ -23,7 +23,10 @@ const styles = {
     },
     main: {
         flex: 1,
-        padding: '2rem 0',
+        padding: 'clamp(1rem, 5vw, 2rem) 0',
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden'
     }
 };
 

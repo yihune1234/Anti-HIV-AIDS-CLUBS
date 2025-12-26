@@ -79,7 +79,7 @@ class GalleryController {
 
     async addComment(req, res, next) {
         try {
-            const comment = await galleryService.addComment(req.params.id, req.user._id, req.body.content);
+            const comment = await galleryService.addComment(req.params.id, req.user._id, req.body?.content);
             res.status(201).json({
                 success: true,
                 data: comment
