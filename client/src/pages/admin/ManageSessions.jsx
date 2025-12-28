@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import sessionService from '../../services/sessionService';
+import adminService from '../../services/adminService';
 
 const thStyle = { padding: '1rem', textAlign: 'left', color: '#555' };
 const tdStyle = { padding: '1rem', borderTop: '1px solid #eee' };
@@ -18,7 +19,7 @@ const ManageSessions = () => {
     const [editingSession, setEditingSession] = useState(null);
     const [users, setUsers] = useState([]);
     const [viewingParticipants, setViewingParticipants] = useState(null);
-    
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -46,7 +47,7 @@ const ManageSessions = () => {
     ];
 
     const sessionTypes = [
-        'workshop', 'seminar', 'group_discussion', 'one_on_one', 
+        'workshop', 'seminar', 'group_discussion', 'one_on_one',
         'presentation', 'interactive', 'online', 'other'
     ];
 
@@ -69,12 +70,9 @@ const ManageSessions = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/admin/users', {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            });
-            const data = await response.json();
+            const data = await adminService.getAllUsers({ limit: 100 });
             if (data.success) {
-                setUsers(data.data.users || []);
+                setUsers(data.data || []);
             }
         } catch (error) {
             console.error('Failed to fetch users', error);
@@ -353,17 +351,17 @@ const ManageSessions = () => {
                 <div style={modalOverlayStyle}>
                     <div style={modalContentStyle}>
                         <h3>Session Details - {viewingParticipants.title}</h3>
-                        
+
                         {/* Educators Section */}
                         {viewingParticipants.educators && viewingParticipants.educators.length > 0 && (
                             <div style={{ marginTop: '1rem', marginBottom: '2rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
                                 <h4 style={{ fontSize: '1rem', marginBottom: '0.75rem', color: '#333' }}>Educators</h4>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                     {viewingParticipants.educators.map((educator) => (
-                                        <div key={educator._id} style={{ 
-                                            padding: '0.5rem 1rem', 
-                                            backgroundColor: '#E53935', 
-                                            color: 'white', 
+                                        <div key={educator._id} style={{
+                                            padding: '0.5rem 1rem',
+                                            backgroundColor: '#E53935',
+                                            color: 'white',
                                             borderRadius: '20px',
                                             fontSize: '0.9rem'
                                         }}>

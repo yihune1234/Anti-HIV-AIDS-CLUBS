@@ -61,7 +61,7 @@ Production mode:
 npm start
 ```
 
-The server will start on `http://localhost:5000`
+The server will start on `https://anti-hiv-aids-clubs.onrender.com` (Production) or `http://localhost:5000` (Local)
 
 ## API Endpoints
 
@@ -148,7 +148,7 @@ server/
 |----------|-------------|---------|
 | `NODE_ENV` | Environment mode | development |
 | `PORT` | Server port | 5000 |
-| `MONGODB_URI` | MongoDB connection string | mongodb://localhost:27017/anti-hiv-aids-clubs |
+| `MONGODB_URI` | MongoDB connection string | (process.env.MONGODB_URI) |
 | `JWT_SECRET` | Secret key for JWT | (required) |
 | `JWT_EXPIRES_IN` | JWT expiration time | 7d |
 | `FRONTEND_URL` | Frontend URL for CORS | http://localhost:3000 |
@@ -210,7 +210,7 @@ Use tools like:
 
 Example cURL request:
 ```bash
-curl -X POST http://localhost:5000/api/users/login \
+curl -X POST https://anti-hiv-aids-clubs.onrender.com/api/users/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
 ```

@@ -14,7 +14,7 @@
     "health",
     "education"
   ],
-  "author": "",
+  "author": "yihune",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",

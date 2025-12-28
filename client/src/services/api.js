@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api', // Start with local dev URL
+    baseURL: 'https://anti-hiv-aids-clubs.onrender.com/api', // Production Render URL
     headers: {
         'Content-Type': 'application/json',
     },

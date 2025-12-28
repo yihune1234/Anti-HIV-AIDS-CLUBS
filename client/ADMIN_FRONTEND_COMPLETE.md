@@ -136,7 +136,7 @@ All admin pages are fully integrated with the backend API endpoints:
 
 To use the admin frontend:
 
-1. Ensure the backend server is running on `http://localhost:5000`
+1. Ensure the backend server is running on `https://anti-hiv-aids-clubs.onrender.com`
 2. Start the client development server: `npm run dev` (in client directory)
 3. Login with an admin account
 4. Access admin panel at `/admin`
