@@ -50,10 +50,17 @@ class UploadController {
         }
 
         // Construct public URL
-        const protocol = req.protocol;
+        // In production (Render), req.protocol might be 'http' due to proxying,
+        // so we check x-forwarded-proto or just force https if host contains onrender.com
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
         const host = req.get('host');
-        // Note: Using forward slashes for URL regardless of OS
-        const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+
+        let fileUrl;
+        if (host.includes('onrender.com')) {
+            fileUrl = `https://${host}/uploads/${req.file.filename}`;
+        } else {
+            fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+        }
 
         res.status(200).json({
             success: true,

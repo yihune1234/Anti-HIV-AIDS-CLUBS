@@ -15,7 +15,7 @@ module.exports = {
     MAX_PAGE_SIZE: 100,
 
     // File Upload
-    MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+    MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
     ALLOWED_FILE_TYPES: ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'],
 
     // Email (for future implementation)

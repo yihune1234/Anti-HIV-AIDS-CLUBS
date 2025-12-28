@@ -38,8 +38,22 @@ app.use(helmet({
 }));
 
 // CORS Configuration
+const allowedOrigins = [
+    constants.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://anti-hiv-aids-clubs.onrender.com'
+].filter(Boolean);
+
 app.use(cors({
-    origin: constants.FRONTEND_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+        // allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            return callback(null, true); // Be more permissive in production for now
+        }
+        return callback(null, true);
+    },
     credentials: true,
     optionsSuccessStatus: 200
 }));
