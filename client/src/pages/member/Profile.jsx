@@ -7,11 +7,13 @@ const Profile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
         firstName: user?.firstName || '',
+        middleName: user?.middleName || '',
         lastName: user?.lastName || '',
         username: user?.username || '',
         department: user?.department || '',
         year: user?.year || '',
         email: user?.email || '',
+        phoneNumber: user?.phoneNumbers?.[0]?.number || '',
         bio: user?.bio || '',
         profileImage: user?.profileImage || ''
     });
@@ -114,11 +116,13 @@ const Profile = () => {
     const handleCancel = () => {
         setFormData({
             firstName: user?.firstName || '',
+            middleName: user?.middleName || '',
             lastName: user?.lastName || '',
             username: user?.username || '',
             department: user?.department || '',
             year: user?.year || '',
             email: user?.email || '',
+            phoneNumber: user?.phoneNumbers?.[0]?.number || '',
             profileImage: user?.profileImage || '',
             bio: user?.bio || ''
         });
@@ -278,26 +282,40 @@ const Profile = () => {
                     </div>
                 )}
 
+                <div className="row" style={{ marginBottom: '2rem' }}>
+                    <div className="col-md-4">
+                        <div className="form-group">
+                            <label className="form-label" style={{ fontWeight: '700' }}>First Name</label>
+                            {isEditing ? (
+                                <input type="text" name="firstName" className="form-control" value={formData.firstName} onChange={handleChange} style={{ borderRadius: '12px' }} />
+                            ) : (
+                                <div style={{ padding: '0.8rem', background: '#f8f9fa', borderRadius: '12px' }}>{formData.firstName}</div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <div className="form-group">
+                            <label className="form-label" style={{ fontWeight: '700' }}>Middle Name</label>
+                            {isEditing ? (
+                                <input type="text" name="middleName" className="form-control" value={formData.middleName} onChange={handleChange} style={{ borderRadius: '12px' }} />
+                            ) : (
+                                <div style={{ padding: '0.8rem', background: '#f8f9fa', borderRadius: '12px' }}>{formData.middleName || '-'}</div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <div className="form-group">
+                            <label className="form-label" style={{ fontWeight: '700' }}>Last Name</label>
+                            {isEditing ? (
+                                <input type="text" name="lastName" className="form-control" value={formData.lastName} onChange={handleChange} style={{ borderRadius: '12px' }} />
+                            ) : (
+                                <div style={{ padding: '0.8rem', background: '#f8f9fa', borderRadius: '12px' }}>{formData.lastName}</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-                    {/* Basic Info */}
-                    <div className="form-group">
-                        <label className="form-label">First Name</label>
-                        {isEditing ? (
-                            <input type="text" name="firstName" className="form-control" value={formData.firstName} onChange={handleChange} />
-                        ) : (
-                            <p style={{ fontSize: '1.1rem', fontWeight: '500', margin: 0 }}>{user?.firstName}</p>
-                        )}
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Last Name</label>
-                        {isEditing ? (
-                            <input type="text" name="lastName" className="form-control" value={formData.lastName} onChange={handleChange} />
-                        ) : (
-                            <p style={{ fontSize: '1.1rem', fontWeight: '500', margin: 0 }}>{user?.lastName}</p>
-                        )}
-                    </div>
-
                     <div className="form-group">
                         <label className="form-label">Username</label>
                         {isEditing ? (
@@ -329,6 +347,22 @@ const Profile = () => {
                     <div className="form-group">
                         <label className="form-label">Email Address</label>
                         <p style={{ fontSize: '1.1rem', fontWeight: '500', margin: 0, color: '#888' }}>{user?.email}</p>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label">Phone Number</label>
+                        {isEditing ? (
+                            <input
+                                type="tel"
+                                name="phoneNumber"
+                                className="form-control"
+                                value={formData.phoneNumber}
+                                onChange={handleChange}
+                                placeholder="e.g. 0912345678"
+                            />
+                        ) : (
+                            <p style={{ fontSize: '1.1rem', fontWeight: '500', margin: 0 }}>{user?.phoneNumbers?.[0]?.number || 'Not provided'}</p>
+                        )}
                     </div>
 
                     {/* Bio - Full Width */}

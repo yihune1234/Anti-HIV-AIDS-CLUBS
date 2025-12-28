@@ -31,7 +31,7 @@ class MemberService {
     async getMemberById(memberId) {
         try {
             const member = await Member.findById(memberId)
-                .populate('user', '-password')
+                .populate('user', 'firstName lastName department year profileImage bio studentId')
                 .populate('eventsAttended')
                 .populate('sessionsAttended');
 
@@ -49,7 +49,7 @@ class MemberService {
     async getMemberByUserId(userId) {
         try {
             const member = await Member.findOne({ user: userId })
-                .populate('user', '-password')
+                .populate('user', 'firstName lastName department year profileImage bio studentId email phoneNumbers')
                 .populate('eventsAttended')
                 .populate('sessionsAttended');
 
@@ -94,7 +94,7 @@ class MemberService {
             const skip = (page - 1) * limit;
 
             const members = await Member.find(query)
-                .populate('user', '-password')
+                .populate('user', 'firstName lastName department year profileImage bio studentId')
                 .skip(skip)
                 .limit(limit)
                 .sort({ createdAt: -1 });

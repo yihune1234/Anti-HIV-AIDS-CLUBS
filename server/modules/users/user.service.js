@@ -103,6 +103,16 @@ class UserService {
     // Update user profile
     async updateProfile(userId, updateData) {
         try {
+            // Handle phoneNumber string to phoneNumbers array conversion
+            if (updateData.phoneNumber) {
+                updateData.phoneNumbers = [{
+                    type: 'mobile',
+                    number: updateData.phoneNumber,
+                    isPrimary: true
+                }];
+                delete updateData.phoneNumber;
+            }
+
             const user = await User.findByIdAndUpdate(
                 userId,
                 { $set: updateData },

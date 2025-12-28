@@ -1,7 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../../services/api';
 
 const About = () => {
+    const [settings, setSettings] = useState({
+        leadership: { presidentName: 'Yihune Belay' }
+    });
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await api.get('/admin/public-settings');
+                if (response.data.success) {
+                    setSettings(response.data.data);
+                }
+            } catch (err) {
+                console.log('Using default settings');
+            }
+        };
+        fetchSettings();
+    }, []);
+
+    const presidentInitials = settings.leadership?.presidentName
+        ? settings.leadership.presidentName.split(' ').map(n => n[0]).join('').toUpperCase()
+        : 'MA';
+
     return (
         <div className="about-page" style={{ animation: 'fadeIn 0.8s ease' }}>
             <style>
@@ -104,13 +127,35 @@ const About = () => {
                 <div className="container py-5">
                     <div style={{ maxWidth: '900px', margin: '0 auto', background: 'white', padding: 'clamp(2rem, 8vw, 5rem) clamp(1rem, 5vw, 3rem)', borderRadius: '40px', boxShadow: '0 40px 100px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                         <div className="leadership-avatar" style={{ background: 'linear-gradient(135deg, #D32F2F, #FF5252)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '4rem', fontWeight: '900' }}>
-                            MA
+                            {presidentInitials}
                         </div>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.5rem' }}>Meraol Abdulkader</h2>
+                        <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '0.5rem' }}>{settings.leadership?.presidentName}</h2>
                         <span style={{ color: '#D32F2F', fontWeight: '800', fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.5rem', display: 'block' }}>President</span>
                         <p style={{ fontSize: '1.2rem', color: '#666', lineHeight: '1.8', fontStyle: 'italic' }}>
                             "Our mission is simple yet profound: to build a campus where health is a shared responsibility and stigma has no place. Every student we educate is a life we help protect."
                         </p>
+                    </div>
+
+                    {/* Other Leadership */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginTop: '4rem' }}>
+                        {settings.leadership?.vicePresidentName && (
+                            <div className="journey-card" style={{ textAlign: 'center', padding: '2rem' }}>
+                                <h4 style={{ color: '#D32F2F', fontSize: '0.9rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Vice President</h4>
+                                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{settings.leadership.vicePresidentName}</h3>
+                            </div>
+                        )}
+                        {settings.leadership?.secretaryName && (
+                            <div className="journey-card" style={{ textAlign: 'center', padding: '2rem' }}>
+                                <h4 style={{ color: '#D32F2F', fontSize: '0.9rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Secretary</h4>
+                                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{settings.leadership.secretaryName}</h3>
+                            </div>
+                        )}
+                        {settings.leadership?.advisorName && (
+                            <div className="journey-card" style={{ textAlign: 'center', padding: '2rem' }}>
+                                <h4 style={{ color: '#D32F2F', fontSize: '0.9rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Club Advisor</h4>
+                                <h3 style={{ fontSize: '1.4rem', fontWeight: '800' }}>{settings.leadership.advisorName}</h3>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>

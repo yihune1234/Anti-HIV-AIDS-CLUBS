@@ -105,19 +105,22 @@ const loginSchema = Joi.object({
  */
 const updateProfileSchema = Joi.object({
     firstName: Joi.string().trim().optional(),
+    middleName: Joi.string().trim().allow('').optional(),
     lastName: Joi.string().trim().optional(),
     username: Joi.string().min(3).max(50).trim().optional(),
+    email: Joi.string().email().lowercase().trim().optional(),
     department: Joi.string().trim().optional(),
     year: Joi.number().min(1).max(7).optional(),
-    bio: Joi.string().max(500).optional(),
+    bio: Joi.string().max(500).allow('').optional(),
     studentId: Joi.string().trim().optional(),
     phoneNumber: Joi.string()
         .pattern(/^[0-9]{10,15}$/)
+        .allow('')
         .optional()
         .messages({
             'string.pattern.base': 'Please provide a valid phone number (10-15 digits)'
         }),
-    profileImage: Joi.string().uri().optional()
+    profileImage: Joi.string().uri().allow('').optional()
 });
 
 // Change password validation

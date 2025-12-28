@@ -22,6 +22,12 @@ const systemSettingsSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  leadership: {
+    presidentName: { type: String, default: 'Yihune Belay' },
+    vicePresidentName: { type: String, default: '' },
+    secretaryName: { type: String, default: '' },
+    advisorName: { type: String, default: '' }
+  },
   socialMedia: {
     facebook: String,
     twitter: String,

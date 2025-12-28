@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import adminService from '../../services/adminService';
+import { useAuth } from '../../context/AuthContext';
 
 const thStyle = {
     padding: '1rem',
@@ -15,6 +16,8 @@ const tdStyle = {
 };
 
 const ManageMembers = () => {
+    const { user } = useAuth();
+    const isSuperAdmin = user?.roles?.includes('superadmin') || user?.role === 'superadmin';
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -140,27 +143,42 @@ const ManageMembers = () => {
                                         </td>
                                         <td style={tdStyle}>
                                             <div style={{ color: '#555' }}>{user.email}</div>
+                                            <div style={{ fontSize: '0.85rem', color: '#E53935', fontWeight: '500' }}>
+                                                {user.phoneNumbers?.[0]?.number || 'No phone'}
+                                            </div>
                                             {user.department && <div style={{ fontSize: '0.8rem', color: '#888' }}>{user.department}</div>}
                                         </td>
                                         <td style={tdStyle}>
-                                            <select
-                                                value={user.roles?.[0] || 'member'}
-                                                onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                                                style={{ padding: '0.3rem', borderRadius: '4px', border: '1px solid #ddd' }}
-                                            >
-                                                <option value="member">Member</option>
-                                                <option value="peer_educator">Peer Educator</option>
-                                                <option value="advisor">Advisor</option>
-                                                <option value="moderator">Moderator</option>
-                                                <option value="content_manager">Content Manager</option>
-                                                <option value="admin">Admin</option>
-                                            </select>
+                                            {isSuperAdmin ? (
+                                                <select
+                                                    value={user.roles?.[0] || 'member'}
+                                                    onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                                                    style={{ padding: '0.3rem', borderRadius: '4px', border: '1px solid #ddd' }}
+                                                >
+                                                    <option value="member">Member</option>
+                                                    <option value="peer_educator">Peer Educator</option>
+                                                    <option value="advisor">Advisor</option>
+                                                    <option value="moderator">Moderator</option>
+                                                    <option value="content_manager">Content Manager</option>
+                                                    <option value="admin">Admin</option>
+                                                    <option value="superadmin">Super Admin</option>
+                                                </select>
+                                            ) : (
+                                                <span style={{
+                                                    padding: '4px 10px',
+                                                    backgroundColor: '#eee',
+                                                    borderRadius: '4px',
+                                                    fontSize: '0.85rem'
+                                                }}>
+                                                    {user.roles?.[0]?.replace('_', ' ') || 'member'}
+                                                </span>
+                                            )}
                                         </td>
                                         <td style={tdStyle}>
                                             <span
-                                                onClick={() => handleToggleStatus(user._id, user.isActive)}
+                                                onClick={() => isSuperAdmin && handleToggleStatus(user._id, user.isActive)}
                                                 style={{
-                                                    cursor: 'pointer',
+                                                    cursor: isSuperAdmin ? 'pointer' : 'default',
                                                     padding: '0.25rem 0.6rem',
                                                     borderRadius: '12px',
                                                     fontSize: '0.75rem',
@@ -173,13 +191,15 @@ const ManageMembers = () => {
                                             </span>
                                         </td>
                                         <td style={tdStyle}>
-                                            <button
-                                                onClick={() => handleDelete(user._id)}
-                                                className="btn btn-outline"
-                                                style={{ padding: '0.3rem 0.6rem', fontSize: '0.85rem', borderColor: '#ffcdd2', color: '#d32f2f' }}
-                                            >
-                                                Delete
-                                            </button>
+                                            {isSuperAdmin && (
+                                                <button
+                                                    onClick={() => handleDelete(user._id)}
+                                                    className="btn btn-outline"
+                                                    style={{ padding: '0.3rem 0.6rem', fontSize: '0.85rem', borderColor: '#ffcdd2', color: '#d32f2f' }}
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

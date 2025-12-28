@@ -21,7 +21,7 @@ const Login = () => {
         if (success) {
             // Check if user has admin role (support both single role and roles array)
             const userRoles = Array.isArray(user.roles) ? user.roles : [user.role];
-            const isAdmin = userRoles.includes('admin');
+            const isAdmin = userRoles.includes('admin') || userRoles.includes('superadmin');
 
             if (isAdmin) {
                 navigate('/admin');

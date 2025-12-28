@@ -14,7 +14,7 @@ const createYihuneAdmin = async () => {
         console.log('✅ Connected to MongoDB\n');
 
         const adminData = {
-            email: 'yihunebelay@gmail.com',
+            email: 'yihune@gmail.com',
             username: 'yihune',
             password: 'yihune@123',
             firstName: 'Yihune',
@@ -22,7 +22,7 @@ const createYihuneAdmin = async () => {
             lastName: 'Sebsibe',
             studentId: '1063/15',
             department: 'Software Engineering',
-            roles: ['admin'],
+            roles: ['superadmin'],
             isActive: true,
             year: 4,
             membershipStatus: 'active',
@@ -47,8 +47,8 @@ const createYihuneAdmin = async () => {
             console.log(`   Roles: ${existingUser.roles.join(', ')}`);
             
             // Update to admin if not already
-            if (!existingUser.roles.includes('admin')) {
-                existingUser.roles = ['admin'];
+            if (!existingUser.roles.includes('s')) {
+                existingUser.roles = ['superadmin'];
                 existingUser.isActive = true;
                 existingUser.firstName = adminData.firstName;
                 existingUser.middleName = adminData.middleName;

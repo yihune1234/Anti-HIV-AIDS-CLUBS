@@ -146,8 +146,27 @@ const Dashboard = () => {
                     }}>
                         {user?.firstName?.[0]}{user?.lastName?.[0]}
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>{user?.idNumber || 'Member ID'}</div>
-                    <div style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>Active Member</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>{user?.idNumber || user?.studentId || 'Member ID'}</div>
+                    <div style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Active Member</div>
+
+                    {(user?.role === 'admin' || user?.role === 'superadmin' || user?.roles?.includes('admin') || user?.roles?.includes('superadmin')) && (
+                        <Link
+                            to="/admin"
+                            className="btn btn-primary"
+                            style={{
+                                fontSize: '0.75rem',
+                                padding: '0.5rem 1rem',
+                                width: '100%',
+                                borderRadius: '15px',
+                                background: 'white',
+                                color: '#D32F2F',
+                                border: 'none',
+                                fontWeight: '800'
+                            }}
+                        >
+                            ADMIN PANEL
+                        </Link>
+                    )}
                 </div>
 
                 {/* Decorative background blobs */}

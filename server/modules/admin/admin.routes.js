@@ -3,42 +3,47 @@ const router = express.Router();
 const adminController = require('./admin.controller');
 const { protect, restrictTo } = require('../../middleware/auth.middleware');
 
-// All routes require admin authentication
+// Public routes
+router.get('/public-settings', adminController.getPublicSettings);
+
+// All routes below require authentication and at least admin role
 router.use(protect);
-router.use(restrictTo('admin'));
 
-// User Management
-router.get('/users', adminController.getAllUsers);
-router.get('/users/:id', adminController.getUserById);
-router.patch('/users/:id/roles', adminController.updateUserRoles);
-router.patch('/users/:id/status', adminController.updateUserStatus);
-router.delete('/users/:id', adminController.deleteUser);
+// User Management (Super Admin Only for sensitive actions)
+router.get('/users', restrictTo('superadmin'), adminController.getAllUsers);
+router.get('/users/:id', restrictTo('superadmin'), adminController.getUserById);
+router.patch('/users/:id/roles', restrictTo('superadmin'), adminController.updateUserRoles);
+router.patch('/users/:id/status', restrictTo('superadmin'), adminController.updateUserStatus);
+router.delete('/users/:id', restrictTo('superadmin'), adminController.deleteUser);
 
-// Event Attendance Management
-router.get('/events/:id/attendees', adminController.getEventAttendees);
-router.patch('/events/:id/attendees/:userId', adminController.markAttendance);
-router.get('/events/attendance/report', adminController.getAttendanceReport);
+// Event Attendance Management (Both Admin and Super Admin)
+router.get('/events/:id/attendees', restrictTo('superadmin', 'admin'), adminController.getEventAttendees);
+router.patch('/events/:id/attendees/:userId', restrictTo('superadmin', 'admin'), adminController.markAttendance);
+router.get('/events/attendance/report', restrictTo('superadmin'), adminController.getAttendanceReport);
 
-// Session Attendance Management
-router.get('/sessions/:id/attendees', adminController.getSessionAttendees);
-router.patch('/sessions/:id/attendees/:userId', adminController.markSessionAttendance);
+// Session Attendance Management (Both Admin and Super Admin)
+router.get('/sessions/:id/attendees', restrictTo('superadmin', 'admin'), adminController.getSessionAttendees);
+router.patch('/sessions/:id/attendees/:userId', restrictTo('superadmin', 'admin'), adminController.markSessionAttendance);
 
-// System Settings
-router.get('/settings', adminController.getSystemSettings);
-router.patch('/settings', adminController.updateSystemSettings);
+// System Settings (Super Admin Only)
+router.get('/settings', restrictTo('superadmin'), adminController.getSystemSettings);
+router.patch('/settings', restrictTo('superadmin'), adminController.updateSystemSettings);
 
-// Dashboard Statistics
-router.get('/dashboard/stats', adminController.getDashboardStats);
-router.get('/dashboard/recent-activity', adminController.getRecentActivity);
+// Dashboard Statistics (Super Admin for full reports, Admin might need restricted view)
+router.get('/dashboard/stats', restrictTo('superadmin', 'admin'), adminController.getDashboardStats);
+router.get('/dashboard/recent-activity', restrictTo('superadmin', 'admin'), adminController.getRecentActivity);
 
-// Content Management
-router.get('/content/pending', adminController.getPendingContent);
-router.patch('/content/:type/:id/approve', adminController.approveContent);
-router.patch('/content/:type/:id/reject', adminController.rejectContent);
+// Content Management (Both Admin and Super Admin)
+router.get('/content/pending', restrictTo('superadmin', 'admin'), adminController.getPendingContent);
+router.patch('/content/:type/:id/approve', restrictTo('superadmin', 'admin'), adminController.approveContent);
+router.patch('/content/:type/:id/reject', restrictTo('superadmin', 'admin'), adminController.rejectContent);
 
-// Reports
-router.get('/reports/users', adminController.getUsersReport);
-router.get('/reports/events', adminController.getEventsReport);
-router.get('/reports/sessions', adminController.getSessionsReport);
+// Reports (Super Admin Only)
+router.get('/reports/users', restrictTo('superadmin'), adminController.getUsersReport);
+router.get('/reports/events', restrictTo('superadmin'), adminController.getEventsReport);
+router.get('/reports/sessions', restrictTo('superadmin'), adminController.getSessionsReport);
+
+// Member Contacts (Admin can view member contacts)
+router.get('/member-contacts', restrictTo('superadmin', 'admin'), adminController.getAllMemberContacts);
 
 module.exports = router;

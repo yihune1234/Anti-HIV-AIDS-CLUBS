@@ -51,6 +51,17 @@ const resourceService = {
         } catch (error) {
             throw error.response?.data?.message || 'Failed to verify resource';
         }
+    },
+
+    // Training completion tracking
+    markCompleted: async (id, completionData = {}) => {
+        const response = await api.post(`/resources/${id}/complete`, completionData);
+        return response.data;
+    },
+
+    getUserCompletions: async () => {
+        const response = await api.get('/resources/my/completions');
+        return response.data;
     }
 };
 

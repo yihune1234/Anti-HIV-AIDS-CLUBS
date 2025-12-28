@@ -12,8 +12,9 @@ const AdminRoute = () => {
     // Check if user is logged in and has admin role
     // Support both single role and roles array
     const hasAdminRole = user && (
-        user.role === 'admin' || 
-        (Array.isArray(user.roles) && user.roles.includes('admin'))
+        user.role === 'admin' ||
+        user.role === 'superadmin' ||
+        (Array.isArray(user.roles) && (user.roles.includes('admin') || user.roles.includes('superadmin')))
     );
 
     if (hasAdminRole) {

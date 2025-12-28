@@ -86,16 +86,16 @@ const AdminLayout = () => {
                 <nav style={{ flex: 1, padding: '1rem 0', overflowY: 'auto' }}>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                         {[
-                            { path: '/admin', icon: '📊', label: 'Dashboard' },
-                            { path: '/admin/members', icon: '👥', label: 'Manage Members' },
-                            { path: '/admin/events', icon: '📅', label: 'Manage Events' },
-                            { path: '/admin/sessions', icon: '🎓', label: 'Peer Education' },
-                            { path: '/admin/training', icon: '📚', label: 'Training Content' },
-                            { path: '/admin/gallery', icon: '🖼️', label: 'Manage Gallery' },
-                            { path: '/admin/resources', icon: '📚', label: 'Manage Resources' },
-                            { path: '/admin/stories', icon: '📝', label: 'Manage Stories' },
-                            { path: '/admin/questions', icon: '❓', label: 'Anonymous Q&A' },
-                        ].map((item) => (
+                            { path: '/admin', icon: '📊', label: 'Dashboard', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/members', icon: '👥', label: 'Manage Members', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/member-contacts', icon: '📇', label: 'Member Contacts', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/events', icon: '📅', label: 'Manage Events', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/sessions', icon: '🎓', label: 'Peer Education', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/gallery', icon: '🖼️', label: 'Manage Gallery', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/resources', icon: '📚', label: 'Manage Resources', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/stories', icon: '📝', label: 'Manage Stories', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/questions', icon: '❓', label: 'Anonymous Q&A', roles: ['superadmin', 'admin'] },
+                        ].filter(item => item.roles.some(role => user?.roles?.includes(role))).map((item) => (
                             <li key={item.path}>
                                 <Link
                                     to={item.path}
@@ -110,10 +110,12 @@ const AdminLayout = () => {
                         <li style={{ height: '1px', background: '#2a2a40', margin: '1rem 0' }}></li>
 
                         {[
-                            { path: '/admin/content-approval', icon: '✅', label: 'Content Approval' },
-                            { path: '/admin/reports', icon: '📈', label: 'Reports' },
-                            { path: '/admin/settings', icon: '⚙️', label: 'System Settings' },
-                        ].map((item) => (
+                            { path: '/admin/users', icon: '👤', label: 'Manage Users', roles: ['superadmin'] },
+                            { path: '/admin/content-approval', icon: '✅', label: 'Content Approval', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/feedback', icon: '💬', label: 'Manage Feedback', roles: ['superadmin', 'admin'] },
+                            { path: '/admin/reports', icon: '📈', label: 'Reports', roles: ['superadmin'] },
+                            { path: '/admin/settings', icon: '⚙️', label: 'System Settings', roles: ['superadmin'] },
+                        ].filter(item => item.roles.some(role => user?.roles?.includes(role))).map((item) => (
                             <li key={item.path}>
                                 <Link
                                     to={item.path}

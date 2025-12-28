@@ -12,9 +12,11 @@ router.get('/:id', resourceController.getResourceById);
 // Protected routes
 router.use(authenticate);
 
-// Regular members can track downloads and add reviews
+// Regular members can track downloads, add reviews, and mark completion
 router.post('/:id/download', resourceController.downloadResource);
 router.post('/:id/reviews', validate(addReviewSchema), resourceController.addReview);
+router.post('/:id/complete', resourceController.markCompleted);
+router.get('/my/completions', resourceController.getUserCompletions);
 
 // Admin/Advisor/PeerEducator management routes
 router.post('/', authorize('admin', 'advisor', 'peer_educator'), validate(createResourceSchema), resourceController.createResource);

@@ -5,6 +5,77 @@ const Story = require('../../models/Story');
 const Resource = require('../../models/Resource');
 const Gallery = require('../../models/Gallery');
 const SystemSettings = require('../../models/SystemSettings');
+const Member = require('../../models/Member');
+
+// User Management
+// ... existing exports ...
+
+// Add this at the end of the file
+exports.getAllMemberContacts = async (req, res) => {
+  try {
+    const members = await Member.find()
+      .populate('user', 'firstName lastName email phoneNumbers profileImage')
+      .sort({ createdAt: -1 });
+
+    const contactList = members.map(member => ({
+      memberId: member._id,
+      studentId: member.studentId,
+      fullName: member.user ? `${member.user.firstName} ${member.user.lastName}` : 'N/A',
+      email: member.user ? member.user.email : 'N/A',
+      phone: member.user && member.user.phoneNumbers && member.user.phoneNumbers.length > 0
+        ? member.user.phoneNumbers.find(p => p.isPrimary)?.number || member.user.phoneNumbers[0].number
+        : 'N/A',
+      department: member.department,
+      position: member.position,
+      membershipStatus: member.membershipStatus
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: contactList
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Public Settings
+exports.getPublicSettings = async (req, res) => {
+  try {
+    const settings = await SystemSettings.findOne();
+    if (!settings) {
+      return res.status(200).json({
+        success: true,
+        data: {
+          siteName: 'Haramaya University Anti-HIV/AIDS Club',
+          contactEmail: 'anti-hiv-club@haramaya.edu.et',
+          contactPhone: '+251 25 553 0334',
+          leadership: { presidentName: 'Yihune Belay' },
+          socialMedia: {}
+        }
+      });
+    }
+
+    // Only return public fields
+    const publicSettings = {
+      siteName: settings.siteName,
+      siteDescription: settings.siteDescription,
+      siteLogo: settings.siteLogo,
+      contactEmail: settings.contactEmail,
+      contactPhone: settings.contactPhone,
+      leadership: settings.leadership,
+      socialMedia: settings.socialMedia,
+      features: settings.features
+    };
+
+    res.status(200).json({
+      success: true,
+      data: publicSettings
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // User Management
 exports.getAllUsers = async (req, res) => {

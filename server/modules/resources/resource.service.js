@@ -150,6 +150,42 @@ class ResourceService {
             throw error;
         }
     }
+
+    // Mark resource as completed
+    async markCompleted(resourceId, userId, completionData = {}) {
+        try {
+            const resource = await Resource.findById(resourceId);
+            if (!resource) throw new Error('Resource not found');
+            
+            await resource.markCompleted(userId, completionData.timeSpent, completionData.feedback);
+            return resource;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get user's completed resources
+    async getUserCompletions(userId) {
+        try {
+            const resources = await Resource.find({
+                'completions.user': userId
+            }).select('title category resourceType completions');
+
+            return resources.map(resource => ({
+                resource: {
+                    _id: resource._id,
+                    title: resource.title,
+                    category: resource.category,
+                    resourceType: resource.resourceType
+                },
+                completion: resource.completions.find(
+                    c => c.user.toString() === userId.toString()
+                )
+            }));
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new ResourceService();

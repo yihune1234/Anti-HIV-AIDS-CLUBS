@@ -107,6 +107,17 @@ const SystemSettings = () => {
                     </div>
 
                     <div className="form-group">
+                        <label className="form-label">Site Logo URL</label>
+                        <input
+                            type="url"
+                            className="form-control"
+                            placeholder="https://example.com/logo.png"
+                            value={settings.logo || ''}
+                            onChange={(e) => updateSetting('logo', e.target.value)}
+                        />
+                    </div>
+
+                    <div className="form-group">
                         <label className="form-label">Site Description</label>
                         <textarea
                             className="form-control"
@@ -136,20 +147,61 @@ const SystemSettings = () => {
                         />
                     </div>
 
-                    <h4 style={{ marginTop: '2rem', marginBottom: '1rem' }}>Social Media</h4>
-
-                    {['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'].map(platform => (
-                        <div key={platform} className="form-group">
-                            <label className="form-label" style={{ textTransform: 'capitalize' }}>{platform}</label>
+                    <h4 style={{ marginTop: '2rem', marginBottom: '1rem', color: '#D32F2F', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Club Leadership</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="form-group">
+                            <label className="form-label">Club President Name</label>
                             <input
-                                type="url"
+                                type="text"
                                 className="form-control"
-                                placeholder={`https://${platform}.com/...`}
-                                value={settings.socialMedia?.[platform] || ''}
-                                onChange={(e) => updateSetting(`socialMedia.${platform}`, e.target.value)}
+                                value={settings.leadership?.presidentName || ''}
+                                onChange={(e) => updateSetting('leadership.presidentName', e.target.value)}
                             />
                         </div>
-                    ))}
+                        <div className="form-group">
+                            <label className="form-label">Vice President Name</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={settings.leadership?.vicePresidentName || ''}
+                                onChange={(e) => updateSetting('leadership.vicePresidentName', e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Secretary Name</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={settings.leadership?.secretaryName || ''}
+                                onChange={(e) => updateSetting('leadership.secretaryName', e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Club Advisor Name</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={settings.leadership?.advisorName || ''}
+                                onChange={(e) => updateSetting('leadership.advisorName', e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <h4 style={{ marginTop: '2rem', marginBottom: '1rem', color: '#D32F2F', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Social Media Links</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        {['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'].map(platform => (
+                            <div key={platform} className="form-group">
+                                <label className="form-label" style={{ textTransform: 'capitalize' }}>{platform}</label>
+                                <input
+                                    type="url"
+                                    className="form-control"
+                                    placeholder={`https://${platform}.com/...`}
+                                    value={settings.socialMedia?.[platform] || ''}
+                                    onChange={(e) => updateSetting(`socialMedia.${platform}`, e.target.value)}
+                                />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 
