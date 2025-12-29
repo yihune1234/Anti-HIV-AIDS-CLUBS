@@ -146,9 +146,9 @@ const AttendanceManagement = () => {
                                 <thead>
                                     <tr>
                                         <th>Attendee</th>
-                                        <th>Email</th>
-                                        <th>Department</th>
-                                        <th>Registration Date</th>
+                                        <th className="hide-tablet">Email</th>
+                                        <th className="hide-mobile">Department</th>
+                                        <th className="hide-tablet">Registration Date</th>
                                         <th>Attendance</th>
                                         <th>Action</th>
                                     </tr>
@@ -184,9 +184,9 @@ const AttendanceManagement = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td data-label="Email">{attendee.user.email}</td>
-                                                <td data-label="Department">{attendee.user.department || '-'}</td>
-                                                <td data-label="Registration Date">
+                                                <td data-label="Email" className="hide-tablet">{attendee.user.email}</td>
+                                                <td data-label="Department" className="hide-mobile">{attendee.user.department || '-'}</td>
+                                                <td data-label="Registration Date" className="hide-tablet">
                                                     {new Date(attendee.registrationDate).toLocaleDateString()}
                                                 </td>
                                                 <td data-label="Attendance">

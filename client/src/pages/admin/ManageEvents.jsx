@@ -160,9 +160,9 @@ const ManageEvents = () => {
                         <thead>
                             <tr>
                                 <th>Event</th>
-                                <th>Type</th>
+                                <th className="hide-mobile">Type</th>
                                 <th>Date & Location</th>
-                                <th>Registrations</th>
+                                <th className="hide-tablet">Registrations</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -175,14 +175,14 @@ const ManageEvents = () => {
                                             {event.description}
                                         </div>
                                     </td>
-                                    <td data-label="Type">
+                                    <td data-label="Type" className="hide-mobile">
                                         <span style={{ textTransform: 'capitalize' }}>{event.eventType?.replace('_', ' ')}</span>
                                     </td>
                                     <td data-label="Date & Location">
                                         <div>{new Date(event.startDate).toLocaleDateString()}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#777' }}>📍 {event.location?.venue}</div>
                                     </td>
-                                    <td data-label="Registrations">
+                                    <td data-label="Registrations" className="hide-tablet">
                                         {event.totalRegistrations || (event.registrations ? event.registrations.length : 0)} registered
                                     </td>
                                     <td data-label="Actions">

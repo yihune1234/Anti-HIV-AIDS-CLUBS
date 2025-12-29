@@ -23,6 +23,7 @@ import PeerEducationSessions from './pages/member/PeerEducationSessions';
 
 import AdminRoute from './components/guard/AdminRoute';
 import AdminLayout from './components/layout/AdminLayout';
+import MemberLayout from './components/layout/MemberLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageMembers from './pages/admin/ManageMembers';
 import ManageEvents from './pages/admin/ManageEvents';
@@ -37,10 +38,12 @@ import Reports from './pages/admin/Reports';
 import ManageSessions from './pages/admin/ManageSessions';
 import ManageUsers from './pages/admin/ManageUsers';
 import MemberContacts from './pages/admin/MemberContacts';
+import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
   return (
-    <Router>
+    <ThemeProvider>
+      <Router>
       <ScrollToTop />
       <Routes>
         {/* Public Routes */}
@@ -57,8 +60,11 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Protected Member Routes */}
-          <Route element={<ProtectedRoute />}>
+        </Route>
+
+        {/* Protected Member Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MemberLayout />}>
             <Route path="/member" element={<Dashboard />} />
             <Route path="/member/events" element={<Events />} />
             <Route path="/member/gallery" element={<Gallery />} />
@@ -92,7 +98,8 @@ function App() {
         {/* 404 Route */}
         <Route path="*" element={<div className="container mt-5"><h1>404 - Page Not Found</h1></div>} />
       </Routes>
-    </Router>
+      </Router>
+    </ThemeProvider>
   );
 }
 

@@ -150,9 +150,9 @@ const ManageTrainingContent = () => {
                             <tr>
                                 <th>Title</th>
                                 <th>Type</th>
-                                <th>Category</th>
-                                <th>Access</th>
-                                <th>Stats</th>
+                                <th className="hide-tablet">Category</th>
+                                <th className="hide-mobile">Access</th>
+                                <th className="hide-mobile">Stats</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -164,13 +164,13 @@ const ManageTrainingContent = () => {
                                         {content.isFeatured && <span style={{ fontSize: '0.75rem', color: '#F57C00' }}>⭐ Featured</span>}
                                     </td>
                                     <td data-label="Type">{getTypeBadge(content.contentType)}</td>
-                                    <td data-label="Category">{content.category}</td>
-                                    <td data-label="Access">
+                                    <td data-label="Category" className="hide-tablet">{content.category}</td>
+                                    <td data-label="Access" className="hide-mobile">
                                         <span style={{ fontSize: '0.85rem', color: content.accessLevel === 'public' ? '#388E3C' : '#1976D2' }}>
                                             {content.accessLevel === 'public' ? '🌐 Public' : '🔒 Members'}
                                         </span>
                                     </td>
-                                    <td data-label="Stats">
+                                    <td data-label="Stats" className="hide-mobile">
                                         <div style={{ fontSize: '0.85rem' }}>
                                             <div>👁 {content.viewCount || 0} views</div>
                                             <div>⬇ {content.downloadCount || 0} downloads</div>

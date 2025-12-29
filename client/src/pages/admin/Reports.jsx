@@ -93,10 +93,10 @@ const Reports = () => {
                         <tr>
                             <th>Username</th>
                             <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Department</th>
-                            <th>Status</th>
+                            <th className="hide-tablet">Email</th>
+                            <th className="hide-mobile">Role</th>
+                            <th className="hide-tablet">Department</th>
+                            <th className="hide-mobile">Status</th>
                             <th>Joined</th>
                         </tr>
                     </thead>
@@ -105,10 +105,10 @@ const Reports = () => {
                             <tr key={user._id}>
                                 <td data-label="Username">{user.username}</td>
                                 <td data-label="Name">{user.firstName} {user.lastName}</td>
-                                <td data-label="Email">{user.email}</td>
-                                <td data-label="Role">{user.roles?.join(', ')}</td>
-                                <td data-label="Department">{user.department || '-'}</td>
-                                <td data-label="Status">{user.membershipStatus}</td>
+                                <td data-label="Email" className="hide-tablet">{user.email}</td>
+                                <td data-label="Role" className="hide-mobile">{user.roles?.join(', ')}</td>
+                                <td data-label="Department" className="hide-tablet">{user.department || '-'}</td>
+                                <td data-label="Status" className="hide-mobile">{user.membershipStatus}</td>
                                 <td data-label="Joined">{new Date(user.createdAt).toLocaleDateString()}</td>
                             </tr>
                         ))}
@@ -135,28 +135,28 @@ const Reports = () => {
                     <thead>
                         <tr>
                             <th>Event Title</th>
-                            <th>Type</th>
+                            <th className="hide-tablet">Type</th>
                             <th>Date</th>
                             <th>Registrations</th>
                             <th>Attended</th>
-                            <th>Attendance Rate</th>
-                            <th>Status</th>
+                            <th className="hide-mobile">Attendance Rate</th>
+                            <th className="hide-tablet">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {eventsData.map(event => (
                             <tr key={event._id}>
                                 <td data-label="Event Title">{event.title}</td>
-                                <td data-label="Type">{event.eventType}</td>
+                                <td data-label="Type" className="hide-tablet">{event.eventType}</td>
                                 <td data-label="Date">{new Date(event.startDate).toLocaleDateString()}</td>
                                 <td data-label="Registrations">{event.totalRegistrations}</td>
                                 <td data-label="Attended">{event.totalAttended}</td>
-                                <td data-label="Attendance Rate">
+                                <td data-label="Attendance Rate" className="hide-mobile">
                                     {event.totalRegistrations > 0
                                         ? `${((event.totalAttended / event.totalRegistrations) * 100).toFixed(1)}%`
                                         : '0%'}
                                 </td>
-                                <td data-label="Status">{event.status}</td>
+                                <td data-label="Status" className="hide-tablet">{event.status}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -182,28 +182,28 @@ const Reports = () => {
                     <thead>
                         <tr>
                             <th>Session Title</th>
-                            <th>Topic</th>
+                            <th className="hide-tablet">Topic</th>
                             <th>Date</th>
                             <th>Participants</th>
                             <th>Attended</th>
-                            <th>Attendance Rate</th>
-                            <th>Status</th>
+                            <th className="hide-mobile">Attendance Rate</th>
+                            <th className="hide-tablet">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {sessionsData.map(session => (
                             <tr key={session._id}>
                                 <td data-label="Session Title">{session.title}</td>
-                                <td data-label="Topic">{session.topic}</td>
+                                <td data-label="Topic" className="hide-tablet">{session.topic}</td>
                                 <td data-label="Date">{new Date(session.date).toLocaleDateString()}</td>
                                 <td data-label="Participants">{session.totalParticipants}</td>
                                 <td data-label="Attended">{session.totalAttended}</td>
-                                <td data-label="Attendance Rate">
+                                <td data-label="Attendance Rate" className="hide-mobile">
                                     {session.totalParticipants > 0
                                         ? `${((session.totalAttended / session.totalParticipants) * 100).toFixed(1)}%`
                                         : '0%'}
                                 </td>
-                                <td data-label="Status">{session.status}</td>
+                                <td data-label="Status" className="hide-tablet">{session.status}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -259,9 +259,9 @@ const Reports = () => {
                         <tr>
                             <th>Event</th>
                             <th>Date</th>
-                            <th>Registrations</th>
+                            <th className="hide-tablet">Registrations</th>
                             <th>Attended</th>
-                            <th>Attendance Rate</th>
+                            <th className="hide-mobile">Attendance Rate</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -269,9 +269,9 @@ const Reports = () => {
                             <tr key={event.eventId}>
                                 <td data-label="Event">{event.title}</td>
                                 <td data-label="Date">{new Date(event.date).toLocaleDateString()}</td>
-                                <td data-label="Registrations">{event.totalRegistrations}</td>
+                                <td data-label="Registrations" className="hide-tablet">{event.totalRegistrations}</td>
                                 <td data-label="Attended">{event.totalAttended}</td>
-                                <td data-label="Attendance Rate">
+                                <td data-label="Attendance Rate" className="hide-mobile">
                                     <span style={{
                                         padding: '0.25rem 0.6rem',
                                         borderRadius: '12px',
@@ -296,7 +296,7 @@ const Reports = () => {
             <h2 style={{ marginBottom: '2rem' }}>Reports & Analytics</h2>
 
             {/* Report Type Selector */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #eee' }}>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #eee', flexWrap: 'wrap' }}>
                 {[
                     { key: 'users', label: 'Users' },
                     { key: 'events', label: 'Events' },

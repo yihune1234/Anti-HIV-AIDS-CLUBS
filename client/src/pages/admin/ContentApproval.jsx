@@ -32,13 +32,13 @@ const ContentApproval = () => {
         try {
             const notes = reviewNotes[id] || '';
             await adminService.approveContent(type, id, notes);
-            
+
             // Remove from pending list
             setPendingContent(prev => ({
                 ...prev,
                 [type + 's']: prev[type + 's'].filter(item => item._id !== id)
             }));
-            
+
             setReviewNotes(prev => {
                 const updated = { ...prev };
                 delete updated[id];
@@ -58,13 +58,13 @@ const ContentApproval = () => {
 
         try {
             await adminService.rejectContent(type, id, notes);
-            
+
             // Remove from pending list
             setPendingContent(prev => ({
                 ...prev,
                 [type + 's']: prev[type + 's'].filter(item => item._id !== id)
             }));
-            
+
             setReviewNotes(prev => {
                 const updated = { ...prev };
                 delete updated[id];
@@ -102,7 +102,7 @@ const ContentApproval = () => {
                                 {story.category}
                             </span>
                         </div>
-                        
+
                         <div style={{ marginBottom: '1rem', color: '#555', lineHeight: '1.6' }}>
                             {story.content.substring(0, 300)}
                             {story.content.length > 300 && '...'}
@@ -159,7 +159,7 @@ const ContentApproval = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div style={{ marginBottom: '1rem', color: '#555' }}>
                             {resource.description}
                         </div>
@@ -245,7 +245,7 @@ const ContentApproval = () => {
             <h2 style={{ marginBottom: '2rem' }}>Content Approval</h2>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #eee' }}>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #eee', flexWrap: 'wrap' }}>
                 <button
                     onClick={() => setActiveTab('stories')}
                     style={{

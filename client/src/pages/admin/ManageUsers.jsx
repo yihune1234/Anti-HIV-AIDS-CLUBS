@@ -154,9 +154,9 @@ const ManageUsers = () => {
                         <thead>
                             <tr>
                                 <th>User</th>
-                                <th>Roles</th>
+                                <th className="hide-mobile">Roles</th>
                                 <th>Status</th>
-                                <th>Joined</th>
+                                <th className="hide-tablet">Joined</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -172,7 +172,7 @@ const ManageUsers = () => {
                                             </div>
                                         )}
                                     </td>
-                                    <td data-label="Roles">
+                                    <td data-label="Roles" className="hide-mobile">
                                         <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                                             {(user.roles || ['member']).map(role => (
                                                 <span key={role} style={{
@@ -201,7 +201,7 @@ const ManageUsers = () => {
                                             {user.isActive ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
-                                    <td data-label="Joined">
+                                    <td data-label="Joined" className="hide-tablet">
                                         <div style={{ fontSize: '0.85rem' }}>{new Date(user.createdAt).toLocaleDateString()}</div>
                                     </td>
                                     <td data-label="Actions">

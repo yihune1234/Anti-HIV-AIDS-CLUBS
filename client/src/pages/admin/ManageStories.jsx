@@ -162,10 +162,10 @@ const ManageStories = () => {
                     <table className="admin-table responsive-table">
                         <thead>
                             <tr>
-                                <th>Image</th>
+                                <th className="hide-mobile">Image</th>
                                 <th>Title</th>
-                                <th>Author</th>
-                                <th>Category</th>
+                                <th className="hide-mobile">Author</th>
+                                <th className="hide-tablet">Category</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -173,7 +173,7 @@ const ManageStories = () => {
                         <tbody>
                             {stories.map(story => (
                                 <tr key={story._id}>
-                                    <td data-label="Image">
+                                    <td data-label="Image" className="hide-mobile">
                                         {story.featuredImage ? (
                                             <img src={story.featuredImage} alt="" width="40" height="40" />
                                         ) : 'No Image'}
@@ -182,10 +182,10 @@ const ManageStories = () => {
                                         <strong>{story.title}</strong><br />
                                         <small>{new Date(story.createdAt).toLocaleDateString()}</small>
                                     </td>
-                                    <td data-label="Author">
+                                    <td data-label="Author" className="hide-mobile">
                                         {story.author ? `${story.author.firstName} ${story.author.lastName}` : 'Unknown'}
                                     </td>
-                                    <td data-label="Category">{story.category.replace('_', ' ')}</td>
+                                    <td data-label="Category" className="hide-tablet">{story.category.replace('_', ' ')}</td>
                                     <td data-label="Status">{story.status || 'Draft'}</td>
                                     <td data-label="Actions">
                                         <button className="btn btn-sm btn-outline" onClick={() => handleEdit(story)}>Edit</button>{' '}

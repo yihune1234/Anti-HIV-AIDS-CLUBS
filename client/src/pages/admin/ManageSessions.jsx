@@ -197,10 +197,10 @@ const ManageSessions = () => {
                         <thead>
                             <tr>
                                 <th>Session</th>
-                                <th>Topic & Type</th>
+                                <th className="hide-tablet">Topic & Type</th>
                                 <th>Date & Time</th>
                                 <th>Status</th>
-                                <th>Participants</th>
+                                <th className="hide-mobile">Participants</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -213,7 +213,7 @@ const ManageSessions = () => {
                                             {session.description}
                                         </div>
                                     </td>
-                                    <td data-label="Topic & Type">
+                                    <td data-label="Topic & Type" className="hide-tablet">
                                         <div style={{ fontSize: '0.9rem' }}>{session.topic}</div>
                                         <div style={{ fontSize: '0.8rem', color: '#777', textTransform: 'capitalize' }}>
                                             {session.sessionType.replace('_', ' ')}
@@ -229,7 +229,7 @@ const ManageSessions = () => {
                                         </div>
                                     </td>
                                     <td data-label="Status">{getStatusBadge(session.status)}</td>
-                                    <td data-label="Participants">
+                                    <td data-label="Participants" className="hide-mobile">
                                         <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#388E3C' }}>
                                             {session.totalParticipants || 0}
                                         </div>

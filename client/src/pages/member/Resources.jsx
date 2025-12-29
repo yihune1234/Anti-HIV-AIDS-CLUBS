@@ -1,20 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import resourceService from '../../services/resourceService';
+import { useTheme } from '../../context/ThemeContext';
 
 const Resources = () => {
+    const { theme } = useTheme();
     const [resources, setResources] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedType, setSelectedType] = useState('All');
     const [selectedContent, setSelectedContent] = useState(null);
     const [myCompletions, setMyCompletions] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const categories = [
         'All', 'HIV/AIDS Information', 'Sexual Health', 'Mental Health',
-        'Reproductive Health', 'Prevention', 'Support Services', 'Training Materials'
+        'Substance Abuse', 'Gender-Based Violence', 'Reproductive Health',
+        'Prevention', 'Treatment', 'Support Services', 'Research',
+        'Training Materials', 'Other'
     ];
 
-    const types = ['All', 'video', 'document', 'presentation', 'infographic', 'guideline', 'article'];
+    const types = [
+        'All', 'document', 'video', 'image', 'audio', 'infographic', 'presentation',
+        'link', 'book', 'article', 'toolkit', 'guideline', 'other'
+    ];
 
     useEffect(() => {
         fetchResources();
@@ -24,10 +32,15 @@ const Resources = () => {
     const fetchResources = async () => {
         try {
             const response = await resourceService.getAllResources();
-            const resourceData = response.data;
-            setResources(Array.isArray(resourceData.resources) ? resourceData.resources : Array.isArray(resourceData) ? resourceData : []);
+            const resourceData = response?.data;
+            if (resourceData) {
+                setResources(Array.isArray(resourceData.resources) ? resourceData.resources : Array.isArray(resourceData) ? resourceData : []);
+            } else {
+                setResources([]);
+            }
         } catch (err) {
             console.error('Failed to load resources:', err);
+            setResources([]);
         } finally {
             setLoading(false);
         }
@@ -61,7 +74,14 @@ const Resources = () => {
         }
     };
 
-    const isCompleted = (id) => myCompletions.some(c => c.resource._id === id);
+    const isCompleted = (id) => {
+        if (!Array.isArray(myCompletions)) return false;
+        return myCompletions.some(c => 
+            (c.resource?._id === id) || 
+            (c.resource === id) || 
+            (c === id)
+        );
+    };
 
     const getResourceInfo = (type) => {
         const t = type?.toLowerCase() || '';
@@ -71,12 +91,19 @@ const Resources = () => {
         if (t.includes('infographic')) return { icon: '🖼️', label: 'INFOGRAPHIC', color: '#F57C00', bg: '#FFF3E0' };
         if (t.includes('guideline')) return { icon: '📋', label: 'GUIDELINE', color: '#7B1FA2', bg: '#F3E5F5' };
         if (t.includes('article')) return { icon: '📰', label: 'ARTICLE', color: '#0097A7', bg: '#E0F7FA' };
-        return { icon: '📁', label: 'RESOURCE', color: '#757575', bg: '#F5F5F5' };
+        if (t.includes('book')) return { icon: '📖', label: 'BOOK', color: '#5D4037', bg: '#EFEBE9' };
+        if (t.includes('toolkit')) return { icon: '🛠️', label: 'TOOLKIT', color: '#455A64', bg: '#ECEFF1' };
+        if (t.includes('link')) return { icon: '🔗', label: 'LINK', color: '#0288D1', bg: '#E1F5FE' };
+        if (t.includes('image')) return { icon: '🖼️', label: 'IMAGE', color: '#C2185B', bg: '#FCE4EC' };
+        if (t.includes('audio')) return { icon: '🎧', label: 'AUDIO', color: '#512DA8', bg: '#EDE7F6' };
+        return { icon: '📁', label: 'RESOURCE', color: '#616161', bg: '#F5F5F5' };
     };
 
     const filteredResources = resources.filter(r =>
         (selectedCategory === 'All' || r.category === selectedCategory) &&
-        (selectedType === 'All' || r.resourceType === selectedType)
+        (selectedType === 'All' || (r.resourceType || '').toLowerCase().includes(selectedType.toLowerCase())) &&
+        ((r.title || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+         (r.description || '').toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
     if (loading) return (
@@ -92,12 +119,12 @@ const Resources = () => {
         <div style={{ padding: '2rem', background: '#f8f9fa', minHeight: '100vh' }}>
             {/* Modern Header */}
             <div style={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+                background: theme.headerStyle === 'gradient' ? 'linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%)' : theme.primaryColor, 
                 padding: '3rem 2rem', 
                 borderRadius: '16px', 
                 marginBottom: '2rem',
                 color: 'white',
-                boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)'
+                boxShadow: `0 10px 30px ${theme.primaryColor}33`
             }}>
                 <h1 style={{ margin: 0, marginBottom: '0.5rem', fontSize: '2.5rem', fontWeight: 'bold' }}>
                     📚 Resources & Training
@@ -117,7 +144,7 @@ const Resources = () => {
                     borderLeft: '4px solid #667eea'
                 }}>
                     <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#667eea', marginBottom: '0.5rem' }}>
-                        {resources.length}
+                        {resources?.length || 0}
                     </div>
                     <div style={{ color: '#666', fontSize: '1rem' }}>Total Resources</div>
                 </div>
@@ -129,7 +156,7 @@ const Resources = () => {
                     borderLeft: '4px solid #f5576c'
                 }}>
                     <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#f5576c', marginBottom: '0.5rem' }}>
-                        {myCompletions.length}
+                        {myCompletions?.length || 0}
                     </div>
                     <div style={{ color: '#666', fontSize: '1rem' }}>Completed</div>
                 </div>
@@ -141,154 +168,237 @@ const Resources = () => {
                     borderLeft: '4px solid #4CAF50'
                 }}>
                     <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#4CAF50', marginBottom: '0.5rem' }}>
-                        {Math.round((myCompletions.length / (resources.length || 1)) * 100)}%
+                        {Math.round(((myCompletions?.length || 0) / (resources?.length || 1)) * 100)}%
                     </div>
                     <div style={{ color: '#666', fontSize: '1rem' }}>Progress</div>
                 </div>
             </div>
 
-            {/* Dynamic Category Filters */}
-            <div style={{ background: 'white', padding: '2rem', borderRadius: '12px', marginBottom: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <h3 style={{ margin: 0, marginBottom: '1.5rem', fontSize: '1.3rem', color: '#333' }}>
-                    🎯 Filter by Category
-                </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                    {categories.map((cat, idx) => {
-                        const colors = [
-                            { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', shadow: 'rgba(102, 126, 234, 0.3)' },
-                            { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', shadow: 'rgba(245, 87, 108, 0.3)' },
-                            { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', shadow: 'rgba(79, 172, 254, 0.3)' },
-                            { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', shadow: 'rgba(67, 233, 123, 0.3)' },
-                            { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', shadow: 'rgba(250, 112, 154, 0.3)' },
-                            { bg: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', shadow: 'rgba(48, 207, 208, 0.3)' },
-                            { bg: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', shadow: 'rgba(168, 237, 234, 0.3)' },
-                            { bg: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)', shadow: 'rgba(255, 154, 158, 0.3)' }
-                        ];
-                        const color = colors[idx % colors.length];
-                        const isSelected = selectedCategory === cat;
-                        
-                        return (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                style={{
-                                    padding: '1.25rem',
-                                    borderRadius: '12px',
-                                    background: isSelected ? color.bg : 'white',
-                                    color: isSelected ? 'white' : '#666',
-                                    cursor: 'pointer',
-                                    fontWeight: isSelected ? 'bold' : '500',
-                                    fontSize: '0.95rem',
-                                    transition: 'all 0.3s ease',
-                                    boxShadow: isSelected ? `0 8px 20px ${color.shadow}` : '0 2px 8px rgba(0,0,0,0.08)',
-                                    transform: isSelected ? 'translateY(-4px)' : 'translateY(0)',
-                                    border: isSelected ? 'none' : '2px solid #f0f0f0'
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (!isSelected) {
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.12)';
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    if (!isSelected) {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-                                    }
-                                }}
-                            >
-                                {cat}
-                            </button>
-                        );
-                    })}
+            {/* Filters Dashboard */}
+            <div style={{ 
+                background: 'white', 
+                padding: '2rem', 
+                borderRadius: '24px', 
+                marginBottom: '2.5rem', 
+                boxShadow: '0 4px 25px rgba(0,0,0,0.04)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2rem',
+                border: '1px solid #f0f0f0'
+            }}>
+                <div style={{ position: 'relative', width: '100%' }}>
+                    <input 
+                        type="text"
+                        placeholder="Search for resources, modules, or training materials..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '1.2rem 1.5rem 1.2rem 3.5rem',
+                            borderRadius: '18px',
+                            border: '2px solid #f0f0f0',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            outline: 'none',
+                            transition: 'all 0.3s',
+                            background: '#fcfcfc',
+                            color: '#1a1a2e'
+                        }}
+                        onFocus={(e) => { e.target.style.borderColor = theme.primaryColor; e.target.style.background = '#fff'; }}
+                        onBlur={(e) => { e.target.style.borderColor = '#f0f0f0'; e.target.style.background = '#fcfcfc'; }}
+                    />
+                    <div style={{ position: 'absolute', left: '1.2rem', top: '50%', transform: 'translateY(-50%)', fontSize: '1.4rem' }}>
+                        🔍
+                    </div>
                 </div>
-            </div>
 
-            {/* Type Filters */}
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                <h3 style={{ margin: 0, marginBottom: '1rem', fontSize: '1.1rem', color: '#333' }}>
-                    📂 Resource Type
-                </h3>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    {types.map(type => {
-                        const icons = { All: '📁', video: '🎥', document: '📄', presentation: '📊', infographic: '🖼️', guideline: '📋', article: '📰' };
-                        const isSelected = selectedType === type;
-                        return (
-                            <button
-                                key={type}
-                                onClick={() => setSelectedType(type)}
-                                style={{
-                                    padding: '0.75rem 1.5rem',
-                                    borderRadius: '25px',
-                                    border: isSelected ? '2px solid #667eea' : '2px solid #e0e0e0',
-                                    background: isSelected ? '#667eea' : 'white',
-                                    color: isSelected ? 'white' : '#666',
-                                    cursor: 'pointer',
-                                    fontWeight: isSelected ? 'bold' : '500',
-                                    fontSize: '0.9rem',
-                                    transition: 'all 0.2s ease',
-                                    textTransform: 'capitalize'
-                                }}
-                            >
-                                {icons[type] || '📁'} {type}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* Resources Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                {filteredResources.map((resource) => {
-                    const info = getResourceInfo(resource.resourceType);
-                    const completed = isCompleted(resource._id);
-                    
-                    return (
-                        <div key={resource._id} className="card" style={{ padding: 0, overflow: 'hidden', border: completed ? '2px solid #4CAF50' : '1px solid #e0e0e0' }}>
-                            {resource.thumbnailUrl && (
-                                <img src={resource.thumbnailUrl} alt={resource.title} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
-                            )}
-                            <div style={{ padding: '1.5rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
-                                    <span style={{ padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 'bold', background: info.bg, color: info.color }}>
-                                        {info.icon} {info.label}
-                                    </span>
-                                    {completed && (
-                                        <span style={{ background: '#E8F5E9', color: '#388E3C', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.75rem' }}>
-                                            ✓ Completed
-                                        </span>
-                                    )}
-                                </div>
-                                <h3 style={{ margin: 0, marginBottom: '0.5rem', fontSize: '1.1rem' }}>{resource.title}</h3>
-                                <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                                    {resource.description?.substring(0, 100)}...
-                                </p>
-                                <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: '1rem' }}>
-                                    <div>📁 {resource.category}</div>
-                                    {resource.metadata?.duration && <div>⏱ {resource.metadata.duration} min</div>}
-                                    <div>👁 {resource.views || 0} views • ⬇ {resource.downloads || 0} downloads</div>
-                                    {resource.averageRating > 0 && <div>⭐ {resource.averageRating} ({resource.totalRatings} ratings)</div>}
-                                </div>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button onClick={() => setSelectedContent(resource)} className="btn btn-outline" style={{ flex: 1 }}>
-                                        View
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+                    <div>
+                        <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#aaa', textTransform: 'uppercase', marginBottom: '1rem', letterSpacing: '1px' }}>Quick Filter by Type</div>
+                        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                            {['All', 'video', 'document', 'presentation', 'toolkit', 'link'].map(t => {
+                                const isSelected = selectedType === t;
+                                const icon = t === 'All' ? '📁' : t === 'video' ? '🎥' : t === 'document' ? '📄' : t === 'presentation' ? '📊' : t === 'toolkit' ? '🛠️' : '🔗';
+                                return (
+                                    <button
+                                        key={t}
+                                        onClick={() => setSelectedType(t)}
+                                        style={{
+                                            padding: '0.6rem 1.2rem',
+                                            borderRadius: '14px',
+                                            border: 'none',
+                                            background: isSelected ? theme.primaryColor : '#f5f5f7',
+                                            color: isSelected ? 'white' : '#555',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '700',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            boxShadow: isSelected ? `0 4px 12px ${theme.primaryColor}44` : 'none'
+                                        }}
+                                    >
+                                        <span>{icon}</span> {t === 'All' ? 'All Types' : t.charAt(0).toUpperCase() + t.slice(1)}
                                     </button>
-                                    {resource.downloadable && resource.resourceUrl && (
-                                        <button onClick={() => handleDownload(resource._id, resource.resourceUrl)} className="btn btn-outline" style={{ flex: 1 }}>
-                                            Download
-                                        </button>
-                                    )}
-                                    {!completed && (
-                                        <button onClick={() => handleMarkCompleted(resource._id)} className="btn btn-primary" style={{ flex: 1 }}>
-                                            Complete
-                                        </button>
-                                    )}
-                                </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <div style={{ height: '1px', background: '#f0f0f0', width: '100%' }}></div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${theme.primaryColor}15`, color: theme.primaryColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>
+                                🏷️
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#aaa', textTransform: 'uppercase' }}>Filter by Topic/Subject</div>
+                                <select 
+                                    value={selectedCategory} 
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    style={filterSelectStyle}
+                                >
+                                    {categories.map(c => (
+                                        <option key={c} value={c}>{c === 'All' ? 'All Subjects' : c}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
-                    );
-                })}
+
+                        {selectedCategory !== 'All' && (
+                            <button 
+                                onClick={() => setSelectedCategory('All')} 
+                                style={{ 
+                                    background: 'none', 
+                                    border: `1.5px solid ${theme.primaryColor}22`, 
+                                    color: theme.primaryColor, 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: '800', 
+                                    cursor: 'pointer',
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '8px'
+                                }}
+                            >
+                                SHOW ALL SUBJECTS
+                            </button>
+                        )}
+                    </div>
+                </div>
             </div>
+
+            {/* Resources Grouped by Category */}
+            {categories.filter(cat => cat !== 'All' && (selectedCategory === 'All' || selectedCategory === cat)).map((category) => {
+                const categoryResources = filteredResources.filter(r => r.category === category);
+                if (categoryResources.length === 0) return null;
+
+                return (
+                    <div key={category} style={{ marginBottom: '4rem' }}>
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '1rem', 
+                            marginBottom: '1.5rem',
+                            borderLeft: `5px solid ${theme.primaryColor}`,
+                            paddingLeft: '1.2rem'
+                        }}>
+                            <h2 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '900', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>
+                                {category}
+                            </h2>
+                            <div style={{ height: '2px', flex: 1, background: 'linear-gradient(to right, #f0f0f0, transparent)' }}></div>
+                            <span style={{ fontSize: '0.9rem', color: '#999', fontWeight: '600' }}>{categoryResources.length} Materials</span>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                            {categoryResources.map((resource) => {
+                                const info = getResourceInfo(resource.resourceType);
+                                const completed = isCompleted(resource._id);
+                                
+                                return (
+                                    <div key={resource._id} style={{ 
+                                        backgroundColor: 'white',
+                                        borderRadius: '24px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 10px 30px rgba(0,0,0,0.03)',
+                                        border: completed ? `2px solid ${theme.primaryColor}33` : '1px solid #f0f0f0',
+                                        transition: 'all 0.3s ease',
+                                        position: 'relative'
+                                    }}
+                                    className="resource-card"
+                                    onMouseOver={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-10px)';
+                                        e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.08)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.03)';
+                                    }}
+                                    >
+                                        {resource.thumbnailUrl ? (
+                                            <div style={{ position: 'relative' }}>
+                                                <img src={resource.thumbnailUrl} alt={resource.title} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
+                                                <div style={{ position: 'absolute', bottom: '15px', right: '15px', padding: '0.5rem 1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', fontSize: '0.75rem', fontWeight: '800', color: info.color, boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+                                                    {info.icon} {info.label}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div style={{ height: '180px', background: `linear-gradient(45deg, ${theme.primaryColor}08, ${theme.primaryColor}15)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
+                                                {info.icon}
+                                            </div>
+                                        )}
+                                        
+                                        <div style={{ padding: '1.5rem' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                                                {completed && (
+                                                    <div style={{ background: '#E8F5E9', color: '#388E3C', padding: '0.3rem 0.8rem', borderRadius: '10px', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase' }}>
+                                                        Completed ✓
+                                                    </div>
+                                                )}
+                                                {!completed && (
+                                                    <div style={{ color: '#aaa', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase' }}>New Material</div>
+                                                )}
+                                            </div>
+                                            <h3 style={{ margin: 0, marginBottom: '0.8rem', fontSize: '1.15rem', fontWeight: '800', color: '#1a1a2e', lineHeight: '1.4' }}>{resource.title}</h3>
+                                            <p style={{ color: '#666', fontSize: '0.85rem', marginBottom: '1.5rem', minHeight: '3.6rem' }}>
+                                                {resource.description?.substring(0, 85)}...
+                                            </p>
+                                            
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#f8f9fa', borderRadius: '16px', marginBottom: '1.5rem' }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontSize: '0.7rem', color: '#aaa', textTransform: 'uppercase', fontWeight: '700' }}>Duration</div>
+                                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#333' }}>{resource.metadata?.duration || '5'} Min</div>
+                                                </div>
+                                                <div style={{ width: '1px', height: '20px', background: '#ddd' }}></div>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontSize: '0.7rem', color: '#aaa', textTransform: 'uppercase', fontWeight: '700' }}>Impact</div>
+                                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#333' }}>{resource.views || 0} Learners</div>
+                                                </div>
+                                            </div>
+
+                                            <div style={{ display: 'flex', gap: '0.8rem' }}>
+                                                <button onClick={() => setSelectedContent(resource)} style={{ ...actionButtonStyle, background: '#1a1a2e', color: 'white' }}>
+                                                    Open
+                                                </button>
+                                                {!completed && (
+                                                    <button onClick={() => handleMarkCompleted(resource._id)} style={{ ...actionButtonStyle, background: theme.primaryColor, color: 'white', boxShadow: `0 4px 15px ${theme.primaryColor}33` }}>
+                                                        Complete
+                                                    </button>
+                                                )}
+                                                {completed && resource.downloadable && (
+                                                    <button onClick={() => handleDownload(resource._id, resource.resourceUrl)} style={{ ...actionButtonStyle, background: '#f0f0f0', color: '#333' }}>
+                                                        Get PDF
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            })}
 
             {filteredResources.length === 0 && (
                 <div className="card" style={{ padding: '3rem', textAlign: 'center', color: '#999' }}>
@@ -336,6 +446,31 @@ const Resources = () => {
             )}
         </div>
     );
+};
+
+const actionButtonStyle = {
+    flex: 1,
+    padding: '0.8rem',
+    borderRadius: '14px',
+    border: 'none',
+    fontWeight: '800',
+    fontSize: '0.8rem',
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+    transition: 'all 0.2s'
+};
+
+const filterSelectStyle = {
+    border: 'none', 
+    background: 'transparent', 
+    fontSize: '0.95rem', 
+    fontWeight: '700', 
+    color: '#333', 
+    outline: 'none',
+    cursor: 'pointer',
+    padding: '4px 0',
+    width: '100%',
+    minWidth: '150px'
 };
 
 export default Resources;

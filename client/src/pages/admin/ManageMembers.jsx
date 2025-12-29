@@ -109,8 +109,8 @@ const ManageMembers = () => {
                         <thead>
                             <tr>
                                 <th>User</th>
-                                <th>Contact</th>
-                                <th>Role</th>
+                                <th className="hide-tablet">Contact</th>
+                                <th className="hide-mobile">Role</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -130,14 +130,14 @@ const ManageMembers = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td data-label="Contact">
+                                        <td data-label="Contact" className="hide-tablet">
                                             <div style={{ color: '#555' }}>{user.email}</div>
                                             <div style={{ fontSize: '0.85rem', color: '#E53935', fontWeight: '500' }}>
                                                 {user.phoneNumbers?.[0]?.number || 'No phone'}
                                             </div>
                                             {user.department && <div style={{ fontSize: '0.8rem', color: '#888' }}>{user.department}</div>}
                                         </td>
-                                        <td data-label="Role">
+                                        <td data-label="Role" className="hide-mobile">
                                             {isSuperAdmin ? (
                                                 <select
                                                     value={user.roles?.[0] || 'member'}

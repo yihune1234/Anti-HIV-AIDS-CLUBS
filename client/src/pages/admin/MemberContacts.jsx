@@ -63,11 +63,11 @@ const MemberContacts = () => {
                     <thead>
                         <tr>
                             <th>Full Name</th>
-                            <th>Student ID</th>
-                            <th>Department</th>
-                            <th>Position</th>
-                            <th>Email</th>
-                            <th>Phone Number</th>
+                            <th className="hide-tablet">Student ID</th>
+                            <th className="hide-tablet">Department</th>
+                            <th className="hide-mobile">Position</th>
+                            <th className="hide-mobile">Email</th>
+                            <th className="hide-mobile">Phone Number</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -81,17 +81,17 @@ const MemberContacts = () => {
                                             {contact.fullName}
                                         </div>
                                     </td>
-                                    <td data-label="Student ID" style={tdStyle}>{contact.studentId}</td>
-                                    <td data-label="Department" style={tdStyle}>{contact.department}</td>
-                                    <td data-label="Position" style={tdStyle}>
+                                    <td data-label="Student ID" className="hide-tablet" style={tdStyle}>{contact.studentId}</td>
+                                    <td data-label="Department" className="hide-tablet" style={tdStyle}>{contact.department}</td>
+                                    <td data-label="Position" className="hide-mobile" style={tdStyle}>
                                         <span style={badgeStyle(contact.position)}>
                                             {contact.position}
                                         </span>
                                     </td>
-                                    <td data-label="Email" style={tdStyle}>
+                                    <td data-label="Email" className="hide-mobile" style={tdStyle}>
                                         <a href={`mailto:${contact.email}`} style={linkStyle}>{contact.email}</a>
                                     </td>
-                                    <td data-label="Phone Number" style={tdStyle}>
+                                    <td data-label="Phone Number" className="hide-mobile" style={tdStyle}>
                                         <a href={`tel:${contact.phone}`} style={linkStyle}>{contact.phone}</a>
                                     </td>
                                     <td data-label="Status" style={tdStyle}>

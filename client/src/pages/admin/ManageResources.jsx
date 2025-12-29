@@ -179,9 +179,9 @@ const ManageResources = () => {
                         <thead>
                             <tr>
                                 <th>Resource Detail</th>
-                                <th>Classification</th>
-                                <th>Privacy</th>
-                                <th>Status</th>
+                                <th className="hide-mobile">Classification</th>
+                                <th className="hide-tablet">Privacy</th>
+                                <th className="hide-tablet">Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -217,11 +217,11 @@ const ManageResources = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td data-label="Classification">
+                                        <td data-label="Classification" className="hide-mobile">
                                             <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>{resource.category}</div>
                                             <div style={{ fontSize: '0.7rem', color: '#aaa', textTransform: 'uppercase' }}>{resource.resourceType}</div>
                                         </td>
-                                        <td data-label="Privacy">
+                                        <td data-label="Privacy" className="hide-tablet">
                                             <span style={{
                                                 padding: '4px 12px',
                                                 borderRadius: '100px',
@@ -234,7 +234,7 @@ const ManageResources = () => {
                                                 {resource.accessLevel.replace('_', ' ')}
                                             </span>
                                         </td>
-                                        <td data-label="Status">
+                                        <td data-label="Status" className="hide-tablet">
                                             <span style={{
                                                 fontSize: '0.85rem',
                                                 color: resource.status === 'published' ? '#2e7d32' : '#999',

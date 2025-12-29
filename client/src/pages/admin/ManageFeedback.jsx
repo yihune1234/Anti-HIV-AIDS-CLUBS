@@ -29,13 +29,18 @@ const ManageFeedback = () => {
         try {
             const response = await api.patch(`/feedback/${id}`, { status });
             if (response.data.success) {
-                setFeedbacks(feedbacks.map(f => f._id === id ? { ...f, status } : f));
-                if (selectedFeedback?._id === id) {
-                    setSelectedFeedback({ ...selectedFeedback, status });
-                }
+                setFeedbacks(prev => prev.map(f => f._id === id ? { ...f, status } : f));
+                setSelectedFeedback(prev => prev && prev._id === id ? { ...prev, status } : prev);
             }
         } catch (err) {
-            alert('Failed to update status');
+            console.error('Failed to update status:', err);
+        }
+    };
+
+    const handleSelectFeedback = (feedback) => {
+        setSelectedFeedback(feedback);
+        if (feedback.status === 'unread') {
+            updateStatus(feedback._id, 'read');
         }
     };
 
@@ -73,17 +78,17 @@ const ManageFeedback = () => {
                 <button onClick={fetchFeedbacks} className="btn btn-outline btn-sm">Refresh List</button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: selectedFeedback ? '1fr 1fr' : '1fr', gap: '2rem' }}>
+            <div className={`feedback-container ${selectedFeedback ? 'has-selection' : ''}`}>
                 {/* List Section */}
-                <div className="card" style={{ padding: '0', borderRadius: '20px', overflow: 'hidden' }}>
+                <div className={`card list-section ${selectedFeedback ? 'hide-on-mobile' : ''}`} style={{ padding: '0', borderRadius: '20px', overflow: 'hidden' }}>
                     <div className="table-responsive">
                         <table className="admin-table responsive-table" style={{ margin: 0 }}>
                             <thead style={{ background: '#f8f9fa' }}>
                                 <tr>
-                                    <th>Status</th>
+                                    <th className="hide-mobile">Status</th>
                                     <th>Subject</th>
                                     <th>From</th>
-                                    <th>Date</th>
+                                    <th className="hide-tablet">Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -98,9 +103,9 @@ const ManageFeedback = () => {
                                                 background: selectedFeedback?._id === feedback._id ? '#fff5f5' : 'transparent',
                                                 fontWeight: feedback.status === 'unread' ? 'bold' : 'normal'
                                             }}
-                                            onClick={() => setSelectedFeedback(feedback)}
+                                            onClick={() => handleSelectFeedback(feedback)}
                                         >
-                                            <td data-label="Status" style={{ verticalAlign: 'middle' }}>
+                                            <td data-label="Status" className="hide-mobile" style={{ verticalAlign: 'middle' }}>
                                                 <span style={{
                                                     padding: '4px 10px',
                                                     borderRadius: '100px',
@@ -123,7 +128,7 @@ const ManageFeedback = () => {
                                                 <div>{feedback.name}</div>
                                                 <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 'normal' }}>{feedback.email}</div>
                                             </td>
-                                            <td data-label="Date" style={{ verticalAlign: 'middle', fontSize: '0.85rem' }}>
+                                            <td data-label="Date" className="hide-tablet" style={{ verticalAlign: 'middle', fontSize: '0.85rem' }}>
                                                 {new Date(feedback.createdAt).toLocaleDateString()}
                                             </td>
                                             <td data-label="Actions" style={{ verticalAlign: 'middle' }} onClick={e => e.stopPropagation()}>
@@ -145,9 +150,18 @@ const ManageFeedback = () => {
                 {/* Detail view */}
                 {selectedFeedback && (
                     <div className="card" style={{ padding: '2rem', borderRadius: '30px', animation: 'slideInRight 0.3s ease' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                            <h3 style={{ margin: 0, fontWeight: '800' }}>Message Details</h3>
-                            <button onClick={() => setSelectedFeedback(null)} className="btn-close"></button>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <button 
+                                    onClick={() => setSelectedFeedback(null)} 
+                                    className="btn btn-sm btn-outline show-on-mobile"
+                                    style={{ padding: '4px 8px' }}
+                                >
+                                    ← Back
+                                </button>
+                                <h3 style={{ margin: 0, fontWeight: '800' }}>Message Details</h3>
+                            </div>
+                            <button onClick={() => setSelectedFeedback(null)} className="btn-close hide-on-mobile"></button>
                         </div>
 
                         <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#f8f9fa', borderRadius: '20px' }}>
@@ -168,16 +182,30 @@ const ManageFeedback = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                             <a href={`mailto:${selectedFeedback.email}?subject=Re: ${selectedFeedback.subject} - HU Anti-HIV/AIDS Club`}
-                                className="btn btn-primary" style={{ flex: 1, borderRadius: '12px' }}>
-                                Reply via Email
+                                className="btn btn-primary" style={{ flex: '2 1 200px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                ✉️ Reply via Email
                             </a>
+                            <button 
+                                onClick={() => updateStatus(selectedFeedback._id, selectedFeedback.status === 'read' ? 'unread' : 'read')} 
+                                className="btn btn-outline" 
+                                style={{ flex: '1 1 150px', borderRadius: '12px' }}
+                            >
+                                {selectedFeedback.status === 'unread' ? '👁️ Mark as Read' : '📩 Mark Unread'}
+                            </button>
                             {selectedFeedback.status !== 'archived' && (
-                                <button onClick={() => updateStatus(selectedFeedback._id, 'archived')} className="btn btn-outline" style={{ flex: 1, borderRadius: '12px' }}>
-                                    Archive Message
+                                <button onClick={() => updateStatus(selectedFeedback._id, 'archived')} className="btn btn-outline" style={{ flex: '1 1 150px', borderRadius: '12px' }}>
+                                    📦 Archive
                                 </button>
                             )}
+                            <button 
+                                onClick={() => deleteFeedback(selectedFeedback._id)} 
+                                className="btn btn-outline text-danger" 
+                                style={{ flex: '1 1 150px', borderRadius: '12px', borderColor: '#ffcdd2' }}
+                            >
+                                🗑️ Delete
+                            </button>
                         </div>
                     </div>
                 )}
@@ -188,7 +216,38 @@ const ManageFeedback = () => {
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes slideInRight { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
                 
+                 /* Desktop Grid Layout */
+                .feedback-container {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+                
+                @media screen and (min-width: 1025px) {
+                    .feedback-container.has-selection {
+                        grid-template-columns: 1fr 1fr;
+                    }
+                }
+
                  /* Card/Grid Layout for Mobile */
+                @media screen and (max-width: 1024px) {
+                    .feedback-container.has-selection {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .hide-on-mobile {
+                        display: none !important;
+                    }
+                    
+                    .show-on-mobile {
+                        display: flex !important;
+                    }
+                }
+
+                .show-on-mobile {
+                    display: none;
+                }
+
                 @media screen and (max-width: 768px) {
                     .admin-table.responsive-table thead {
                         display: none;
