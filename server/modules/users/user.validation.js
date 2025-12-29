@@ -161,14 +161,19 @@ const changePasswordSchema = Joi.object({
  * - Example: `router.post('/forgot-password', validate(forgotPasswordSchema), userController.forgotPassword);`
  */
 const forgotPasswordSchema = Joi.object({
-    email: Joi.string()
-        .email()
+    identity: Joi.string()
         .required()
         .trim()
-        .lowercase()
         .messages({
-            'string.email': 'Please provide a valid email address',
-            'any.required': 'Email is required'
+            'any.required': 'Username or Student ID is required',
+            'string.empty': 'Username or Student ID cannot be empty'
+        }),
+    contact: Joi.string()
+        .required()
+        .trim()
+        .messages({
+            'any.required': 'Email or Phone Number is required',
+            'string.empty': 'Email or Phone Number cannot be empty'
         })
 });
 
@@ -184,17 +189,31 @@ const forgotPasswordSchema = Joi.object({
  * - Example: `router.post('/reset-password', validate(resetPasswordSchema), userController.resetPassword);`
  */
 const resetPasswordSchema = Joi.object({
-    token: Joi.string()
+    contact: Joi.string()
         .required()
+        .trim()
         .messages({
-            'any.required': 'Reset token is required'
+            'any.required': 'Email or Phone Number is required',
+            'string.empty': 'Email or Phone Number cannot be empty'
+        }),
+    otp: Joi.string()
+        .required()
+        .trim()
+        .length(6)
+        .pattern(/^[0-9]+$/)
+        .messages({
+            'any.required': 'OTP is required',
+            'string.length': 'OTP must be 6 digits',
+            'string.pattern.base': 'OTP must be numeric',
+            'string.empty': 'OTP cannot be empty'
         }),
     newPassword: Joi.string()
         .min(6)
         .required()
         .messages({
             'string.min': 'New password must be at least 6 characters long',
-            'any.required': 'New password is required'
+            'any.required': 'New password is required',
+            'string.empty': 'New password cannot be empty'
         })
 });
 

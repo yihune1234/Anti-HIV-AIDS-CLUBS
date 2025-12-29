@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 const Register = () => {
     const [formData, setFormData] = useState({
         firstName: '',
+        middleName: '',
         lastName: '',
         username: '',
         email: '',
@@ -73,6 +74,13 @@ const Register = () => {
                             <input
                                 type="text" name="firstName" className="form-control" placeholder="John" required
                                 value={formData.firstName} onChange={handleChange}
+                            />
+                        </div>
+                        <div style={{ flex: '1 1 250px' }} className="form-group">
+                            <label className="form-label">Middle Name (Optional)</label>
+                            <input
+                                type="text" name="middleName" className="form-control" placeholder="M."
+                                value={formData.middleName} onChange={handleChange}
                             />
                         </div>
                         <div style={{ flex: '1 1 250px' }} className="form-group">
