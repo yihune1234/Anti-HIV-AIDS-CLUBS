@@ -59,7 +59,12 @@ app.use(cors({
 }));
 
 // Serve Uploads Directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve Uploads Directory
+const uploadDir = path.join(__dirname, 'uploads');
+if (!require('fs').existsSync(uploadDir)) {
+    require('fs').mkdirSync(uploadDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadDir));
 
 // Rate Limiting
 const limiter = rateLimit({

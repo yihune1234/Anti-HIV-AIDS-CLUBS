@@ -20,7 +20,7 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
+        setIsMenuOpen(prev => prev === true ? false : true);
     };
 
     const closeMenu = () => {
@@ -47,19 +47,111 @@ const Navbar = () => {
                     </Link>
                 </div>
 
-                {/* Hamburger Menu Button */}
-                <button
-                    className={`hamburger ${isMenuOpen ? 'active' : ''}`}
-                    onClick={toggleMenu}
-                    aria-label="Toggle menu"
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                {/* User Settings & Hamburger Wrapper */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+
+                    {/* Settings Icon - Visible to Authenticated Users on ALL devices */}
+                    {user && (
+                        <div style={{ position: 'relative' }}>
+                            <button
+                                onClick={() => setIsMenuOpen(prev => prev === 'settings' ? false : 'settings')}
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: '5px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: '50%',
+                                    transition: 'background 0.3s'
+                                }}
+                                aria-label="Settings"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                </svg>
+                            </button>
+
+                            {/* Settings Dropdown */}
+                            {isMenuOpen === 'settings' && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '120%',
+                                    right: '-10px',
+                                    background: 'white',
+                                    borderRadius: '12px',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                                    minWidth: '220px',
+                                    padding: '0.5rem',
+                                    zIndex: 1001,
+                                    border: '1px solid #eee'
+                                }}>
+                                    <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f0f0f0', marginBottom: '0.5rem' }}>
+                                        <p style={{ margin: 0, fontWeight: 'bold', color: '#333' }}>{user.firstName} {user.lastName}</p>
+                                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>@{user.username}</p>
+                                    </div>
+
+                                    <Link
+                                        to="/member/profile"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        style={{ ...dropdownLinkStyle, borderRadius: '8px' }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <span>👤</span> My Profile
+                                    </Link>
+
+                                    {(user?.role === 'admin' || user?.role === 'superadmin' || user.roles?.includes('admin')) && (
+                                        <Link
+                                            to="/admin"
+                                            onClick={() => setIsMenuOpen(false)}
+                                            style={{ ...dropdownLinkStyle, borderRadius: '8px' }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = '#f8f9fa'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            <span>🛠️</span> Admin Panel
+                                        </Link>
+                                    )}
+
+                                    <div style={{ height: '1px', background: '#f0f0f0', margin: '0.5rem 0' }}></div>
+
+                                    <button
+                                        onClick={handleLogout}
+                                        style={{
+                                            ...dropdownLinkStyle,
+                                            width: '100%',
+                                            border: 'none',
+                                            background: 'transparent',
+                                            color: '#D32F2F',
+                                            cursor: 'pointer',
+                                            borderRadius: '8px'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.background = '#FFEBEE'}
+                                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <span>🚪</span> Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Hamburger Menu Button */}
+                    <button
+                        className={`hamburger ${isMenuOpen === true ? 'active' : ''}`}
+                        onClick={toggleMenu}
+                        aria-label="Toggle menu"
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
 
                 {/* Navigation Links */}
-                <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
+                <div className={`nav-links ${isMenuOpen === true ? 'active' : ''}`}>
                     {!user && <NavLink to="/" onClick={closeMenu}>Home</NavLink>}
 
                     {!user ? (
@@ -108,123 +200,10 @@ const Navbar = () => {
                             <Link to="/login" className="btn btn-outline" style={{ borderRadius: '25px', fontWeight: '600' }}>Login</Link>
                             <Link to="/register" className="btn btn-primary" style={{ borderRadius: '25px', fontWeight: '600', padding: '0.6rem 1.5rem', boxShadow: '0 4px 15px rgba(211, 47, 47, 0.3)' }}>Join Club</Link>
                         </>
-                    ) : (
-                        <div style={{ position: 'relative' }}>
-                            <button
-                                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.75rem',
-                                    padding: '4px 6px 4px 14px',
-                                    background: 'white',
-                                    border: '1px solid #eee',
-                                    borderRadius: '35px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.95rem',
-                                    fontWeight: '600',
-                                    transition: 'all 0.3s ease',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = '#d32f2f';
-                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.borderColor = '#eee';
-                                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
-                                }}
-                            >
-                                <span style={{ color: '#333' }}>Hi, {user.firstName}</span>
-                                {user.profileImage ? (
-                                    <img
-                                        src={user.profileImage}
-                                        alt="Profile"
-                                        style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
-                                    />
-                                ) : (
-                                    <div style={{
-                                        width: '38px',
-                                        height: '38px',
-                                        borderRadius: '50%',
-                                        background: 'linear-gradient(135deg, #d32f2f 0%, #1a1a2e 100%)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: 'white',
-                                        fontWeight: 'bold',
-                                        fontSize: '0.9rem'
-                                    }}>
-                                        {user.firstName?.[0]}{user.lastName?.[0]}
-                                    </div>
-                                )}
-                            </button>
-
-                            {isMenuOpen && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '100%',
-                                    right: 0,
-                                    marginTop: '0.5rem',
-                                    background: 'white',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                    minWidth: '200px',
-                                    zIndex: 1000
-                                }}>
-                                    <Link
-                                        to="/member/profile"
-                                        onClick={closeMenu}
-                                        style={dropdownLinkStyle}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = '#f8f8f8'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                                    >
-                                        <span style={{ fontSize: '1.2rem' }}>👤</span>
-                                        <span>My Profile</span>
-                                    </Link>
-
-                                    {(user?.role === 'admin' || user?.role === 'superadmin' || (Array.isArray(user?.roles) && (user.roles.includes('admin') || user.roles.includes('superadmin')))) && (
-                                        <Link
-                                            to="/admin"
-                                            onClick={closeMenu}
-                                            style={dropdownLinkStyle}
-                                            onMouseEnter={(e) => e.currentTarget.style.background = '#f8f8f8'}
-                                            onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                                        >
-                                            <span style={{ fontSize: '1.2rem' }}>🛠️</span>
-                                            <span>Admin Dashboard</span>
-                                        </Link>
-                                    )}
-                                    <button
-                                        onClick={handleLogout}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.75rem',
-                                            padding: '0.75rem 1rem',
-                                            width: '100%',
-                                            border: 'none',
-                                            background: 'white',
-                                            textAlign: 'left',
-                                            cursor: 'pointer',
-                                            color: '#E53935',
-                                            fontWeight: '500',
-                                            borderRadius: '0 0 8px 8px'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.background = '#FFEBEE'}
-                                        onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                                    >
-                                        <span style={{ fontSize: '1.2rem' }}>🚪</span>
-                                        <span>Logout</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    ) : null}
                 </div>
             </div>
-        </nav>
+        </nav >
     );
 };
 

@@ -187,8 +187,62 @@ const ManageFeedback = () => {
                 {`
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes slideInRight { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-                .table th { border: none; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; color: #666; letter-spacing: 1px; padding: 1.2rem 1rem; }
-                .table td { border-top: 1px solid #f0f0f0; padding: 1.2rem 1rem; }
+                
+                 /* Card/Grid Layout for Mobile */
+                @media screen and (max-width: 768px) {
+                    .admin-table.responsive-table thead {
+                        display: none;
+                    }
+
+                    .admin-table.responsive-table tbody tr {
+                        display: block;
+                        margin-bottom: 1.5rem;
+                        background: #fff;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                        padding: 1.25rem;
+                        border: 1px solid #f0f0f0;
+                    }
+
+                    .admin-table.responsive-table tbody td {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 0.75rem 0;
+                        border: none;
+                        border-bottom: 1px solid #f8f9fa;
+                        text-align: right;
+                    }
+
+                    .admin-table.responsive-table tbody td:last-child {
+                        border-bottom: none;
+                        padding-bottom: 0;
+                    }
+
+                    .admin-table.responsive-table tbody td:before {
+                        content: attr(data-label);
+                        font-weight: 700;
+                        color: #666;
+                        text-align: left;
+                        padding-right: 1rem;
+                        text-transform: uppercase;
+                        font-size: 0.8rem;
+                    }
+                    
+                    /* Specific adjustments for content cells */
+                    .admin-table.responsive-table tbody td[data-label="Subject"],
+                    .admin-table.responsive-table tbody td[data-label="From"] {
+                        flex-direction: column;
+                        align-items: flex-end;
+                        text-align: right;
+                    }
+                    
+                    .admin-table.responsive-table tbody td[data-label="Subject"]:before,
+                    .admin-table.responsive-table tbody td[data-label="From"]:before {
+                         align-self: flex-start;
+                         margin-bottom: 0.25rem;
+                    }
+                }
                 `}
             </style>
         </div>

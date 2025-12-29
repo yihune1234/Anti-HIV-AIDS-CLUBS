@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+export const BASE_URL = 'https://anti-hiv-aids-clubs.onrender.com';
+
 const api = axios.create({
-    baseURL: 'https://anti-hiv-aids-clubs.onrender.com/api', // Production Render URL
+    baseURL: `${BASE_URL}/api`, // Production Render URL
     headers: {
         'Content-Type': 'application/json',
     },
