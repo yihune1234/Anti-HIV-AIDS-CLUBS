@@ -121,7 +121,7 @@ const Events = () => {
             ) : (
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                     gap: '3rem',
                     animation: 'fadeInUp 1s ease 0.2s',
                     animationFillMode: 'both'

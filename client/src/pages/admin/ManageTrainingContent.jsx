@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import trainingContentService from '../../services/trainingContentService';
 
-const thStyle = { padding: '1rem', textAlign: 'left', color: '#555' };
-const tdStyle = { padding: '1rem', borderTop: '1px solid #eee' };
+
 const modalOverlayStyle = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100
@@ -16,7 +15,7 @@ const ManageTrainingContent = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContent, setEditingContent] = useState(null);
-    
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -146,39 +145,39 @@ const ManageTrainingContent = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                    <table className="admin-table responsive-table">
+                        <thead>
                             <tr>
-                                <th style={thStyle}>Title</th>
-                                <th style={thStyle}>Type</th>
-                                <th style={thStyle}>Category</th>
-                                <th style={thStyle}>Access</th>
-                                <th style={thStyle}>Stats</th>
-                                <th style={thStyle}>Actions</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Access</th>
+                                <th>Stats</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {contents.map(content => (
                                 <tr key={content._id} style={{ borderBottom: '1px solid #eee' }}>
-                                    <td style={tdStyle}>
+                                    <td data-label="Title">
                                         <div style={{ fontWeight: 'bold' }}>{content.title}</div>
                                         {content.isFeatured && <span style={{ fontSize: '0.75rem', color: '#F57C00' }}>⭐ Featured</span>}
                                     </td>
-                                    <td style={tdStyle}>{getTypeBadge(content.contentType)}</td>
-                                    <td style={tdStyle}>{content.category}</td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Type">{getTypeBadge(content.contentType)}</td>
+                                    <td data-label="Category">{content.category}</td>
+                                    <td data-label="Access">
                                         <span style={{ fontSize: '0.85rem', color: content.accessLevel === 'public' ? '#388E3C' : '#1976D2' }}>
                                             {content.accessLevel === 'public' ? '🌐 Public' : '🔒 Members'}
                                         </span>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Stats">
                                         <div style={{ fontSize: '0.85rem' }}>
                                             <div>👁 {content.viewCount || 0} views</div>
                                             <div>⬇ {content.downloadCount || 0} downloads</div>
                                             <div>✓ {content.completionCount || 0} completed</div>
                                         </div>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Actions">
                                         <button
                                             className="btn btn-outline"
                                             style={{ marginRight: '0.5rem', fontSize: '0.85rem', padding: '0.3rem 0.6rem' }}

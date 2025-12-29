@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import resourceService from '../../services/resourceService';
 import uploadService from '../../services/uploadService';
 
-const thStyle = { padding: '1.2rem 1rem', textAlign: 'left', color: '#888', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' };
-const tdStyle = { padding: '1.5rem 1rem', verticalAlign: 'middle' };
+
 const modalOverlayStyle = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100,
@@ -176,14 +175,14 @@ const ManageResources = () => {
 
             <div className="card" style={{ padding: 0, borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                 <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead style={{ backgroundColor: '#fafafa', borderBottom: '1px solid #f0f0f0' }}>
+                    <table className="admin-table responsive-table">
+                        <thead>
                             <tr>
-                                <th style={thStyle}>Resource Detail</th>
-                                <th style={thStyle}>Classification</th>
-                                <th style={thStyle}>Privacy</th>
-                                <th style={thStyle}>Status</th>
-                                <th style={thStyle}>Actions</th>
+                                <th>Resource Detail</th>
+                                <th>Classification</th>
+                                <th>Privacy</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -195,8 +194,8 @@ const ManageResources = () => {
                                 </tr>
                             ) : (
                                 resources.map(resource => (
-                                    <tr key={resource._id} style={{ borderBottom: '1px solid #f8f8f8' }}>
-                                        <td style={tdStyle}>
+                                    <tr key={resource._id}>
+                                        <td data-label="Resource Detail">
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                                 <div style={{
                                                     width: '45px',
@@ -218,11 +217,11 @@ const ManageResources = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Classification">
                                             <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>{resource.category}</div>
                                             <div style={{ fontSize: '0.7rem', color: '#aaa', textTransform: 'uppercase' }}>{resource.resourceType}</div>
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Privacy">
                                             <span style={{
                                                 padding: '4px 12px',
                                                 borderRadius: '100px',
@@ -235,7 +234,7 @@ const ManageResources = () => {
                                                 {resource.accessLevel.replace('_', ' ')}
                                             </span>
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Status">
                                             <span style={{
                                                 fontSize: '0.85rem',
                                                 color: resource.status === 'published' ? '#2e7d32' : '#999',
@@ -244,7 +243,7 @@ const ManageResources = () => {
                                                 {resource.status}
                                             </span>
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Actions">
                                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                 <button
                                                     className="btn btn-sm btn-outline-primary"

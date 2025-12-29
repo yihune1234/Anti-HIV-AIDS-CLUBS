@@ -2,18 +2,7 @@ import React, { useState, useEffect } from 'react';
 import adminService from '../../services/adminService';
 import { useAuth } from '../../context/AuthContext';
 
-const thStyle = {
-    padding: '1rem',
-    textAlign: 'left',
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    color: '#555'
-};
 
-const tdStyle = {
-    padding: '1rem',
-    fontSize: '0.95rem'
-};
 
 const ManageMembers = () => {
     const { user } = useAuth();
@@ -116,21 +105,21 @@ const ManageMembers = () => {
 
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                    <table className="admin-table responsive-table">
+                        <thead>
                             <tr>
-                                <th style={thStyle}>User</th>
-                                <th style={thStyle}>Contact</th>
-                                <th style={thStyle}>Role</th>
-                                <th style={thStyle}>Status</th>
-                                <th style={thStyle}>Actions</th>
+                                <th>User</th>
+                                <th>Contact</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {users.length > 0 ? (
                                 users.map(user => (
-                                    <tr key={user._id} style={{ borderBottom: '1px solid #eee' }}>
-                                        <td style={tdStyle}>
+                                    <tr key={user._id}>
+                                        <td data-label="User">
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#ffeb3b', color: '#f57f17', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '0.8rem' }}>
                                                     {user.firstName?.charAt(0) || '?'}
@@ -141,14 +130,14 @@ const ManageMembers = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Contact">
                                             <div style={{ color: '#555' }}>{user.email}</div>
                                             <div style={{ fontSize: '0.85rem', color: '#E53935', fontWeight: '500' }}>
                                                 {user.phoneNumbers?.[0]?.number || 'No phone'}
                                             </div>
                                             {user.department && <div style={{ fontSize: '0.8rem', color: '#888' }}>{user.department}</div>}
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Role">
                                             {isSuperAdmin ? (
                                                 <select
                                                     value={user.roles?.[0] || 'member'}
@@ -174,7 +163,7 @@ const ManageMembers = () => {
                                                 </span>
                                             )}
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Status">
                                             <span
                                                 onClick={() => isSuperAdmin && handleToggleStatus(user._id, user.isActive)}
                                                 style={{
@@ -190,7 +179,7 @@ const ManageMembers = () => {
                                                 {user.isActive ? 'Active' : 'Inactive'}
                                             </span>
                                         </td>
-                                        <td style={tdStyle}>
+                                        <td data-label="Actions">
                                             {isSuperAdmin && (
                                                 <button
                                                     onClick={() => handleDelete(user._id)}

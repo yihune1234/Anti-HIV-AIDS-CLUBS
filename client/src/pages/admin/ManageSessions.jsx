@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import sessionService from '../../services/sessionService';
 import adminService from '../../services/adminService';
 
-const thStyle = { padding: '1rem', textAlign: 'left', color: '#555' };
-const tdStyle = { padding: '1rem', borderTop: '1px solid #eee' };
+
 const modalOverlayStyle = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100
@@ -194,33 +193,33 @@ const ManageSessions = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                    <table className="admin-table responsive-table">
+                        <thead>
                             <tr>
-                                <th style={thStyle}>Session</th>
-                                <th style={thStyle}>Topic & Type</th>
-                                <th style={thStyle}>Date & Time</th>
-                                <th style={thStyle}>Status</th>
-                                <th style={thStyle}>Participants</th>
-                                <th style={thStyle}>Actions</th>
+                                <th>Session</th>
+                                <th>Topic & Type</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th>Participants</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {sessions.map(session => (
                                 <tr key={session._id} style={{ borderBottom: '1px solid #eee' }}>
-                                    <td style={tdStyle}>
+                                    <td data-label="Session">
                                         <div style={{ fontWeight: 'bold' }}>{session.title}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#777', maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                             {session.description}
                                         </div>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Topic & Type">
                                         <div style={{ fontSize: '0.9rem' }}>{session.topic}</div>
                                         <div style={{ fontSize: '0.8rem', color: '#777', textTransform: 'capitalize' }}>
                                             {session.sessionType.replace('_', ' ')}
                                         </div>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Date & Time">
                                         <div>{new Date(session.date).toLocaleDateString()}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#777' }}>
                                             {session.startTime} - {session.endTime}
@@ -229,8 +228,8 @@ const ManageSessions = () => {
                                             📍 {session.location?.venue}
                                         </div>
                                     </td>
-                                    <td style={tdStyle}>{getStatusBadge(session.status)}</td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Status">{getStatusBadge(session.status)}</td>
+                                    <td data-label="Participants">
                                         <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#388E3C' }}>
                                             {session.totalParticipants || 0}
                                         </div>
@@ -241,7 +240,7 @@ const ManageSessions = () => {
                                             View List
                                         </button>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Actions">
                                         <button
                                             className="btn btn-outline"
                                             style={{ marginRight: '0.5rem', color: '#333', borderColor: '#ddd', fontSize: '0.85rem', padding: '0.3rem 0.6rem' }}

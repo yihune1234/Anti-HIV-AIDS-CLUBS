@@ -10,6 +10,8 @@ import AnonymousQuestions from './pages/public/AnonymousQuestions';
 import Developer from './pages/public/Developer';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 import Contact from './pages/public/Contact';
 import Dashboard from './pages/member/Dashboard';
 import Events from './pages/member/Events';
@@ -52,6 +54,8 @@ function App() {
           <Route path="/developer" element={<Developer />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected Member Routes */}
           <Route element={<ProtectedRoute />}>

@@ -77,7 +77,7 @@ const ManageFeedback = () => {
                 {/* List Section */}
                 <div className="card" style={{ padding: '0', borderRadius: '20px', overflow: 'hidden' }}>
                     <div className="table-responsive">
-                        <table className="table" style={{ margin: 0 }}>
+                        <table className="admin-table responsive-table" style={{ margin: 0 }}>
                             <thead style={{ background: '#f8f9fa' }}>
                                 <tr>
                                     <th>Status</th>
@@ -100,7 +100,7 @@ const ManageFeedback = () => {
                                             }}
                                             onClick={() => setSelectedFeedback(feedback)}
                                         >
-                                            <td style={{ verticalAlign: 'middle' }}>
+                                            <td data-label="Status" style={{ verticalAlign: 'middle' }}>
                                                 <span style={{
                                                     padding: '4px 10px',
                                                     borderRadius: '100px',
@@ -113,20 +113,20 @@ const ManageFeedback = () => {
                                                     {feedback.status}
                                                 </span>
                                             </td>
-                                            <td style={{ verticalAlign: 'middle' }}>
+                                            <td data-label="Subject" style={{ verticalAlign: 'middle' }}>
                                                 <div>{feedback.subject}</div>
                                                 <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 'normal' }}>
                                                     {feedback.message.substring(0, 30)}...
                                                 </div>
                                             </td>
-                                            <td style={{ verticalAlign: 'middle' }}>
+                                            <td data-label="From" style={{ verticalAlign: 'middle' }}>
                                                 <div>{feedback.name}</div>
                                                 <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 'normal' }}>{feedback.email}</div>
                                             </td>
-                                            <td style={{ verticalAlign: 'middle', fontSize: '0.85rem' }}>
+                                            <td data-label="Date" style={{ verticalAlign: 'middle', fontSize: '0.85rem' }}>
                                                 {new Date(feedback.createdAt).toLocaleDateString()}
                                             </td>
-                                            <td style={{ verticalAlign: 'middle' }} onClick={e => e.stopPropagation()}>
+                                            <td data-label="Actions" style={{ verticalAlign: 'middle' }} onClick={e => e.stopPropagation()}>
                                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                     <button onClick={() => updateStatus(feedback._id, feedback.status === 'read' ? 'unread' : 'read')} className="btn btn-sm" title="Toggle Read Status">
                                                         {feedback.status === 'unread' ? '👁️' : '📩'}

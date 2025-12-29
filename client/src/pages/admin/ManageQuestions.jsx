@@ -100,7 +100,7 @@ const ManageQuestions = () => {
                 }
                 .questions-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(min(450px, 100%), 1fr));
+                    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
                     gap: 2rem;
                 }
                 @media (max-width: 600px) {

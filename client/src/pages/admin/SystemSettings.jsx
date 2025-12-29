@@ -148,7 +148,7 @@ const SystemSettings = () => {
                     </div>
 
                     <h4 style={{ marginTop: '2rem', marginBottom: '1rem', color: '#D32F2F', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Club Leadership</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
                         <div className="form-group">
                             <label className="form-label">Club President Name</label>
                             <input
@@ -188,7 +188,7 @@ const SystemSettings = () => {
                     </div>
 
                     <h4 style={{ marginTop: '2rem', marginBottom: '1rem', color: '#D32F2F', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>Social Media Links</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
                         {['facebook', 'twitter', 'instagram', 'linkedin', 'youtube'].map(platform => (
                             <div key={platform} className="form-group">
                                 <label className="form-label" style={{ textTransform: 'capitalize' }}>{platform}</label>

@@ -59,42 +59,42 @@ const MemberContacts = () => {
             </div>
 
             <div style={tableContainerStyle}>
-                <table style={tableStyle}>
+                <table className="admin-table responsive-table">
                     <thead>
                         <tr>
-                            <th style={thStyle}>Full Name</th>
-                            <th style={thStyle}>Student ID</th>
-                            <th style={thStyle}>Department</th>
-                            <th style={thStyle}>Position</th>
-                            <th style={thStyle}>Email</th>
-                            <th style={thStyle}>Phone Number</th>
-                            <th style={thStyle}>Status</th>
+                            <th>Full Name</th>
+                            <th>Student ID</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Email</th>
+                            <th>Phone Number</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredContacts.length > 0 ? (
                             filteredContacts.map((contact) => (
                                 <tr key={contact.memberId} style={trStyle}>
-                                    <td style={tdStyle}>
+                                    <td data-label="Full Name" style={tdStyle}>
                                         <div style={nameWrapperStyle}>
                                             <div style={avatarStyle}>{contact.fullName.charAt(0)}</div>
                                             {contact.fullName}
                                         </div>
                                     </td>
-                                    <td style={tdStyle}>{contact.studentId}</td>
-                                    <td style={tdStyle}>{contact.department}</td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Student ID" style={tdStyle}>{contact.studentId}</td>
+                                    <td data-label="Department" style={tdStyle}>{contact.department}</td>
+                                    <td data-label="Position" style={tdStyle}>
                                         <span style={badgeStyle(contact.position)}>
                                             {contact.position}
                                         </span>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Email" style={tdStyle}>
                                         <a href={`mailto:${contact.email}`} style={linkStyle}>{contact.email}</a>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Phone Number" style={tdStyle}>
                                         <a href={`tel:${contact.phone}`} style={linkStyle}>{contact.phone}</a>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Status" style={tdStyle}>
                                         <span style={statusStyle(contact.membershipStatus)}>
                                             {contact.membershipStatus}
                                         </span>
@@ -193,22 +193,7 @@ const tableContainerStyle = {
     marginBottom: '20px'
 };
 
-const tableStyle = {
-    width: '100%',
-    borderCollapse: 'collapse',
-    textAlign: 'left'
-};
 
-const thStyle = {
-    padding: '15px 20px',
-    backgroundColor: '#f8f9fa',
-    color: '#1a1a2e',
-    fontWeight: '700',
-    fontSize: '0.9rem',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    borderBottom: '2px solid #eee'
-};
 
 const trStyle = {
     borderBottom: '1px solid #f0f0f0',

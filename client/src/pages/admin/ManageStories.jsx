@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import storyService from '../../services/storyService';
 import uploadService from '../../services/uploadService';
 
-const thStyle = { padding: '1rem', textAlign: 'left', color: '#555' };
-const tdStyle = { padding: '1rem', borderTop: '1px solid #eee' };
+
 
 const modalOverlayStyle = {
     position: 'fixed',
@@ -160,40 +159,40 @@ const ManageStories = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead style={{ background: '#f8f9fa' }}>
+                    <table className="admin-table responsive-table">
+                        <thead>
                             <tr>
-                                <th style={thStyle}>Image</th>
-                                <th style={thStyle}>Title</th>
-                                <th style={thStyle}>Author</th>
-                                <th style={thStyle}>Category</th>
-                                <th style={thStyle}>Status</th>
-                                <th style={thStyle}>Actions</th>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {stories.map(story => (
                                 <tr key={story._id}>
-                                    <td style={tdStyle}>
+                                    <td data-label="Image">
                                         {story.featuredImage ? (
                                             <img src={story.featuredImage} alt="" width="40" height="40" />
                                         ) : 'No Image'}
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Title">
                                         <strong>{story.title}</strong><br />
                                         <small>{new Date(story.createdAt).toLocaleDateString()}</small>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Author">
                                         {story.author ? `${story.author.firstName} ${story.author.lastName}` : 'Unknown'}
                                     </td>
-                                    <td style={tdStyle}>{story.category.replace('_', ' ')}</td>
-                                    <td style={tdStyle}>{story.status || 'Draft'}</td>
-                                    <td style={tdStyle}>
-                                        <button onClick={() => handleEdit(story)}>Edit</button>{' '}
+                                    <td data-label="Category">{story.category.replace('_', ' ')}</td>
+                                    <td data-label="Status">{story.status || 'Draft'}</td>
+                                    <td data-label="Actions">
+                                        <button className="btn btn-sm btn-outline" onClick={() => handleEdit(story)}>Edit</button>{' '}
                                         {story.status !== 'published' &&
-                                            <button onClick={() => handleApprove(story._id)}>Publish</button>}
+                                            <button className="btn btn-sm btn-primary" onClick={() => handleApprove(story._id)}>Publish</button>}
                                         {' '}
-                                        <button onClick={() => handleDelete(story._id)}>Delete</button>
+                                        <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(story._id)}>Delete</button>
                                     </td>
                                 </tr>
                             ))}

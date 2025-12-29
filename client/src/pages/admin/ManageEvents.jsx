@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import eventService from '../../services/eventService';
 import uploadService from '../../services/uploadService';
 
-const thStyle = { padding: '1rem', textAlign: 'left', color: '#555' };
-const tdStyle = { padding: '1rem', borderTop: '1px solid #eee' };
+
 const modalOverlayStyle = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100
@@ -157,36 +156,36 @@ const ManageEvents = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                    <table className="admin-table responsive-table">
+                        <thead>
                             <tr>
-                                <th style={thStyle}>Event</th>
-                                <th style={thStyle}>Type</th>
-                                <th style={thStyle}>Date & Location</th>
-                                <th style={thStyle}>Registrations</th>
-                                <th style={thStyle}>Actions</th>
+                                <th>Event</th>
+                                <th>Type</th>
+                                <th>Date & Location</th>
+                                <th>Registrations</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {events.map(event => (
-                                <tr key={event._id} style={{ borderBottom: '1px solid #eee' }}>
-                                    <td style={tdStyle}>
+                                <tr key={event._id}>
+                                    <td data-label="Event">
                                         <div style={{ fontWeight: 'bold' }}>{event.title}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#777', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                             {event.description}
                                         </div>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Type">
                                         <span style={{ textTransform: 'capitalize' }}>{event.eventType?.replace('_', ' ')}</span>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Date & Location">
                                         <div>{new Date(event.startDate).toLocaleDateString()}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#777' }}>📍 {event.location?.venue}</div>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Registrations">
                                         {event.totalRegistrations || (event.registrations ? event.registrations.length : 0)} registered
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Actions">
                                         <button
                                             className="btn btn-outline"
                                             style={{ marginRight: '0.5rem', color: '#333', borderColor: '#ddd', fontSize: '0.85rem', padding: '0.3rem 0.6rem' }}

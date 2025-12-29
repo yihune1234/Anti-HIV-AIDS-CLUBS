@@ -43,7 +43,7 @@ const AttendanceManagement = () => {
     const handleMarkAttendance = async (userId, currentStatus) => {
         try {
             await adminService.markAttendance(selectedEvent.id, userId, !currentStatus);
-            
+
             // Update local state
             setAttendees(attendees.map(attendee =>
                 attendee.user._id === userId
@@ -138,26 +138,26 @@ const AttendanceManagement = () => {
                     </div>
 
                     {/* Attendees List */}
-                    <div className="card" style={{ padding: 0, overflow: 'auto' }}>
+                    <div className="card" style={{ padding: 0 }}>
                         {loading ? (
                             <div style={{ padding: '2rem', textAlign: 'center' }}>Loading attendees...</div>
                         ) : (
-                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
-                                <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                            <table className="admin-table responsive-table">
+                                <thead>
                                     <tr>
-                                        <th style={thStyle}>Attendee</th>
-                                        <th style={thStyle}>Email</th>
-                                        <th style={thStyle}>Department</th>
-                                        <th style={thStyle}>Registration Date</th>
-                                        <th style={thStyle}>Attendance</th>
-                                        <th style={thStyle}>Action</th>
+                                        <th>Attendee</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                        <th>Registration Date</th>
+                                        <th>Attendance</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredAttendees.length > 0 ? (
                                         filteredAttendees.map(attendee => (
-                                            <tr key={attendee.user._id} style={{ borderBottom: '1px solid #eee' }}>
-                                                <td style={tdStyle}>
+                                            <tr key={attendee.user._id}>
+                                                <td data-label="Attendee">
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                         <div style={{
                                                             width: '32px',
@@ -184,12 +184,12 @@ const AttendanceManagement = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td style={tdStyle}>{attendee.user.email}</td>
-                                                <td style={tdStyle}>{attendee.user.department || '-'}</td>
-                                                <td style={tdStyle}>
+                                                <td data-label="Email">{attendee.user.email}</td>
+                                                <td data-label="Department">{attendee.user.department || '-'}</td>
+                                                <td data-label="Registration Date">
                                                     {new Date(attendee.registrationDate).toLocaleDateString()}
                                                 </td>
-                                                <td style={tdStyle}>
+                                                <td data-label="Attendance">
                                                     <span style={{
                                                         padding: '0.25rem 0.6rem',
                                                         borderRadius: '12px',
@@ -201,7 +201,7 @@ const AttendanceManagement = () => {
                                                         {attendee.attended ? 'Present' : 'Absent'}
                                                     </span>
                                                 </td>
-                                                <td style={tdStyle}>
+                                                <td data-label="Action">
                                                     <button
                                                         className="btn btn-outline"
                                                         style={{
@@ -234,17 +234,6 @@ const AttendanceManagement = () => {
     );
 };
 
-const thStyle = {
-    padding: '1rem',
-    textAlign: 'left',
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    color: '#555'
-};
 
-const tdStyle = {
-    padding: '1rem',
-    fontSize: '0.95rem'
-};
 
 export default AttendanceManagement;

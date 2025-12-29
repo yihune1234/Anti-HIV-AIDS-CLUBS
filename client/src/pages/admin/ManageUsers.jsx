@@ -3,8 +3,7 @@ import userService from '../../services/userService';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
-const thStyle = { padding: '1rem', textAlign: 'left', color: '#555' };
-const tdStyle = { padding: '1rem', borderTop: '1px solid #eee' };
+
 
 const modalOverlayStyle = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -151,20 +150,20 @@ const ManageUsers = () => {
 
             <div className="card" style={{ padding: 0, backgroundColor: 'white', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
                 <div className="table-responsive">
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <table className="admin-table responsive-table">
                         <thead>
-                            <tr style={{ backgroundColor: '#f8f9fa' }}>
-                                <th style={thStyle}>User</th>
-                                <th style={thStyle}>Roles</th>
-                                <th style={thStyle}>Status</th>
-                                <th style={thStyle}>Joined</th>
-                                <th style={thStyle}>Actions</th>
+                            <tr>
+                                <th>User</th>
+                                <th>Roles</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {users.map(user => (
-                                <tr key={user._id} style={{ borderBottom: '1px solid #eee' }}>
-                                    <td style={tdStyle}>
+                                <tr key={user._id}>
+                                    <td data-label="User">
                                         <div style={{ fontWeight: '600', color: '#1a1a2e' }}>{user.firstName} {user.lastName}</div>
                                         <div style={{ fontSize: '0.8rem', color: '#777' }}>@{user.username} • {user.email}</div>
                                         {user.phoneNumbers?.[0]?.number && (
@@ -173,7 +172,7 @@ const ManageUsers = () => {
                                             </div>
                                         )}
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Roles">
                                         <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                                             {(user.roles || ['member']).map(role => (
                                                 <span key={role} style={{
@@ -190,7 +189,7 @@ const ManageUsers = () => {
                                             ))}
                                         </div>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Status">
                                         <span style={{
                                             padding: '4px 10px',
                                             borderRadius: '20px',
@@ -202,10 +201,10 @@ const ManageUsers = () => {
                                             {user.isActive ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Joined">
                                         <div style={{ fontSize: '0.85rem' }}>{new Date(user.createdAt).toLocaleDateString()}</div>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Actions">
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
                                                 className="btn btn-sm btn-outline"

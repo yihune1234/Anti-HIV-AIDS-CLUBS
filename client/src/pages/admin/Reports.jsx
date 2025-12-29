@@ -13,6 +13,7 @@ const Reports = () => {
         endDate: ''
     });
 
+
     useEffect(() => {
         loadReport(activeReport);
     }, [activeReport]);
@@ -85,30 +86,30 @@ const Reports = () => {
                     📥 Export CSV
                 </button>
             </div>
-            
-            <div className="card" style={{ padding: 0, overflow: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                    <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                <table className="admin-table responsive-table">
+                    <thead>
                         <tr>
-                            <th style={thStyle}>Username</th>
-                            <th style={thStyle}>Name</th>
-                            <th style={thStyle}>Email</th>
-                            <th style={thStyle}>Role</th>
-                            <th style={thStyle}>Department</th>
-                            <th style={thStyle}>Status</th>
-                            <th style={thStyle}>Joined</th>
+                            <th>Username</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Joined</th>
                         </tr>
                     </thead>
                     <tbody>
                         {usersData.map(user => (
-                            <tr key={user._id} style={{ borderBottom: '1px solid #eee' }}>
-                                <td style={tdStyle}>{user.username}</td>
-                                <td style={tdStyle}>{user.firstName} {user.lastName}</td>
-                                <td style={tdStyle}>{user.email}</td>
-                                <td style={tdStyle}>{user.roles?.join(', ')}</td>
-                                <td style={tdStyle}>{user.department || '-'}</td>
-                                <td style={tdStyle}>{user.membershipStatus}</td>
-                                <td style={tdStyle}>{new Date(user.createdAt).toLocaleDateString()}</td>
+                            <tr key={user._id}>
+                                <td data-label="Username">{user.username}</td>
+                                <td data-label="Name">{user.firstName} {user.lastName}</td>
+                                <td data-label="Email">{user.email}</td>
+                                <td data-label="Role">{user.roles?.join(', ')}</td>
+                                <td data-label="Department">{user.department || '-'}</td>
+                                <td data-label="Status">{user.membershipStatus}</td>
+                                <td data-label="Joined">{new Date(user.createdAt).toLocaleDateString()}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -128,34 +129,34 @@ const Reports = () => {
                     📥 Export CSV
                 </button>
             </div>
-            
-            <div className="card" style={{ padding: 0, overflow: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                    <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                <table className="admin-table responsive-table">
+                    <thead>
                         <tr>
-                            <th style={thStyle}>Event Title</th>
-                            <th style={thStyle}>Type</th>
-                            <th style={thStyle}>Date</th>
-                            <th style={thStyle}>Registrations</th>
-                            <th style={thStyle}>Attended</th>
-                            <th style={thStyle}>Attendance Rate</th>
-                            <th style={thStyle}>Status</th>
+                            <th>Event Title</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Registrations</th>
+                            <th>Attended</th>
+                            <th>Attendance Rate</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {eventsData.map(event => (
-                            <tr key={event._id} style={{ borderBottom: '1px solid #eee' }}>
-                                <td style={tdStyle}>{event.title}</td>
-                                <td style={tdStyle}>{event.eventType}</td>
-                                <td style={tdStyle}>{new Date(event.startDate).toLocaleDateString()}</td>
-                                <td style={tdStyle}>{event.totalRegistrations}</td>
-                                <td style={tdStyle}>{event.totalAttended}</td>
-                                <td style={tdStyle}>
+                            <tr key={event._id}>
+                                <td data-label="Event Title">{event.title}</td>
+                                <td data-label="Type">{event.eventType}</td>
+                                <td data-label="Date">{new Date(event.startDate).toLocaleDateString()}</td>
+                                <td data-label="Registrations">{event.totalRegistrations}</td>
+                                <td data-label="Attended">{event.totalAttended}</td>
+                                <td data-label="Attendance Rate">
                                     {event.totalRegistrations > 0
                                         ? `${((event.totalAttended / event.totalRegistrations) * 100).toFixed(1)}%`
                                         : '0%'}
                                 </td>
-                                <td style={tdStyle}>{event.status}</td>
+                                <td data-label="Status">{event.status}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -175,34 +176,34 @@ const Reports = () => {
                     📥 Export CSV
                 </button>
             </div>
-            
-            <div className="card" style={{ padding: 0, overflow: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
-                    <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                <table className="admin-table responsive-table">
+                    <thead>
                         <tr>
-                            <th style={thStyle}>Session Title</th>
-                            <th style={thStyle}>Topic</th>
-                            <th style={thStyle}>Date</th>
-                            <th style={thStyle}>Participants</th>
-                            <th style={thStyle}>Attended</th>
-                            <th style={thStyle}>Attendance Rate</th>
-                            <th style={thStyle}>Status</th>
+                            <th>Session Title</th>
+                            <th>Topic</th>
+                            <th>Date</th>
+                            <th>Participants</th>
+                            <th>Attended</th>
+                            <th>Attendance Rate</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {sessionsData.map(session => (
-                            <tr key={session._id} style={{ borderBottom: '1px solid #eee' }}>
-                                <td style={tdStyle}>{session.title}</td>
-                                <td style={tdStyle}>{session.topic}</td>
-                                <td style={tdStyle}>{new Date(session.date).toLocaleDateString()}</td>
-                                <td style={tdStyle}>{session.totalParticipants}</td>
-                                <td style={tdStyle}>{session.totalAttended}</td>
-                                <td style={tdStyle}>
+                            <tr key={session._id}>
+                                <td data-label="Session Title">{session.title}</td>
+                                <td data-label="Topic">{session.topic}</td>
+                                <td data-label="Date">{new Date(session.date).toLocaleDateString()}</td>
+                                <td data-label="Participants">{session.totalParticipants}</td>
+                                <td data-label="Attended">{session.totalAttended}</td>
+                                <td data-label="Attendance Rate">
                                     {session.totalParticipants > 0
                                         ? `${((session.totalAttended / session.totalParticipants) * 100).toFixed(1)}%`
                                         : '0%'}
                                 </td>
-                                <td style={tdStyle}>{session.status}</td>
+                                <td data-label="Status">{session.status}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -251,26 +252,26 @@ const Reports = () => {
                     Generate Report
                 </button>
             </div>
-            
-            <div className="card" style={{ padding: 0, overflow: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+
+            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                <table className="admin-table responsive-table">
+                    <thead>
                         <tr>
-                            <th style={thStyle}>Event</th>
-                            <th style={thStyle}>Date</th>
-                            <th style={thStyle}>Registrations</th>
-                            <th style={thStyle}>Attended</th>
-                            <th style={thStyle}>Attendance Rate</th>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Registrations</th>
+                            <th>Attended</th>
+                            <th>Attendance Rate</th>
                         </tr>
                     </thead>
                     <tbody>
                         {attendanceData.map(event => (
-                            <tr key={event.eventId} style={{ borderBottom: '1px solid #eee' }}>
-                                <td style={tdStyle}>{event.title}</td>
-                                <td style={tdStyle}>{new Date(event.date).toLocaleDateString()}</td>
-                                <td style={tdStyle}>{event.totalRegistrations}</td>
-                                <td style={tdStyle}>{event.totalAttended}</td>
-                                <td style={tdStyle}>
+                            <tr key={event.eventId}>
+                                <td data-label="Event">{event.title}</td>
+                                <td data-label="Date">{new Date(event.date).toLocaleDateString()}</td>
+                                <td data-label="Registrations">{event.totalRegistrations}</td>
+                                <td data-label="Attended">{event.totalAttended}</td>
+                                <td data-label="Attendance Rate">
                                     <span style={{
                                         padding: '0.25rem 0.6rem',
                                         borderRadius: '12px',
@@ -335,17 +336,6 @@ const Reports = () => {
     );
 };
 
-const thStyle = {
-    padding: '1rem',
-    textAlign: 'left',
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    color: '#555'
-};
 
-const tdStyle = {
-    padding: '1rem',
-    fontSize: '0.95rem'
-};
 
 export default Reports;

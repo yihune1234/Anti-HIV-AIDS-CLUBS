@@ -220,11 +220,13 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   }
 };
 
-userSchema.methods.createPasswordResetToken = function () {
-  const resetToken = require('crypto').randomBytes(32).toString('hex');
-  this.passwordResetToken = require('crypto').createHash('sha256').update(resetToken).digest('hex');
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-  return resetToken;
+userSchema.methods.createPasswordResetOTP = function () {
+  // Generate random 6 digit number
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  this.passwordResetToken = require('crypto').createHash('sha256').update(otp).digest('hex');
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  return otp;
 };
 
 userSchema.methods.createEmailVerificationToken = function () {
