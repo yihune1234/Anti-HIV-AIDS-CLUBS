@@ -35,6 +35,30 @@ const Contact = () => {
         fetchSettings();
     }, []);
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -50,14 +74,14 @@ const Contact = () => {
             if (response.data.success) {
                 setStatus({
                     type: 'success',
-                    msg: 'Thank you for your message! We will get back to you soon.'
+                    msg: '✅ Thank you for your message! We will get back to you soon.'
                 });
                 setFormData({ ...formData, message: '' });
             }
         } catch (error) {
             setStatus({
                 type: 'error',
-                msg: error.response?.data?.message || 'Failed to send message. Please try again later.'
+                msg: '⚠️ ' + getFriendlyError(error)
             });
         } finally {
             setLoading(false);

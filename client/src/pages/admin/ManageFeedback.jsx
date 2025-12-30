@@ -7,6 +7,30 @@ const ManageFeedback = () => {
     const [error, setError] = useState(null);
     const [selectedFeedback, setSelectedFeedback] = useState(null);
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     useEffect(() => {
         fetchFeedbacks();
     }, []);
@@ -19,7 +43,7 @@ const ManageFeedback = () => {
                 setFeedbacks(response.data.data);
             }
         } catch (err) {
-            setError('Failed to fetch feedback messages');
+            setError('⚠️ Error loading feedbacks: ' + getFriendlyError(err));
         } finally {
             setLoading(false);
         }
@@ -33,7 +57,7 @@ const ManageFeedback = () => {
                 setSelectedFeedback(prev => prev && prev._id === id ? { ...prev, status } : prev);
             }
         } catch (err) {
-            console.error('Failed to update status:', err);
+            alert('⚠️ ' + getFriendlyError(err));
         }
     };
 
@@ -49,11 +73,12 @@ const ManageFeedback = () => {
         try {
             const response = await api.delete(`/feedback/${id}`);
             if (response.data.success) {
+                alert('✅ Feedback deleted successfully!');
                 setFeedbacks(feedbacks.filter(f => f._id !== id));
                 setSelectedFeedback(null);
             }
         } catch (err) {
-            alert('Failed to delete message');
+            alert('⚠️ ' + getFriendlyError(err));
         }
     };
 
@@ -82,13 +107,13 @@ const ManageFeedback = () => {
                 {/* List Section */}
                 <div className={`card list-section ${selectedFeedback ? 'hide-on-mobile' : ''}`} style={{ padding: '0', borderRadius: '20px', overflow: 'hidden' }}>
                     <div className="table-responsive">
-                        <table className="admin-table responsive-table" style={{ margin: 0 }}>
+                        <table className="admin-table" style={{ margin: 0 }}>
                             <thead style={{ background: '#f8f9fa' }}>
                                 <tr>
-                                    <th className="hide-mobile">Status</th>
+                                    <th>Status</th>
                                     <th>Subject</th>
                                     <th>From</th>
-                                    <th className="hide-tablet">Date</th>
+                                    <th>Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -105,7 +130,7 @@ const ManageFeedback = () => {
                                             }}
                                             onClick={() => handleSelectFeedback(feedback)}
                                         >
-                                            <td data-label="Status" className="hide-mobile" style={{ verticalAlign: 'middle' }}>
+                                            <td data-label="Status" style={{ verticalAlign: 'middle' }}>
                                                 <span style={{
                                                     padding: '4px 10px',
                                                     borderRadius: '100px',
@@ -128,7 +153,7 @@ const ManageFeedback = () => {
                                                 <div>{feedback.name}</div>
                                                 <div style={{ fontSize: '0.8rem', opacity: 0.6, fontWeight: 'normal' }}>{feedback.email}</div>
                                             </td>
-                                            <td data-label="Date" className="hide-tablet" style={{ verticalAlign: 'middle', fontSize: '0.85rem' }}>
+                                            <td data-label="Date" style={{ verticalAlign: 'middle', fontSize: '0.85rem' }}>
                                                 {new Date(feedback.createdAt).toLocaleDateString()}
                                             </td>
                                             <td data-label="Actions" style={{ verticalAlign: 'middle' }} onClick={e => e.stopPropagation()}>
@@ -248,62 +273,9 @@ const ManageFeedback = () => {
                     display: none;
                 }
 
-                @media screen and (max-width: 768px) {
-                    .admin-table.responsive-table thead {
-                        display: none;
-                    }
-
-                    .admin-table.responsive-table tbody tr {
-                        display: block;
-                        margin-bottom: 1.5rem;
-                        background: #fff;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-                        padding: 1.25rem;
-                        border: 1px solid #f0f0f0;
-                    }
-
-                    .admin-table.responsive-table tbody td {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 0.75rem 0;
-                        border: none;
-                        border-bottom: 1px solid #f8f9fa;
-                        text-align: right;
-                    }
-
-                    .admin-table.responsive-table tbody td:last-child {
-                        border-bottom: none;
-                        padding-bottom: 0;
-                    }
-
-                    .admin-table.responsive-table tbody td:before {
-                        content: attr(data-label);
-                        font-weight: 700;
-                        color: #666;
-                        text-align: left;
-                        padding-right: 1rem;
-                        text-transform: uppercase;
-                        font-size: 0.8rem;
-                    }
-                    
-                    /* Specific adjustments for content cells */
-                    .admin-table.responsive-table tbody td[data-label="Subject"],
-                    .admin-table.responsive-table tbody td[data-label="From"] {
-                        flex-direction: column;
-                        align-items: flex-end;
-                        text-align: right;
-                    }
-                    
-                    .admin-table.responsive-table tbody td[data-label="Subject"]:before,
-                    .admin-table.responsive-table tbody td[data-label="From"]:before {
-                         align-self: flex-start;
-                         margin-bottom: 0.25rem;
-                    }
-                }
-                `}
-            </style>
+                 }
+                 `}
+             </style>
         </div>
     );
 };

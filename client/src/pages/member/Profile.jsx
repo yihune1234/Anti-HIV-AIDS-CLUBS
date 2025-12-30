@@ -33,6 +33,35 @@ const Profile = () => {
     const [passMessage, setPassMessage] = useState(null);
     const fileInputRef = useRef(null);
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (lowerMsg.includes('password')) {
+            if (lowerMsg.includes('current')) return 'The current password you entered is incorrect.';
+            if (lowerMsg.includes('match')) return 'The passwords do not match.';
+            return 'Invalid password. Please try again.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -56,10 +85,12 @@ const Profile = () => {
             const res = await uploadService.uploadFile(file);
             if (res.success) {
                 setFormData(prev => ({ ...prev, profileImage: res.data.url }));
+            } else {
+                setMessage({ type: 'error', text: getFriendlyError(res.message || 'Failed to upload image') });
             }
         } catch (error) {
             console.error('Image upload failed', error);
-            setMessage({ type: 'error', text: 'Failed to upload image' });
+            setMessage({ type: 'error', text: getFriendlyError(error) });
         } finally {
             setUploading(false);
         }
@@ -76,11 +107,11 @@ const Profile = () => {
 
         if (result.success) {
             setIsEditing(false);
-            setMessage({ type: 'success', text: 'Profile updated successfully!' });
+            setMessage({ type: 'success', text: '✅ Profile updated successfully!' });
             // Clear message after 3 seconds
             setTimeout(() => setMessage(null), 3000);
         } else {
-            setMessage({ type: 'error', text: result.message });
+            setMessage({ type: 'error', text: '⚠️ ' + getFriendlyError(result.message) });
         }
         setLoading(false);
     };
@@ -90,7 +121,7 @@ const Profile = () => {
         setPassMessage(null);
 
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            setPassMessage({ type: 'error', text: 'New passwords do not match' });
+            setPassMessage({ type: 'error', text: '⚠️ New passwords do not match' });
             return;
         }
 
@@ -101,14 +132,14 @@ const Profile = () => {
         });
 
         if (result.success) {
-            setPassMessage({ type: 'success', text: 'Password changed successfully!' });
+            setPassMessage({ type: 'success', text: '✅ Password changed successfully!' });
             setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
             setTimeout(() => {
                 setPassMessage(null);
                 setShowPasswordForm(false);
             }, 3000);
         } else {
-            setPassMessage({ type: 'error', text: result.message });
+            setPassMessage({ type: 'error', text: '⚠️ ' + getFriendlyError(result.message) });
         }
         setPassLoading(false);
     };

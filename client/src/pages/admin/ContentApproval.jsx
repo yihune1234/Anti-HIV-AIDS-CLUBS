@@ -11,6 +11,30 @@ const ContentApproval = () => {
     const [activeTab, setActiveTab] = useState('stories');
     const [reviewNotes, setReviewNotes] = useState({});
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     useEffect(() => {
         fetchPendingContent();
     }, []);
@@ -22,7 +46,7 @@ const ContentApproval = () => {
                 setPendingContent(result.data);
             }
         } catch (error) {
-            console.error('Failed to fetch pending content:', error);
+            alert('⚠️ Error loading pending content: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -32,6 +56,7 @@ const ContentApproval = () => {
         try {
             const notes = reviewNotes[id] || '';
             await adminService.approveContent(type, id, notes);
+            alert('✅ Content approved successfully!');
 
             // Remove from pending list
             setPendingContent(prev => ({
@@ -45,19 +70,20 @@ const ContentApproval = () => {
                 return updated;
             });
         } catch (error) {
-            alert('Failed to approve content: ' + error.message);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
     const handleReject = async (type, id) => {
         const notes = reviewNotes[id];
         if (!notes) {
-            alert('Please provide rejection notes');
+            alert('⚠️ Please provide rejection notes');
             return;
         }
 
         try {
             await adminService.rejectContent(type, id, notes);
+            alert('✅ Content rejected successfully');
 
             // Remove from pending list
             setPendingContent(prev => ({
@@ -71,7 +97,7 @@ const ContentApproval = () => {
                 return updated;
             });
         } catch (error) {
-            alert('Failed to reject content: ' + error.message);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 

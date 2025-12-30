@@ -142,13 +142,13 @@ const AttendanceManagement = () => {
                         {loading ? (
                             <div style={{ padding: '2rem', textAlign: 'center' }}>Loading attendees...</div>
                         ) : (
-                            <table className="admin-table responsive-table">
+                            <table className="admin-table">
                                 <thead>
                                     <tr>
                                         <th>Attendee</th>
-                                        <th className="hide-tablet">Email</th>
-                                        <th className="hide-mobile">Department</th>
-                                        <th className="hide-tablet">Registration Date</th>
+                                        <th>Email</th>
+                                        <th>Department</th>
+                                        <th>Registration Date</th>
                                         <th>Attendance</th>
                                         <th>Action</th>
                                     </tr>
@@ -184,9 +184,9 @@ const AttendanceManagement = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td data-label="Email" className="hide-tablet">{attendee.user.email}</td>
-                                                <td data-label="Department" className="hide-mobile">{attendee.user.department || '-'}</td>
-                                                <td data-label="Registration Date" className="hide-tablet">
+                                                <td data-label="Email"> {attendee.user.email}</td>
+                                                <td data-label="Department">{attendee.user.department || '-'}</td>
+                                                <td data-label="Registration Date">
                                                     {new Date(attendee.registrationDate).toLocaleDateString()}
                                                 </td>
                                                 <td data-label="Attendance">

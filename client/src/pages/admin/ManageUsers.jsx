@@ -35,6 +35,30 @@ const ManageUsers = () => {
 
     const isSuperAdmin = currentUser?.roles?.includes('superadmin') || currentUser?.role === 'superadmin';
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     useEffect(() => {
         if (isSuperAdmin) {
             fetchUsers();
@@ -50,7 +74,7 @@ const ManageUsers = () => {
                 setUsers(response.data.data);
             }
         } catch (error) {
-            console.error('Failed to fetch users:', error);
+            alert('⚠️ Error loading users: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -71,11 +95,11 @@ const ManageUsers = () => {
         if (!selectedUser || selectedRoles.length === 0) return;
         try {
             await api.patch(`/admin/users/${selectedUser._id}/roles`, { roles: selectedRoles });
-            alert(`User roles updated successfully`);
+            alert('✅ User roles updated successfully!');
             setRoleModalOpen(false);
             fetchUsers();
         } catch (error) {
-            alert('Failed to update role: ' + (error.response?.data?.message || error.message));
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -84,9 +108,10 @@ const ManageUsers = () => {
         if (window.confirm(`Are you sure you want to ${action} this user?`)) {
             try {
                 await api.patch(`/admin/users/${user._id}/status`, { isActive: !user.isActive });
+                alert(`✅ User ${action}d successfully!`);
                 fetchUsers();
             } catch (error) {
-                alert('Failed to update user status: ' + (error.response?.data?.message || error.message));
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -96,9 +121,10 @@ const ManageUsers = () => {
             try {
                 await api.delete(`/admin/users/${id}`);
                 setUsers(users.filter(u => u._id !== id));
+                alert('✅ User deleted successfully!');
                 fetchStats();
             } catch (error) {
-                alert('Failed to delete user: ' + (error.response?.data?.message || error.message));
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -150,13 +176,13 @@ const ManageUsers = () => {
 
             <div className="card" style={{ padding: 0, backgroundColor: 'white', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
                 <div className="table-responsive">
-                    <table className="admin-table responsive-table">
+                    <table className="admin-table">
                         <thead>
                             <tr>
                                 <th>User</th>
-                                <th className="hide-mobile">Roles</th>
+                                <th>Roles</th>
                                 <th>Status</th>
-                                <th className="hide-tablet">Joined</th>
+                                <th>Joined</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -172,7 +198,7 @@ const ManageUsers = () => {
                                             </div>
                                         )}
                                     </td>
-                                    <td data-label="Roles" className="hide-mobile">
+                                    <td data-label="Roles">
                                         <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                                             {(user.roles || ['member']).map(role => (
                                                 <span key={role} style={{
@@ -201,7 +227,7 @@ const ManageUsers = () => {
                                             {user.isActive ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
-                                    <td data-label="Joined" className="hide-tablet">
+                                    <td data-label="Joined">
                                         <div style={{ fontSize: '0.85rem' }}>{new Date(user.createdAt).toLocaleDateString()}</div>
                                     </td>
                                     <td data-label="Actions">

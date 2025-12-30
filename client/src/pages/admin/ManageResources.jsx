@@ -19,6 +19,31 @@ const ManageResources = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingResource, setEditingResource] = useState(null);
     const [uploading, setUploading] = useState(false);
+
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -56,7 +81,7 @@ const ManageResources = () => {
                 setResources([]);
             }
         } catch (error) {
-            console.error('Failed to fetch resources:', error);
+            alert('⚠️ Error loading resources: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -77,9 +102,12 @@ const ManageResources = () => {
                         file.type.startsWith('image/') ? 'image' :
                             'document'
                 }));
+                alert('✅ File uploaded successfully!');
+            } else {
+                alert('⚠️ ' + getFriendlyError(response.message || 'Upload failed'));
             }
         } catch (error) {
-            alert('Upload failed: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         } finally {
             setUploading(false);
         }
@@ -89,9 +117,10 @@ const ManageResources = () => {
         if (window.confirm('Are you sure you want to delete this resource?')) {
             try {
                 await resourceService.deleteResource(id);
+                alert('✅ Resource deleted successfully!');
                 setResources(resources.filter(r => r._id !== id));
             } catch (error) {
-                alert('Failed to delete resource: ' + error);
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -100,9 +129,9 @@ const ManageResources = () => {
         try {
             await resourceService.verifyResource(id);
             setResources(resources.map(r => r._id === id ? { ...r, status: 'published' } : r));
-            alert('Resource verified and published.');
+            alert('✅ Resource verified and published successfully!');
         } catch (error) {
-            alert('Failed to verify resource: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -139,15 +168,15 @@ const ManageResources = () => {
         try {
             if (editingResource) {
                 await resourceService.updateResource(editingResource._id, formData);
-                alert('Resource updated successfully');
+                alert('✅ Resource updated successfully!');
             } else {
                 await resourceService.createResource(formData);
-                alert('Resource created successfully');
+                alert('✅ Resource created successfully!');
             }
             setIsModalOpen(false);
             fetchResources();
         } catch (error) {
-            alert('Operation failed: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -175,13 +204,13 @@ const ManageResources = () => {
 
             <div className="card" style={{ padding: 0, borderRadius: '20px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                 <div className="table-responsive">
-                    <table className="admin-table responsive-table">
+                    <table className="admin-table">
                         <thead>
                             <tr>
                                 <th>Resource Detail</th>
-                                <th className="hide-mobile">Classification</th>
-                                <th className="hide-tablet">Privacy</th>
-                                <th className="hide-tablet">Status</th>
+                                <th>Classification</th>
+                                <th>Privacy</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -217,11 +246,11 @@ const ManageResources = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td data-label="Classification" className="hide-mobile">
+                                        <td data-label="Classification">
                                             <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#555' }}>{resource.category}</div>
                                             <div style={{ fontSize: '0.7rem', color: '#aaa', textTransform: 'uppercase' }}>{resource.resourceType}</div>
                                         </td>
-                                        <td data-label="Privacy" className="hide-tablet">
+                                        <td data-label="Privacy">
                                             <span style={{
                                                 padding: '4px 12px',
                                                 borderRadius: '100px',
@@ -234,7 +263,7 @@ const ManageResources = () => {
                                                 {resource.accessLevel.replace('_', ' ')}
                                             </span>
                                         </td>
-                                        <td data-label="Status" className="hide-tablet">
+                                        <td data-label="Status">
                                             <span style={{
                                                 fontSize: '0.85rem',
                                                 color: resource.status === 'published' ? '#2e7d32' : '#999',

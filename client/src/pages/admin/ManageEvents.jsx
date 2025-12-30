@@ -26,6 +26,30 @@ const ManageEvents = () => {
         imageUrl: ''
     });
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const eventTypes = [
         'workshop', 'seminar', 'conference', 'training', 'awareness_campaign',
         'health_screening', 'fundraising', 'social', 'meeting', 'other'
@@ -46,7 +70,7 @@ const ManageEvents = () => {
                 setEvents([]);
             }
         } catch (error) {
-            console.error('Failed to fetch events:', error);
+            alert('⚠️ Error loading events: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -56,9 +80,10 @@ const ManageEvents = () => {
         if (window.confirm('Are you sure you want to delete this event?')) {
             try {
                 await eventService.deleteEvent(id);
+                alert('✅ Event deleted successfully!');
                 setEvents(events.filter(e => e._id !== id));
             } catch (error) {
-                alert('Failed to delete event');
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -115,33 +140,24 @@ const ManageEvents = () => {
             if (editingEvent) {
                 const response = await eventService.updateEvent(editingEvent._id, payload);
                 if (response.success) {
-                    alert('Event updated successfully');
+                    alert('✅ Event updated successfully!');
                     setIsModalOpen(false);
                     fetchEvents();
                 } else {
-                    alert(response.message || 'Failed to update event');
+                    alert('⚠️ ' + getFriendlyError(response.message || 'Failed to update event'));
                 }
             } else {
                 const response = await eventService.createEvent(payload);
                 if (response.success) {
-                    alert('Event created successfully');
+                    alert('✅ Event created successfully!');
                     setIsModalOpen(false);
                     fetchEvents();
                 } else {
-                    alert(response.message || 'Failed to create event');
+                    alert('⚠️ ' + getFriendlyError(response.message || 'Failed to create event'));
                 }
             }
         } catch (error) {
-            console.error('Event operation error:', error);
-            const msg = error.response?.data?.message || error.message || 'Operation failed';
-            const errors = error.response?.data?.errors;
-
-            if (errors && Array.isArray(errors)) {
-                const errorDetails = errors.map(e => `${e.field}: ${e.message}`).join('\n');
-                alert(`${msg}\n\n${errorDetails}`);
-            } else {
-                alert(msg);
-            }
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -156,13 +172,13 @@ const ManageEvents = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table className="admin-table responsive-table">
+                    <table className="admin-table">
                         <thead>
                             <tr>
                                 <th>Event</th>
-                                <th className="hide-mobile">Type</th>
+                                <th>Type</th>
                                 <th>Date & Location</th>
-                                <th className="hide-tablet">Registrations</th>
+                                <th>Registrations</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -175,14 +191,14 @@ const ManageEvents = () => {
                                             {event.description}
                                         </div>
                                     </td>
-                                    <td data-label="Type" className="hide-mobile">
+                                    <td data-label="Type">
                                         <span style={{ textTransform: 'capitalize' }}>{event.eventType?.replace('_', ' ')}</span>
                                     </td>
                                     <td data-label="Date & Location">
                                         <div>{new Date(event.startDate).toLocaleDateString()}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#777' }}>📍 {event.location?.venue}</div>
                                     </td>
-                                    <td data-label="Registrations" className="hide-tablet">
+                                    <td data-label="Registrations">
                                         {event.totalRegistrations || (event.registrations ? event.registrations.length : 0)} registered
                                     </td>
                                     <td data-label="Actions">

@@ -152,39 +152,45 @@ class UserService {
         }
     }
 
-    // Generate password reset token
-    async generatePasswordResetToken(email) {
+    // Generate password reset token (OTP)
+    async generatePasswordResetToken(identity, contact) {
         try {
-            const user = await User.findOne({ email });
+            const user = await User.findOne({
+                $and: [
+                    { $or: [{ username: identity }, { studentId: identity }] },
+                    { $or: [{ email: contact }, { 'phoneNumbers.number': contact }] }
+                ]
+            });
 
             if (!user) {
-                throw new Error('User not found');
+                throw new Error('No user found matching these details');
             }
 
-            const resetToken = user.createPasswordResetToken();
+            const otp = user.createPasswordResetOTP();
             await user.save({ validateBeforeSave: false });
 
-            return resetToken;
+            return otp;
         } catch (error) {
             throw error;
         }
     }
 
-    // Reset password
-    async resetPassword(token, newPassword) {
+    // Reset password using OTP
+    async resetPassword(contact, otp, newPassword) {
         try {
             const hashedToken = crypto
                 .createHash('sha256')
-                .update(token)
+                .update(otp)
                 .digest('hex');
 
             const user = await User.findOne({
                 passwordResetToken: hashedToken,
-                passwordResetExpires: { $gt: Date.now() }
+                passwordResetExpires: { $gt: Date.now() },
+                $or: [{ email: contact }, { 'phoneNumbers.number': contact }]
             });
 
             if (!user) {
-                throw new Error('Invalid or expired reset token');
+                throw new Error('Invalid or expired OTP');
             }
 
             user.password = newPassword;

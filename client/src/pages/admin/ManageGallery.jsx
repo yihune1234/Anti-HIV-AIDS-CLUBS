@@ -21,6 +21,30 @@ const ManageGallery = () => {
         albumType: 'general'
     });
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const albumTypes = [
         'event', 'activity', 'awareness_campaign', 'training', 'general', 'other'
     ];
@@ -40,7 +64,7 @@ const ManageGallery = () => {
                 setItems([]);
             }
         } catch (error) {
-            console.error('Failed to fetch gallery:', error);
+            alert('⚠️ Error loading gallery: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -55,9 +79,12 @@ const ManageGallery = () => {
             const response = await uploadService.uploadFile(file);
             if (response.success) {
                 setFormData(prev => ({ ...prev, imageUrl: response.data.url }));
+                alert('✅ Image uploaded successfully!');
+            } else {
+                alert('⚠️ ' + getFriendlyError(response.message || 'Upload failed'));
             }
         } catch (error) {
-            alert('Upload failed: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         } finally {
             setUploading(false);
         }
@@ -67,9 +94,10 @@ const ManageGallery = () => {
         if (window.confirm('Are you sure you want to delete this gallery?')) {
             try {
                 await galleryService.deleteGalleryItem(id);
+                alert('✅ Gallery item deleted successfully!');
                 setItems(items.filter(item => item._id !== id));
             } catch (error) {
-                alert('Failed to delete gallery: ' + error);
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -86,12 +114,12 @@ const ManageGallery = () => {
 
         try {
             await galleryService.createGalleryItem(payload);
-            alert('Gallery created successfully');
+            alert('✅ Gallery item created successfully!');
             setIsModalOpen(false);
             setFormData({ title: '', imageUrl: '', albumType: 'general' });
             fetchGallery();
         } catch (error) {
-            alert('Operation failed: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 

@@ -10,15 +10,40 @@ const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Invalid email or password. Please try again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        const { success, message, user } = await login(email, password);
+        const result = await login(email, password);
         setLoading(false);
 
-        if (success) {
+        if (result.success) {
+            const user = result.user;
             // Check if user has admin role (support both single role and roles array)
             const userRoles = Array.isArray(user.roles) ? user.roles : [user.role];
             const isAdmin = userRoles.includes('admin') || userRoles.includes('superadmin');
@@ -29,7 +54,7 @@ const Login = () => {
                 navigate('/member');
             }
         } else {
-            setError(message);
+            setError(getFriendlyError(result.message));
         }
     };
 

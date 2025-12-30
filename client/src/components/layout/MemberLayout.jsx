@@ -213,11 +213,10 @@ const MemberLayout = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '0.6rem',
                             transition: 'all 0.3s'
                         }}
                     >
-                        <span>🚪</span> LOGOUT
+                        LOGOUT
                     </button>
                 </div>
             </aside>
@@ -226,19 +225,19 @@ const MemberLayout = () => {
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginLeft: isMobile ? 0 : '280px', transition: 'margin-left 0.4s ease' }}>
                 {/* Header */}
                 <header style={{
-                    height: '80px',
+                    minHeight: '70px',
                     background: getHeaderBackground(),
                     borderBottom: `1px solid rgba(255,255,255,0.1)`,
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '0 2.5rem',
+                    padding: isMobile ? '1rem 1.5rem' : '1.5rem 2.5rem',
                     position: 'sticky',
                     top: 0,
                     zIndex: 900,
                     justifyContent: 'space-between',
                     boxShadow: '0 4px 30px rgba(0,0,0,0.1)'
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
                         {isMobile && (
                             <button
                                 onClick={toggleSidebar}
@@ -252,93 +251,90 @@ const MemberLayout = () => {
                                     alignItems: 'center', 
                                     justifyContent: 'center', 
                                     cursor: 'pointer', 
-                                    color: 'white' 
+                                    color: 'white',
+                                    flexShrink: 0
                                 }}
                             >
                                 ☰
                             </button>
                         )}
                         <div>
-                            <h3 style={{ margin: 0, fontSize: '0.65rem', color: getAccentColor(), fontWeight: '900', letterSpacing: '1.5px', textTransform: 'uppercase' }}>{getPageTitle()}</h3>
-                            <h2 style={{ margin: 0, fontSize: '1.3rem', color: 'white', fontWeight: '800', letterSpacing: '-0.5px' }}>{getPageTitle() === 'DASHBOARD' ? 'Welcome Back!' : getPageTitle()}</h2>
+                            <h1 style={{ 
+                                margin: 0, 
+                                fontSize: isMobile ? '1.25rem' : '1.75rem', 
+                                color: 'white', 
+                                fontWeight: '900', 
+                                letterSpacing: '-0.5px',
+                                lineHeight: 1.2
+                            }}>
+                                {getPageTitle()}
+                            </h1>
+                            {!isMobile && (
+                                <p style={{ 
+                                    margin: '0.25rem 0 0 0', 
+                                    fontSize: '0.85rem', 
+                                    color: 'rgba(255,255,255,0.7)', 
+                                    fontWeight: '500' 
+                                }}>
+                                    {getPageTitle() === 'DASHBOARD' ? `Welcome back, ${user?.firstName}!` : 'Manage your activities and resources'}
+                                </p>
+                            )}
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
                         {/* Theme Settings Icon */}
                         <button 
                             onClick={() => setIsThemeModalOpen(true)}
                             title="Theme Customization"
                             style={{
-                                width: '42px',
-                                height: '42px',
-                                borderRadius: '12px',
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
                                 background: 'rgba(255,255,255,0.1)',
-                                border: '1px solid rgba(255,255,255,0.1)',
+                                border: '1px solid rgba(255,255,255,0.15)',
                                 color: 'white',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 transition: 'all 0.3s ease',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                flexShrink: 0
                             }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#333'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'white'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <circle cx="12" cy="12" r="3"></circle>
                                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                             </svg>
                         </button>
 
+                        {/* Profile Icon */}
                         <Link 
                             to="/member/profile" 
                             title="My Profile"
                             style={{
-                                width: '42px',
-                                height: '42px',
-                                borderRadius: '12px',
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
                                 background: 'rgba(255,255,255,0.1)',
-                                border: '1px solid rgba(255,255,255,0.1)',
+                                border: '1px solid rgba(255,255,255,0.15)',
                                 color: 'white',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                transition: 'all 0.3s ease'
+                                transition: 'all 0.3s ease',
+                                flexShrink: 0
                             }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#333'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'white'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
                         >
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
                             </svg>
                         </Link>
-                        
-                        <button 
-                            onClick={handleLogout}
-                            style={{ 
-                                background: getAccentColor(), 
-                                color: 'white', 
-                                border: 'none', 
-                                padding: isMobile ? '0.6rem' : '0.6rem 1.4rem', 
-                                borderRadius: '10px', 
-                                fontWeight: '800', 
-                                fontSize: '0.8rem', 
-                                cursor: 'pointer',
-                                transition: 'all 0.3s',
-                                boxShadow: `0 4px 15px ${getAccentColor()}44`,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem'
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.filter = 'brightness(1.1)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.filter = 'brightness(1)'; }}
-                        >
-                            <span style={{ fontSize: '1.2rem' }}>🚪</span>
-                            {!isMobile && "SIGN OUT"}
-                        </button>
                     </div>
                 </header>
 

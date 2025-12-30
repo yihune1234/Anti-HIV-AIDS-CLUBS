@@ -1,0 +1,217 @@
+/* ============================================
+   RESPONSIVE DASHBOARD - QUICK REFERENCE
+   ============================================ */
+
+/* BREAKPOINTS */
+/*
+  Mobile:       ≤ 768px
+  Tablet:       769px - 1024px  
+  Desktop:      > 1024px
+  Extra Small:  ≤ 576px
+*/
+
+/* ============================================
+   TABLE RESPONSIVE BEHAVIOR
+   ============================================ */
+
+/* Desktop: Full table layout */
+.admin-table {
+  width: 100%;
+  /* All columns visible, standard spacing */
+}
+
+/* Mobile: Horizontal scroll */
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: auto;           /* Enable horizontal scroll */
+    max-width: 100vw;           /* Prevent page scroll */
+    -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
+  }
+  
+  .table-responsive table {
+    min-width: 1000px;          /* Force scroll for all columns */
+  }
+  
+  .admin-table th,
+  .admin-table td {
+    white-space: nowrap;        /* Prevent text wrapping */
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* ============================================
+   GRID LAYOUTS
+   ============================================ */
+
+/* Auto-responsive grid */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 1.5rem;
+}
+
+/* Behavior:
+   Desktop:  4 columns
+   Tablet:   2 columns  
+   Mobile:   1 column
+*/
+
+/* ============================================
+   CARDS & CONTAINERS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  /* Stats cards stack vertically */
+  .stats-card {
+    min-width: 100% !important;
+  }
+}
+
+/* ============================================
+   FORMS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* All inputs full width */
+  .form-control,
+  input, select, textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Buttons stack */
+  .btn-group button,
+  [style*="gap"] button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Modal containers */
+  [style*="position: fixed"][style*="zIndex: 1100"] {
+    padding: 1rem !important;
+  }
+  
+  /* Modal content */
+  [style*="width: 600px"],
+  [style*="width: 700px"] {
+    width: 95% !important;
+    max-width: 95vw !important;
+  }
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+@media (max-width: 768px) {
+  h1 { font-size: clamp(1.5rem, 5vw, 2rem) !important; }
+  h2 { font-size: clamp(1.25rem, 4vw, 1.75rem) !important; }
+  h3 { font-size: clamp(1.1rem, 3.5vw, 1.5rem) !important; }
+}
+
+/* ============================================
+   ACTION BARS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Horizontal bars become vertical */
+  [style*="justify-content: space-between"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+}
+
+/* ============================================
+   VISUAL SCROLL INDICATOR
+   ============================================ */
+
+@media (max-width: 768px) {
+  .table-responsive::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to left, rgba(255,255,255,0.9), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* ============================================
+   LANDSCAPE PHONE
+   ============================================ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .table-responsive {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .table-responsive {
+    overflow: visible !important;
+  }
+  
+  .table-responsive table {
+    min-width: 100% !important;
+  }
+  
+  .btn, button {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   USAGE EXAMPLES
+   ============================================ */
+
+/*
+1. RESPONSIVE TABLE:
+   <div className="table-responsive">
+     <table className="admin-table">
+       <thead>...</thead>
+       <tbody>...</tbody>
+     </table>
+   </div>
+
+2. RESPONSIVE GRID:
+   <div style={{
+     display: 'grid',
+     gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))',
+     gap: '1.5rem'
+   }}>
+     <div className="card">...</div>
+     <div className="card">...</div>
+   </div>
+
+3. RESPONSIVE FLEX:
+   <div style={{
+     display: 'flex',
+     justifyContent: 'space-between',
+     flexWrap: 'wrap',
+     gap: '1rem'
+   }}>
+     <button>Action 1</button>
+     <button>Action 2</button>
+   </div>
+*/

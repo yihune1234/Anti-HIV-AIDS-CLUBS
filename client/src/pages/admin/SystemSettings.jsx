@@ -7,6 +7,39 @@ const SystemSettings = () => {
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState('general');
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        
+        const errorMsg = error.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        
+        // Network errors
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        // Authentication errors
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        // Validation errors
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        // Server errors
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        
+        // If error message is already user-friendly (no technical jargon)
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     useEffect(() => {
         fetchSettings();
     }, []);
@@ -16,9 +49,11 @@ const SystemSettings = () => {
             const result = await adminService.getSystemSettings();
             if (result.success) {
                 setSettings(result.data);
+            } else {
+                alert('⚠️ ' + getFriendlyError(result.message || 'Failed to load settings'));
             }
         } catch (error) {
-            console.error('Failed to fetch settings:', error);
+            alert('⚠️ Error loading settings: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -27,10 +62,14 @@ const SystemSettings = () => {
     const handleSave = async () => {
         try {
             setSaving(true);
-            await adminService.updateSystemSettings(settings);
-            alert('Settings saved successfully');
+            const result = await adminService.updateSystemSettings(settings);
+            if (result.success) {
+                alert('✅ Settings saved successfully!');
+            } else {
+                alert('⚠️ ' + getFriendlyError(result.message || 'Failed to save settings'));
+            }
         } catch (error) {
-            alert('Failed to save settings: ' + error.message);
+            alert('⚠️ Error saving settings: ' + getFriendlyError(error));
         } finally {
             setSaving(false);
         }

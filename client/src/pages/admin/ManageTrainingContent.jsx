@@ -16,6 +16,30 @@ const ManageTrainingContent = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingContent, setEditingContent] = useState(null);
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -49,7 +73,7 @@ const ManageTrainingContent = () => {
             const response = await trainingContentService.getAllContent({});
             setContents(response.data || []);
         } catch (error) {
-            console.error('Failed to load content:', error);
+            alert('⚠️ Error loading contents: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -90,15 +114,15 @@ const ManageTrainingContent = () => {
         try {
             if (editingContent) {
                 await trainingContentService.updateContent(editingContent._id, formData);
-                alert('Content updated successfully');
+                alert('✅ Content updated successfully!');
             } else {
                 await trainingContentService.createContent(formData);
-                alert('Content created successfully');
+                alert('✅ Content created successfully!');
             }
             setIsModalOpen(false);
             fetchContents();
         } catch (error) {
-            alert(error.response?.data?.message || 'Failed to save content');
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -106,10 +130,10 @@ const ManageTrainingContent = () => {
         if (window.confirm('Are you sure you want to delete this content?')) {
             try {
                 await trainingContentService.deleteContent(id);
-                alert('Content deleted successfully');
+                alert('✅ Content deleted successfully!');
                 fetchContents();
             } catch (error) {
-                alert('Failed to delete content');
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -145,14 +169,14 @@ const ManageTrainingContent = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table className="admin-table responsive-table">
+                    <table className="admin-table">
                         <thead>
                             <tr>
                                 <th>Title</th>
                                 <th>Type</th>
-                                <th className="hide-tablet">Category</th>
-                                <th className="hide-mobile">Access</th>
-                                <th className="hide-mobile">Stats</th>
+                                <th>Category</th>
+                                <th>Access</th>
+                                <th>Stats</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -164,13 +188,13 @@ const ManageTrainingContent = () => {
                                         {content.isFeatured && <span style={{ fontSize: '0.75rem', color: '#F57C00' }}>⭐ Featured</span>}
                                     </td>
                                     <td data-label="Type">{getTypeBadge(content.contentType)}</td>
-                                    <td data-label="Category" className="hide-tablet">{content.category}</td>
-                                    <td data-label="Access" className="hide-mobile">
+                                    <td data-label="Category">{content.category}</td>
+                                    <td data-label="Access">
                                         <span style={{ fontSize: '0.85rem', color: content.accessLevel === 'public' ? '#388E3C' : '#1976D2' }}>
                                             {content.accessLevel === 'public' ? '🌐 Public' : '🔒 Members'}
                                         </span>
                                     </td>
-                                    <td data-label="Stats" className="hide-mobile">
+                                    <td data-label="Stats">
                                         <div style={{ fontSize: '0.85rem' }}>
                                             <div>👁 {content.viewCount || 0} views</div>
                                             <div>⬇ {content.downloadCount || 0} downloads</div>

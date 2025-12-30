@@ -40,6 +40,30 @@ const ManageStories = () => {
         imageUrl: ''
     });
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const categories = [
         'personal_journey', 'recovery', 'awareness', 'prevention',
         'support', 'education', 'advocacy', 'inspiration', 'other'
@@ -60,7 +84,7 @@ const ManageStories = () => {
                 setStories([]);
             }
         } catch (error) {
-            console.error('Failed to fetch stories:', error);
+            alert('⚠️ Error loading stories: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -70,20 +94,22 @@ const ManageStories = () => {
         if (!window.confirm('Are you sure you want to delete this story?')) return;
         try {
             await storyService.deleteStory(id);
+            alert('✅ Story deleted successfully!');
             setStories(prev => prev.filter(s => s._id !== id));
         } catch (error) {
-            alert('Failed to delete story: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
     const handleApprove = async (id) => {
         try {
             await storyService.approveStory(id);
+            alert('✅ Story approved successfully!');
             setStories(prev =>
                 prev.map(s => s._id === id ? { ...s, status: 'published' } : s)
             );
         } catch (error) {
-            alert('Failed to approve story: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -113,9 +139,12 @@ const ManageStories = () => {
             const response = await uploadService.uploadFile(file);
             if (response?.success) {
                 setFormData(prev => ({ ...prev, imageUrl: response.data.url }));
+                alert('✅ Image uploaded successfully!');
+            } else {
+                alert('⚠️ ' + getFriendlyError(response.message || 'Upload failed'));
             }
         } catch (error) {
-            alert('Upload failed: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         } finally {
             setUploading(false);
         }
@@ -136,15 +165,15 @@ const ManageStories = () => {
         try {
             if (editingStory) {
                 await storyService.updateStory(editingStory._id, payload);
-                alert('Story updated successfully');
+                alert('✅ Story updated successfully!');
             } else {
                 await storyService.createStory(payload);
-                alert('Story created successfully');
+                alert('✅ Story created successfully!');
             }
             setIsModalOpen(false);
             fetchStories();
         } catch (error) {
-            alert('Operation failed: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -159,13 +188,13 @@ const ManageStories = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table className="admin-table responsive-table">
+                    <table className="admin-table">
                         <thead>
                             <tr>
-                                <th className="hide-mobile">Image</th>
+                                <th>Image</th>
                                 <th>Title</th>
-                                <th className="hide-mobile">Author</th>
-                                <th className="hide-tablet">Category</th>
+                                <th>Author</th>
+                                <th>Category</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -173,7 +202,7 @@ const ManageStories = () => {
                         <tbody>
                             {stories.map(story => (
                                 <tr key={story._id}>
-                                    <td data-label="Image" className="hide-mobile">
+                                    <td data-label="Image">
                                         {story.featuredImage ? (
                                             <img src={story.featuredImage} alt="" width="40" height="40" />
                                         ) : 'No Image'}
@@ -182,10 +211,10 @@ const ManageStories = () => {
                                         <strong>{story.title}</strong><br />
                                         <small>{new Date(story.createdAt).toLocaleDateString()}</small>
                                     </td>
-                                    <td data-label="Author" className="hide-mobile">
+                                    <td data-label="Author">
                                         {story.author ? `${story.author.firstName} ${story.author.lastName}` : 'Unknown'}
                                     </td>
-                                    <td data-label="Category" className="hide-tablet">{story.category.replace('_', ' ')}</td>
+                                    <td data-label="Category">{story.category.replace('_', ' ')}</td>
                                     <td data-label="Status">{story.status || 'Draft'}</td>
                                     <td data-label="Actions">
                                         <button className="btn btn-sm btn-outline" onClick={() => handleEdit(story)}>Edit</button>{' '}

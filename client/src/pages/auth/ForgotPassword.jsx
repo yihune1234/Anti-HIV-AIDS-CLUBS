@@ -21,6 +21,30 @@ const ForgotPassword = () => {
 
     const navigate = useNavigate();
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const handleRequestOTP = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -29,17 +53,16 @@ const ForgotPassword = () => {
 
         try {
             const response = await api.post('/users/forgot-password', { identity, contact });
-
-            setMessage(response.data.message);
+            setMessage('✅ ' + response.data.message);
+            
             // DEVELOPMENT ONLY: Log OTP
             if (response.data.otp) {
                 console.log('DEV ONLY - OTP:', response.data.otp);
-                setMessage(prev => `${prev} (Check console for dev OTP)`);
             }
 
             setStep(2);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to verify credentials');
+            setError('⚠️ ' + getFriendlyError(err));
         } finally {
             setLoading(false);
         }
@@ -51,24 +74,24 @@ const ForgotPassword = () => {
         setError(null);
 
         if (newPassword.length < 6) {
-            setError('New password must be at least 6 characters long');
+            setError('⚠️ New password must be at least 6 characters long');
             setLoading(false);
             return;
         }
 
         try {
             await api.post('/users/reset-password', {
-                contact, // We pass the contact (email/phone) back to server to identify user along with OTP
+                contact,
                 otp,
                 newPassword
             });
 
-            setMessage('Password reset successfully! Redirecting to login...');
+            setMessage('✅ Password reset successfully! Redirecting...');
             setTimeout(() => {
                 navigate('/login');
             }, 2000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to reset password');
+            setError('⚠️ ' + getFriendlyError(err));
         } finally {
             setLoading(false);
         }
@@ -109,8 +132,8 @@ const ForgotPassword = () => {
                     </h2>
                     <p style={{ color: '#666', fontSize: '0.9rem' }}>
                         {step === 1
-                            ? "Verify your identity to receive a One-Time Password (OTP)."
-                            : "Enter the OTP sent to your contact method."}
+                            ? "Verify your account to receive a code."
+                            : "Enter the 6-digit code received."}
                     </p>
                 </div>
 
@@ -121,7 +144,8 @@ const ForgotPassword = () => {
                         marginBottom: '1.5rem',
                         backgroundColor: '#d4edda',
                         color: '#155724',
-                        border: '1px solid #c3e6cb'
+                        border: '1px solid #c3e6cb',
+                        textAlign: 'center'
                     }}>
                         {message}
                     </div>
@@ -134,7 +158,8 @@ const ForgotPassword = () => {
                         marginBottom: '1.5rem',
                         backgroundColor: '#f8d7da',
                         color: '#721c24',
-                        border: '1px solid #f5c6cb'
+                        border: '1px solid #f5c6cb',
+                        textAlign: 'center'
                     }}>
                         {error}
                     </div>
@@ -143,7 +168,7 @@ const ForgotPassword = () => {
                 {step === 1 ? (
                     <form onSubmit={handleRequestOTP}>
                         <div className="form-group" style={{ marginBottom: '1rem' }}>
-                            <label className="form-label" style={{ fontWeight: '600', color: '#444' }}>Username <span style={{ fontWeight: 'normal', color: '#777' }}>OR</span> Student ID</label>
+                            <label className="form-label" style={{ fontWeight: '600', color: '#444' }}>Username or Student ID</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -151,11 +176,11 @@ const ForgotPassword = () => {
                                 onChange={(e) => setIdentity(e.target.value)}
                                 required
                                 style={{ padding: '0.8rem 1rem', borderRadius: '10px' }}
-                                placeholder="e.g. johndoe or SID12345"
+                                placeholder="Enter your username or ID"
                             />
                         </div>
                         <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                            <label className="form-label" style={{ fontWeight: '600', color: '#444' }}>Registered Email <span style={{ fontWeight: 'normal', color: '#777' }}>OR</span> Phone</label>
+                            <label className="form-label" style={{ fontWeight: '600', color: '#444' }}>Email or Phone</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -163,7 +188,7 @@ const ForgotPassword = () => {
                                 onChange={(e) => setContact(e.target.value)}
                                 required
                                 style={{ padding: '0.8rem 1rem', borderRadius: '10px' }}
-                                placeholder="e.g. john@example.com or +251..."
+                                placeholder="Enter your registered contact"
                             />
                         </div>
 
@@ -182,7 +207,7 @@ const ForgotPassword = () => {
                                 opacity: loading ? 0.7 : 1
                             }}
                         >
-                            {loading ? 'Verifying...' : 'Verify & Send OTP'}
+                            {loading ? 'Verifying...' : 'Verify & Send Code'}
                         </button>
                     </form>
                 ) : (

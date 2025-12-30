@@ -19,6 +19,30 @@ const ManageSessions = () => {
     const [users, setUsers] = useState([]);
     const [viewingParticipants, setViewingParticipants] = useState(null);
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -61,7 +85,7 @@ const ManageSessions = () => {
             const response = await sessionService.getAllSessions({});
             setSessions(response.data || []);
         } catch (error) {
-            console.error('Failed to load sessions:', error);
+            alert('⚠️ Error loading sessions: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -83,7 +107,7 @@ const ManageSessions = () => {
             const response = await sessionService.getSessionById(sessionId);
             setViewingParticipants(response.data);
         } catch (error) {
-            alert('Failed to load participants');
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -128,15 +152,15 @@ const ManageSessions = () => {
         try {
             if (editingSession) {
                 await sessionService.updateSession(editingSession._id, formData);
-                alert('Session updated successfully');
+                alert('✅ Session updated successfully!');
             } else {
                 await sessionService.createSession(formData);
-                alert('Session created successfully');
+                alert('✅ Session created successfully!');
             }
             setIsModalOpen(false);
             fetchSessions();
         } catch (error) {
-            alert(error.response?.data?.message || 'Failed to save session');
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
@@ -144,10 +168,10 @@ const ManageSessions = () => {
         if (window.confirm('Are you sure you want to delete this session?')) {
             try {
                 await sessionService.deleteSession(id);
-                alert('Session deleted successfully');
+                alert('✅ Session deleted successfully!');
                 fetchSessions();
             } catch (error) {
-                alert('Failed to delete session');
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -193,14 +217,14 @@ const ManageSessions = () => {
 
             <div className="card" style={{ padding: 0 }}>
                 <div className="table-responsive">
-                    <table className="admin-table responsive-table">
+                    <table className="admin-table">
                         <thead>
                             <tr>
                                 <th>Session</th>
-                                <th className="hide-tablet">Topic & Type</th>
+                                <th>Topic & Type</th>
                                 <th>Date & Time</th>
                                 <th>Status</th>
-                                <th className="hide-mobile">Participants</th>
+                                <th>Participants</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -213,7 +237,7 @@ const ManageSessions = () => {
                                             {session.description}
                                         </div>
                                     </td>
-                                    <td data-label="Topic & Type" className="hide-tablet">
+                                    <td data-label="Topic & Type">
                                         <div style={{ fontSize: '0.9rem' }}>{session.topic}</div>
                                         <div style={{ fontSize: '0.8rem', color: '#777', textTransform: 'capitalize' }}>
                                             {session.sessionType.replace('_', ' ')}
@@ -229,7 +253,7 @@ const ManageSessions = () => {
                                         </div>
                                     </td>
                                     <td data-label="Status">{getStatusBadge(session.status)}</td>
-                                    <td data-label="Participants" className="hide-mobile">
+                                    <td data-label="Participants">
                                         <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#388E3C' }}>
                                             {session.totalParticipants || 0}
                                         </div>

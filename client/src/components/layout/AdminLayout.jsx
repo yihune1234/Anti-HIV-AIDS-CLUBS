@@ -224,84 +224,108 @@ const AdminLayout = () => {
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginLeft: isMobile ? 0 : '260px', transition: 'margin-left 0.3s ease' }}>
                 {/* Admin Header */}
                 <header style={{
-                    height: '64px',
+                    minHeight: '70px',
                     backgroundColor: 'white',
                     borderBottom: '1px solid #e0e0e0',
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '0 1.5rem',
+                    padding: isMobile ? '1rem 1.5rem' : '1.5rem 2rem',
                     position: 'sticky',
                     top: 0,
-                    zIndex: 900
+                    zIndex: 900,
+                    justifyContent: 'space-between'
                 }}>
-                    {isMobile && (
-                        <button
-                            onClick={toggleSidebar}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                fontSize: '1.5rem',
-                                cursor: 'pointer',
-                                marginRight: '1rem',
-                                color: '#1a1a2e'
-                            }}
-                        >
-                            ☰
-                        </button>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                        <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#1a1a2e', fontWeight: '800' }}>
-                            {location.pathname.split('/').pop().replace('-', ' ').toUpperCase() || 'DASHBOARD'}
-                        </h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                            <button 
-                                onClick={() => setIsThemeModalOpen(true)}
-                                title="Theme Customization"
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
+                        {isMobile && (
+                            <button
+                                onClick={toggleSidebar}
                                 style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '10px',
-                                    backgroundColor: '#f8f9fa',
-                                    color: '#555',
+                                    background: 'transparent',
                                     border: 'none',
+                                    fontSize: '1.5rem',
                                     cursor: 'pointer',
-                                    transition: 'all 0.3s'
+                                    color: '#1a1a2e',
+                                    flexShrink: 0
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.primaryColor; e.currentTarget.style.color = 'white'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; e.currentTarget.style.color = '#555'; }}
                             >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                                </svg>
+                                ☰
                             </button>
-
-                            <Link 
-                                to="/admin/settings" 
-                                title="System Settings"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '10px',
-                                    backgroundColor: '#f8f9fa',
-                                    color: '#555',
-                                    textDecoration: 'none',
-                                    transition: 'all 0.3s'
-                                }}
-                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.primaryColor; e.currentTarget.style.color = 'white'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; e.currentTarget.style.color = '#555'; }}
-                            >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-                                </svg>
-                            </Link>
+                        )}
+                        <div>
+                            <h1 style={{ 
+                                margin: 0, 
+                                fontSize: isMobile ? '1.25rem' : '1.75rem', 
+                                color: '#1a1a2e', 
+                                fontWeight: '900',
+                                letterSpacing: '-0.5px',
+                                lineHeight: 1.2,
+                                textTransform: 'uppercase'
+                            }}>
+                                {location.pathname.split('/').pop().replace('-', ' ') || 'DASHBOARD'}
+                            </h1>
+                            {!isMobile && (
+                                <p style={{ 
+                                    margin: '0.25rem 0 0 0', 
+                                    fontSize: '0.85rem', 
+                                    color: '#666', 
+                                    fontWeight: '500' 
+                                }}>
+                                    Manage and monitor your platform
+                                </p>
+                            )}
                         </div>
+                    </div>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                        <button 
+                            onClick={() => setIsThemeModalOpen(true)}
+                            title="Theme Customization"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
+                                backgroundColor: '#f8f9fa',
+                                color: '#555',
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s',
+                                flexShrink: 0
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.primaryColor; e.currentTarget.style.color = 'white'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; e.currentTarget.style.color = '#555'; }}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </button>
+
+                        <Link 
+                            to="/admin/settings" 
+                            title="System Settings"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
+                                backgroundColor: '#f8f9fa',
+                                color: '#555',
+                                textDecoration: 'none',
+                                transition: 'all 0.3s',
+                                flexShrink: 0
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = theme.primaryColor; e.currentTarget.style.color = 'white'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; e.currentTarget.style.color = '#555'; }}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                            </svg>
+                        </Link>
                     </div>
                 </header>
                 <main style={{ padding: isMobile ? '1rem' : '2rem', flex: 1, width: '100%', overflowX: 'hidden' }}>

@@ -17,6 +17,30 @@ const ManageMembers = () => {
         total: 0
     });
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     useEffect(() => {
         fetchUsers();
     }, [searchTerm]);
@@ -38,10 +62,10 @@ const ManageMembers = () => {
                     total: result.total || 0
                 });
             } else {
-                setError('Failed to load users');
+                setError(getFriendlyError(result.message || 'Failed to load users'));
             }
         } catch (err) {
-            setError(err.message || 'Failed to fetch users');
+            setError(getFriendlyError(err));
         } finally {
             setLoading(false);
         }
@@ -50,35 +74,50 @@ const ManageMembers = () => {
     const handleDelete = async (userId) => {
         if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
             try {
-                await adminService.deleteUser(userId);
-                setUsers(users.filter(user => user._id !== userId));
+                const result = await adminService.deleteUser(userId);
+                if (result.success) {
+                    alert('✅ User deleted successfully!');
+                    setUsers(users.filter(user => user._id !== userId));
+                } else {
+                    alert('⚠️ ' + getFriendlyError(result.message || 'Failed to delete user'));
+                }
             } catch (err) {
-                alert('Failed to delete user: ' + err.message);
+                alert('⚠️ ' + getFriendlyError(err));
             }
         }
     };
 
     const handleRoleChange = async (userId, newRoles) => {
         try {
-            await adminService.updateUserRoles(userId, [newRoles]);
-            setUsers(users.map(user =>
-                user._id === userId ? { ...user, roles: [newRoles] } : user
-            ));
+            const result = await adminService.updateUserRoles(userId, [newRoles]);
+            if (result.success) {
+                alert('✅ Role updated successfully!');
+                setUsers(users.map(user =>
+                    user._id === userId ? { ...user, roles: [newRoles] } : user
+                ));
+            } else {
+                alert('⚠️ ' + getFriendlyError(result.message || 'Failed to update role'));
+            }
         } catch (err) {
-            alert('Failed to update role: ' + err.message);
+            alert('⚠️ ' + getFriendlyError(err));
         }
     };
 
     const handleToggleStatus = async (userId, currentStatus) => {
         try {
-            await adminService.updateUserStatus(userId, {
+            const result = await adminService.updateUserStatus(userId, {
                 isActive: !currentStatus
             });
-            setUsers(users.map(user =>
-                user._id === userId ? { ...user, isActive: !currentStatus } : user
-            ));
+            if (result.success) {
+                alert(`✅ User ${!currentStatus ? 'activated' : 'deactivated'} successfully!`);
+                setUsers(users.map(user =>
+                    user._id === userId ? { ...user, isActive: !currentStatus } : user
+                ));
+            } else {
+                alert('⚠️ ' + getFriendlyError(result.message || 'Failed to toggle status'));
+            }
         } catch (err) {
-            alert('Failed to toggle status: ' + err.message);
+            alert('⚠️ ' + getFriendlyError(err));
         }
     };
 
@@ -105,12 +144,12 @@ const ManageMembers = () => {
 
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="table-responsive">
-                    <table className="admin-table responsive-table">
+                    <table className="admin-table">
                         <thead>
                             <tr>
                                 <th>User</th>
-                                <th className="hide-tablet">Contact</th>
-                                <th className="hide-mobile">Role</th>
+                                <th>Contact</th>
+                                <th>Role</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -130,14 +169,14 @@ const ManageMembers = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td data-label="Contact" className="hide-tablet">
+                                        <td data-label="Contact">
                                             <div style={{ color: '#555' }}>{user.email}</div>
                                             <div style={{ fontSize: '0.85rem', color: '#E53935', fontWeight: '500' }}>
                                                 {user.phoneNumbers?.[0]?.number || 'No phone'}
                                             </div>
                                             {user.department && <div style={{ fontSize: '0.8rem', color: '#888' }}>{user.department}</div>}
                                         </td>
-                                        <td data-label="Role" className="hide-mobile">
+                                        <td data-label="Role">
                                             {isSuperAdmin ? (
                                                 <select
                                                     value={user.roles?.[0] || 'member'}

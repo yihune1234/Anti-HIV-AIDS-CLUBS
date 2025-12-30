@@ -8,6 +8,30 @@ const ManageQuestions = () => {
     const [answerText, setAnswerText] = useState('');
     const [stats, setStats] = useState({ total: 0, pending: 0, answered: 0 });
 
+    // Helper function to get friendly error message
+    const getFriendlyError = (error) => {
+        if (!error) return 'An unexpected error occurred. Please try again.';
+        const errorMsg = error.message || error.response?.data?.message || error.toString();
+        const lowerMsg = errorMsg.toLowerCase();
+        if (lowerMsg.includes('network') || lowerMsg.includes('fetch')) {
+            return 'Unable to connect to the server. Please check your internet connection.';
+        }
+        if (lowerMsg.includes('unauthorized') || lowerMsg.includes('token')) {
+            return 'Your session has expired. Please log in again.';
+        }
+        if (lowerMsg.includes('validation') || lowerMsg.includes('invalid')) {
+            return 'Please check your input and try again.';
+        }
+        if (lowerMsg.includes('500') || lowerMsg.includes('server error')) {
+            return 'A server error occurred. Please try again later.';
+        }
+        if (!lowerMsg.includes('undefined') && !lowerMsg.includes('null') && 
+            !lowerMsg.includes('exception') && errorMsg.length < 100) {
+            return errorMsg;
+        }
+        return 'An unexpected error occurred. Please try again or contact support.';
+    };
+
     useEffect(() => {
         fetchQuestions();
         fetchStats();
@@ -26,7 +50,7 @@ const ManageQuestions = () => {
             }
             setQuestions(qs);
         } catch (error) {
-            console.error('Failed to fetch questions:', error);
+            alert('⚠️ Error loading questions: ' + getFriendlyError(error));
         } finally {
             setLoading(false);
         }
@@ -47,10 +71,11 @@ const ManageQuestions = () => {
         if (window.confirm('Permanently delete this question? This cannot be undone.')) {
             try {
                 await anonymousQuestionService.deleteQuestion(id);
+                alert('✅ Question deleted successfully!');
                 setQuestions(questions.filter(q => q._id !== id));
                 fetchStats();
             } catch (error) {
-                alert('Delete failed: ' + error);
+                alert('⚠️ ' + getFriendlyError(error));
             }
         }
     };
@@ -59,12 +84,13 @@ const ManageQuestions = () => {
         if (!answerText.trim()) return;
         try {
             await anonymousQuestionService.answerQuestion(id, answerText);
+            alert('✅ Answer submitted successfully!');
             setAnsweringId(null);
             setAnswerText('');
             fetchQuestions();
             fetchStats();
         } catch (error) {
-            alert('Submission failed: ' + error);
+            alert('⚠️ ' + getFriendlyError(error));
         }
     };
 
