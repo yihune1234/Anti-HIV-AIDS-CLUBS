@@ -88,10 +88,10 @@ const Dashboard = () => {
             {/* Premium Header Section */}
             <div style={{
                 background: 'linear-gradient(135deg, #1e1e2f 0%, #111119 100%)',
-                padding: '4rem 3rem',
-                borderRadius: '40px',
+                padding: 'clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem)',
+                borderRadius: 'clamp(16px, 4vw, 40px)',
                 color: 'white',
-                marginBottom: '3rem',
+                marginBottom: 'clamp(1.5rem, 4vw, 3rem)',
                 position: 'relative',
                 overflow: 'hidden',
                 boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
@@ -99,7 +99,7 @@ const Dashboard = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '2rem'
+                gap: 'clamp(1rem, 3vw, 2rem)'
             }}>
                 <div style={{ position: 'relative', zIndex: 2 }}>
                     <span style={{
@@ -113,10 +113,10 @@ const Dashboard = () => {
                     }}>
                         {greeting}, Advocate
                     </span>
-                    <h1 style={{ color: 'white', fontSize: '3.5rem', fontWeight: '900', marginBottom: '1rem', letterSpacing: '-1px' }}>
+                    <h1 style={{ color: 'white', fontSize: 'clamp(1.8rem, 6vw, 3.5rem)', fontWeight: '900', marginBottom: '1rem', letterSpacing: '-1px' }}>
                         {user?.firstName} <span style={{ color: '#D32F2F' }}>{user?.middleName}</span>
                     </h1>
-                    <p style={{ opacity: 0.7, fontSize: '1.2rem', maxWidth: '500px', lineHeight: '1.6' }}>
+                    <p style={{ opacity: 0.7, fontSize: 'clamp(0.95rem, 2.5vw, 1.2rem)', maxWidth: 'clamp(280px, 80%, 500px)', lineHeight: '1.6' }}>
                         Welcome to your central hub for advocacy, education, and community support. Together, we make a difference.
                     </p>
                 </div>
@@ -125,22 +125,23 @@ const Dashboard = () => {
                     zIndex: 2,
                     background: 'rgba(255,255,255,0.05)',
                     backdropFilter: 'blur(20px)',
-                    padding: '2rem',
-                    borderRadius: '30px',
+                    padding: 'clamp(1.5rem, 4vw, 2rem)',
+                    borderRadius: 'clamp(12px, 3vw, 30px)',
                     border: '1px solid rgba(255,255,255,0.1)',
                     textAlign: 'center',
-                    minWidth: '200px'
+                    minWidth: 'clamp(140px, 35vw, 200px)',
+                    flexShrink: 0
                 }}>
                     <div style={{
-                        width: '80px',
-                        height: '80px',
+                        width: 'clamp(50px, 12vw, 80px)',
+                        height: 'clamp(50px, 12vw, 80px)',
                         borderRadius: '50%',
                         background: '#D32F2F',
                         margin: '0 auto 1rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '2rem',
+                        fontSize: 'clamp(1.2rem, 4vw, 2rem)',
                         fontWeight: 'bold',
                         boxShadow: '0 0 20px rgba(211, 47, 47, 0.4)'
                     }}>
@@ -175,27 +176,27 @@ const Dashboard = () => {
             </div>
 
             {/* Dashboard Analytics Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2.5rem', marginBottom: '4rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: 'clamp(1.5rem, 4vw, 2.5rem)', marginBottom: 'clamp(2rem, 5vw, 4rem)' }}>
                 {/* Event Stat */}
                 <div className="stat-card" style={{
                     background: 'white',
-                    borderRadius: '35px',
-                    padding: '2.5rem',
+                    borderRadius: 'clamp(16px, 4vw, 35px)',
+                    padding: 'clamp(1.5rem, 4vw, 2.5rem)',
                     border: '1px solid #f0f0f0',
                     boxShadow: '0 15px 35px rgba(0,0,0,0.03)',
                     transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                        <div style={{ width: '60px', height: '60px', background: '#FFF5F5', color: '#D32F2F', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}>
+                        <div style={{ width: 'clamp(45px, 10vw, 60px)', height: 'clamp(45px, 10vw, 60px)', background: '#FFF5F5', color: '#D32F2F', borderRadius: 'clamp(10px, 2.5vw, 18px)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(1.2rem, 3.5vw, 1.8rem)' }}>
                             📅
                         </div>
                         <div style={{ textAlign: 'right' }}>
                             <div style={{ fontSize: '0.75rem', fontWeight: '900', color: '#BDBDBD', letterSpacing: '1px' }}>UPCOMING</div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#1a1a1a', lineHeight: '1' }}>{stats.upcomingEvents}</div>
+                            <div style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: '900', color: '#1a1a1a', lineHeight: '1' }}>{stats.upcomingEvents}</div>
                         </div>
                     </div>
-                    <h4 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '0.5rem' }}>Active Events</h4>
-                    <p style={{ color: '#777', fontSize: '0.95rem', marginBottom: '2rem' }}>Workshops, seminars and campaigns waiting for you.</p>
+                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '800', marginBottom: '0.5rem' }}>Active Events</h4>
+                    <p style={{ color: '#777', fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', marginBottom: 'clamp(1.5rem, 3vw, 2rem)' }}>Workshops, seminars and campaigns waiting for you.</p>
                     <Link className="action-btn" to="/member/events" style={{ color: '#D32F2F', fontWeight: '800', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.3s ease' }}>
                         JOIN NOW <span>→</span>
                     </Link>
@@ -204,23 +205,23 @@ const Dashboard = () => {
                 {/* Library Stat */}
                 <div className="stat-card" style={{
                     background: 'white',
-                    borderRadius: '35px',
-                    padding: '2.5rem',
+                    borderRadius: 'clamp(16px, 4vw, 35px)',
+                    padding: 'clamp(1.5rem, 4vw, 2.5rem)',
                     border: '1px solid #f0f0f0',
                     boxShadow: '0 15px 35px rgba(0,0,0,0.03)',
                     transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                        <div style={{ width: '60px', height: '60px', background: '#F0F7FF', color: '#1976D2', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}>
+                        <div style={{ width: 'clamp(45px, 10vw, 60px)', height: 'clamp(45px, 10vw, 60px)', background: '#F0F7FF', color: '#1976D2', borderRadius: 'clamp(10px, 2.5vw, 18px)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(1.2rem, 3.5vw, 1.8rem)' }}>
                             📂
                         </div>
                         <div style={{ textAlign: 'right' }}>
                             <div style={{ fontSize: '0.75rem', fontWeight: '900', color: '#BDBDBD', letterSpacing: '1px' }}>KNOWLEDGE</div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#1a1a1a', lineHeight: '1' }}>{stats.newResources}</div>
+                            <div style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: '900', color: '#1a1a1a', lineHeight: '1' }}>{stats.newResources}</div>
                         </div>
                     </div>
-                    <h4 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '0.5rem' }}>Learning Hub</h4>
-                    <p style={{ color: '#777', fontSize: '0.95rem', marginBottom: '2rem' }}>Curated materials to expand your understanding.</p>
+                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '800', marginBottom: '0.5rem' }}>Learning Hub</h4>
+                    <p style={{ color: '#777', fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', marginBottom: 'clamp(1.5rem, 3vw, 2rem)' }}>Curated materials to expand your understanding.</p>
                     <Link className="action-btn" to="/member/resources" style={{ color: '#1976D2', fontWeight: '800', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.3s ease' }}>
                         EXPLORE <span>→</span>
                     </Link>
@@ -229,58 +230,58 @@ const Dashboard = () => {
                 {/* Membership Stat */}
                 <div className="stat-card" style={{
                     background: 'white',
-                    borderRadius: '35px',
-                    padding: '2.5rem',
+                    borderRadius: 'clamp(16px, 4vw, 35px)',
+                    padding: 'clamp(1.5rem, 4vw, 2.5rem)',
                     border: '1px solid #f0f0f0',
                     boxShadow: '0 15px 35px rgba(0,0,0,0.03)',
                     transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                        <div style={{ width: '60px', height: '60px', background: '#F2FFF4', color: '#388E3C', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}>
+                        <div style={{ width: 'clamp(45px, 10vw, 60px)', height: 'clamp(45px, 10vw, 60px)', background: '#F2FFF4', color: '#388E3C', borderRadius: 'clamp(10px, 2.5vw, 18px)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(1.2rem, 3.5vw, 1.8rem)' }}>
                             👑
                         </div>
                         <div style={{ textAlign: 'right' }}>
                             <div style={{ fontSize: '0.75rem', fontWeight: '900', color: '#BDBDBD', letterSpacing: '1px' }}>STATUS</div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: '900', color: user?.isActive ? '#388E3C' : '#D32F2F', lineHeight: '2' }}>
+                            <div style={{ fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', fontWeight: '900', color: user?.isActive ? '#388E3C' : '#D32F2F', lineHeight: '2' }}>
                                 {user?.isActive ? 'VERIFIED' : 'PENDING'}
                             </div>
                         </div>
                     </div>
-                    <h4 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '0.5rem' }}>Club Standing</h4>
-                    <p style={{ color: '#777', fontSize: '0.95rem', marginBottom: '2rem' }}>Your current engagement and verification status.</p>
+                    <h4 style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', fontWeight: '800', marginBottom: '0.5rem' }}>Club Standing</h4>
+                    <p style={{ color: '#777', fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', marginBottom: 'clamp(1.5rem, 3vw, 2rem)' }}>Your current engagement and verification status.</p>
                     <Link className="action-btn" to="/member/profile" style={{ color: '#388E3C', fontWeight: '800', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', transition: 'all 0.3s ease' }}>
                         MY PROFILE <span>→</span>
                     </Link>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 450px), 1fr))', gap: '3rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: 'clamp(2rem, 5vw, 3rem)' }}>
                 {/* Community Announcements */}
                 <div style={{
                     background: 'white',
-                    borderRadius: '40px',
-                    padding: '3rem',
+                    borderRadius: 'clamp(20px, 5vw, 40px)',
+                    padding: 'clamp(2rem, 5vw, 3rem)',
                     border: '1px solid #f0f0f0',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.02)'
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
-                        <h3 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '900', letterSpacing: '-0.5px' }}>Club <span style={{ color: '#D32F2F' }}>Bulletins</span></h3>
+                        <h3 style={{ margin: 0, fontSize: 'clamp(1.2rem, 4vw, 1.6rem)', fontWeight: '900', letterSpacing: '-0.5px' }}>Club <span style={{ color: '#D32F2F' }}>Bulletins</span></h3>
                         <span style={{ fontSize: '0.7rem', fontWeight: '900', background: '#f8f9fa', padding: '6px 15px', borderRadius: '100px', border: '1px solid #eee' }}>LATEST UPDATES</span>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-                        <div style={{ position: 'relative', paddingLeft: '2rem', borderLeft: '3px solid #D32F2F' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(1.5rem, 3vw, 2.5rem)' }}>
+                        <div style={{ position: 'relative', paddingLeft: 'clamp(1.5rem, 3vw, 2rem)', borderLeft: '3px solid #D32F2F' }}>
                             <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#D32F2F', marginBottom: '0.5rem', opacity: 0.8 }}>SYSTEM ANNOUNCEMENT • TODAY</div>
-                            <h4 style={{ margin: '0 0 0.8rem 0', fontSize: '1.2rem', fontWeight: '800' }}>Platform Evolution Complete</h4>
-                            <p style={{ color: '#666', fontSize: '1rem', lineHeight: '1.7', margin: 0 }}>
+                            <h4 style={{ margin: '0 0 0.8rem 0', fontSize: 'clamp(1rem, 3vw, 1.2rem)', fontWeight: '800' }}>Platform Evolution Complete</h4>
+                            <p style={{ color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)', lineHeight: '1.7', margin: 0 }}>
                                 We've successfully integrated the club's administrative systems. You can now track your participation, access exclusive resources, and submit stories seamlessly.
                             </p>
                         </div>
 
                         <div style={{ position: 'relative', paddingLeft: '2rem', borderLeft: '3px solid #eee' }}>
                             <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#999', marginBottom: '0.5rem' }}>PEER ADVISORY • 2 DAYS AGO</div>
-                            <h4 style={{ margin: '0 0 0.8rem 0', fontSize: '1.2rem', fontWeight: '800' }}>Confidential Peer Support</h4>
-                            <p style={{ color: '#666', fontSize: '1rem', lineHeight: '1.7', margin: 0 }}>
+                            <h4 style={{ margin: '0 0 0.8rem 0', fontSize: 'clamp(1rem, 3vw, 1.2rem)', fontWeight: '800' }}>Confidential Peer Support</h4>
+                            <p style={{ color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)', lineHeight: '1.7', margin: 0 }}>
                                 Remember that our peer educators are available for confidential counselling every weekday. Visit the 'Team' section to connect with a mentor.
                             </p>
                         </div>

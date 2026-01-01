@@ -28,6 +28,16 @@ const galleryService = {
         }
     },
 
+    // Admin: Update Gallery Item
+    updateGalleryItem: async (id, galleryData) => {
+        try {
+            const response = await api.put(`/gallery/${id}`, galleryData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Failed to update gallery item';
+        }
+    },
+
     // Admin: Delete Gallery Item
     deleteGalleryItem: async (id) => {
         try {
