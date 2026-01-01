@@ -86,34 +86,54 @@ class UploadController {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
 
-        // Construct public URL
-        // In production (Render), req.protocol might be 'http' due to proxying,
-        // so we check x-forwarded-proto or just force https if host contains onrender.com
+        // Debug: log the uploaded file object to help diagnose storage provider response
+        console.log('Uploaded file object:', req.file);
+
+        // Construct public URL robustly supporting Cloudinary and local disk
         const protocol = req.headers['x-forwarded-proto'] || req.protocol;
         const host = req.get('host');
 
-        let fileUrl;
+        let fileUrl = null;
 
-        // If file has 'path' and it's a URL (Cloudinary), use it
-        if (req.file.path && (req.file.path.startsWith('http') || req.file.path.startsWith('https'))) {
-            fileUrl = req.file.path;
-        } else {
-            // Local file fallback
-            if (host.includes('onrender.com')) {
-                fileUrl = `https://${host}/uploads/${req.file.filename}`;
-            } else {
-                fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+        try {
+            // Common Cloudinary/remote keys: path, url, secure_url
+            if (req.file.path && typeof req.file.path === 'string' && req.file.path.match(/^https?:\/\//i)) {
+                fileUrl = req.file.path;
+            } else if (req.file.secure_url && typeof req.file.secure_url === 'string') {
+                fileUrl = req.file.secure_url;
+            } else if (req.file.url && typeof req.file.url === 'string' && req.file.url.match(/^https?:\/\//i)) {
+                fileUrl = req.file.url;
             }
+
+            // Fallback: if storage produced a filename (local disk) build a public URL
+            if (!fileUrl) {
+                // Local file fallback
+                const filename = req.file.filename || req.file.public_id || req.file.originalname;
+                if (host && filename) {
+                    if (host.includes('onrender.com')) {
+                        fileUrl = `https://${host}/uploads/${filename}`;
+                    } else {
+                        fileUrl = `${protocol}://${host}/uploads/${filename}`;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error constructing file URL:', err);
         }
 
+        // Ensure we always return a URL field (if we failed to construct one, return null)
         res.status(200).json({
             success: true,
             message: 'File uploaded successfully',
             data: {
                 url: fileUrl,
-                filename: req.file.filename,
-                mimetype: req.file.mimetype,
-                size: req.file.size
+                filename: req.file.filename || req.file.public_id || req.file.originalname || null,
+                mimetype: req.file.mimetype || null,
+                size: req.file.size || null,
+                // Include provider-specific metadata when available
+                provider: useCloudinary ? 'cloudinary' : 'local',
+                public_id: req.file.public_id || null,
+                raw: req.file
             }
         });
     }
