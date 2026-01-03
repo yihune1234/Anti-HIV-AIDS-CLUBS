@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
 const ForgotPassword = () => {
-    // Identity = Username or Student ID
     const [identity, setIdentity] = useState('');
-    // Contact = Email or Phone Number
+  
     const [contact, setContact] = useState('');
 
     // Step 2 inputs
