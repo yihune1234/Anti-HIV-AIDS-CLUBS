@@ -81,7 +81,7 @@ const Home = () => {
                             </div>
 
                             <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: '900', color: 'white', lineHeight: '1.1', marginBottom: '2rem' }}>
-                                Empowering Haramaya Students<br /> <span style={{ color: '#FF5252' }}>Against HIV/AIDS</span>
+                                Empowering University Students and Community<br /> <span style={{ color: '#FF5252' }}>Against HIV/AIDS</span>
                             </h1>
 
                             <p style={{ fontSize: '1.25rem', color: 'rgba(255,255,255,0.8)', marginBottom: '3rem', lineHeight: '1.6', maxWidth: '600px' }}>
