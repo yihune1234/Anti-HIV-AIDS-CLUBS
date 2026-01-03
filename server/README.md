@@ -176,7 +176,7 @@ All errors follow a consistent format:
 {
   "success": false,
   "message": "Error message",
-  "errors": [...]  // Optional validation errors
+  "errors": [...]  
 }
 ```
 
