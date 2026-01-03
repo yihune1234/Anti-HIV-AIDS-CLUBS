@@ -81,19 +81,19 @@ const Home = () => {
                             </div>
 
                             <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: '900', color: 'white', lineHeight: '1.1', marginBottom: '2rem' }}>
-                                A Legacy of <br /> <span style={{ color: '#FF5252' }}>Stigma-Free</span> Excellence
+                                Empowering Haramaya Students<br /> <span style={{ color: '#FF5252' }}>Against HIV/AIDS</span>
                             </h1>
 
                             <p style={{ fontSize: '1.25rem', color: 'rgba(255,255,255,0.8)', marginBottom: '3rem', lineHeight: '1.6', maxWidth: '600px' }}>
-                                Join the movement that has been spearheading awareness and support for over 25 years. We stand for knowledge, resilience, and a healthier campus community.
+                                Founded by students at Haramaya University, we champion HIV prevention, voluntary testing, peer support, and stigma-free care across our campus community.
                             </p>
 
                             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                                 <Link to="/register" className="btn btn-primary" style={{ padding: '1.2rem 3rem', borderRadius: '18px', fontWeight: '800', fontSize: '1.1rem', boxShadow: '0 10px 20px rgba(211,47,47,0.3)' }}>
-                                    Join the Family
+                                    Become a Member
                                 </Link>
                                 <Link to="/about" className="btn btn-outline" style={{ padding: '1.2rem 3rem', borderRadius: '18px', color: 'white', borderColor: 'rgba(255,255,255,0.3)', fontWeight: '800' }}>
-                                    Our Story
+                                    Learn Our Story
                                 </Link>
                             </div>
                         </div>
