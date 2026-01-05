@@ -1,6 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cloudinaryService = require('../../services/cloudinary.service');
 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, '../../uploads');
@@ -17,11 +18,18 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 // As a fallback/helper, we can explicit set config if individual vars are used
 if (process.env.CLOUDINARY_CLOUD_NAME) {
-    cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET
-    });
+    try {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET
+        });
+        console.log('✅ Cloudinary configured successfully');
+    } catch (error) {
+        console.error('❌ Cloudinary configuration error:', error);
+    }
+} else {
+    console.log('⚠️ Cloudinary credentials not found, will use local storage');
 }
 
 // Determine storage engine
@@ -32,17 +40,33 @@ const useCloudinary = process.env.CLOUDINARY_URL || process.env.CLOUDINARY_CLOUD
 
 if (useCloudinary) {
     console.log('☁️ Using Cloudinary for file storage');
-    storage = new CloudinaryStorage({
-        cloudinary: cloudinary,
-        params: {
-            folder: 'anti-hiv-aids-clubs', // folder name in cloudinary
-            allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx'],
-            public_id: (req, file) => {
-                const name = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9]/g, '_');
-                return `${Date.now()}-${name}`;
+    try {
+        storage = new CloudinaryStorage({
+            cloudinary: cloudinary,
+            params: {
+                folder: 'anti-hiv-aids-clubs', // folder name in cloudinary
+                allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'mp4', 'mov', 'avi'],
+                public_id: (req, file) => {
+                    const name = file.originalname.split('.')[0].replace(/[^a-zA-Z0-9]/g, '_');
+                    return `${Date.now()}-${name}`;
+                },
+                resource_type: 'auto' // Automatically detect resource type
             },
-        },
-    });
+        });
+    } catch (error) {
+        console.error('❌ CloudinaryStorage initialization error:', error);
+        console.log('🔄 Falling back to local storage');
+        // Fallback to local storage if Cloudinary fails
+        storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+                cb(null, uploadDir);
+            },
+            filename: function (req, file, cb) {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                cb(null, uniqueSuffix + path.extname(file.originalname));
+            }
+        });
+    }
 } else {
     // Fallback to Disk Storage
     console.log('💾 Using Local Disk for file storage');
@@ -77,25 +101,51 @@ const upload = multer({
 class UploadController {
     // Middleware for handling single file upload
     uploadSingle(fieldName) {
-        return upload.single(fieldName);
+        return (req, res, next) => {
+            const uploadMiddleware = upload.single(fieldName);
+            uploadMiddleware(req, res, (err) => {
+                if (err) {
+                    console.error('Upload middleware error:', err);
+                    
+                    if (err instanceof multer.MulterError) {
+                        if (err.code === 'LIMIT_FILE_SIZE') {
+                            return res.status(400).json({
+                                success: false,
+                                message: 'File too large. Maximum size is 10MB.'
+                            });
+                        }
+                        return res.status(400).json({
+                            success: false,
+                            message: `Upload error: ${err.message}`
+                        });
+                    }
+                    
+                    return res.status(400).json({
+                        success: false,
+                        message: err.message || 'File upload failed'
+                    });
+                }
+                next();
+            });
+        };
     }
 
     // Controller method to return the file URL
     handleUpload(req, res) {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'No file uploaded' });
-        }
-
-        // Debug: log the uploaded file object to help diagnose storage provider response
-        console.log('Uploaded file object:', req.file);
-
-        // Construct public URL robustly supporting Cloudinary and local disk
-        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-        const host = req.get('host');
-
-        let fileUrl = null;
-
         try {
+            if (!req.file) {
+                return res.status(400).json({ success: false, message: 'No file uploaded' });
+            }
+
+            // Debug: log the uploaded file object to help diagnose storage provider response
+            console.log('Uploaded file object:', req.file);
+
+            // Construct public URL robustly supporting Cloudinary and local disk
+            const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+            const host = req.get('host');
+
+            let fileUrl = null;
+
             // Common Cloudinary/remote keys: path, url, secure_url
             if (req.file.path && typeof req.file.path === 'string' && req.file.path.match(/^https?:\/\//i)) {
                 fileUrl = req.file.path;
@@ -110,32 +160,78 @@ class UploadController {
                 // Local file fallback
                 const filename = req.file.filename || req.file.public_id || req.file.originalname;
                 if (host && filename) {
-                    if (host.includes('onrender.com')) {
+                    if (host.includes('onrender.com') || host.includes('vercel.app')) {
                         fileUrl = `https://${host}/uploads/${filename}`;
                     } else {
                         fileUrl = `${protocol}://${host}/uploads/${filename}`;
                     }
                 }
             }
-        } catch (err) {
-            console.error('Error constructing file URL:', err);
-        }
 
-        // Ensure we always return a URL field (if we failed to construct one, return null)
-        res.status(200).json({
-            success: true,
-            message: 'File uploaded successfully',
-            data: {
-                url: fileUrl,
-                filename: req.file.filename || req.file.public_id || req.file.originalname || null,
-                mimetype: req.file.mimetype || null,
-                size: req.file.size || null,
-                // Include provider-specific metadata when available
-                provider: useCloudinary ? 'cloudinary' : 'local',
-                public_id: req.file.public_id || null,
-                raw: req.file
+            // Ensure we always return a URL field (if we failed to construct one, return null)
+            res.status(200).json({
+                success: true,
+                message: 'File uploaded successfully',
+                data: {
+                    url: fileUrl,
+                    filename: req.file.filename || req.file.public_id || req.file.originalname || null,
+                    mimetype: req.file.mimetype || null,
+                    size: req.file.size || null,
+                    // Include provider-specific metadata when available
+                    provider: useCloudinary ? 'cloudinary' : 'local',
+                    public_id: req.file.public_id || null
+                }
+            });
+        } catch (error) {
+            console.error('Upload handler error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Internal server error during file upload',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
+        }
+    }
+
+    // Alternative upload method using Cloudinary service directly
+    async handleDirectUpload(req, res) {
+        try {
+            if (!req.file) {
+                return res.status(400).json({ success: false, message: 'No file uploaded' });
             }
-        });
+
+            console.log('Direct upload - file received:', req.file.originalname);
+
+            // Use the Cloudinary service directly
+            const result = await cloudinaryService.uploadImage(req.file);
+            
+            if (result.success) {
+                res.status(200).json({
+                    success: true,
+                    message: 'File uploaded successfully',
+                    data: {
+                        url: result.data.url,
+                        filename: req.file.originalname,
+                        mimetype: req.file.mimetype,
+                        size: req.file.size,
+                        provider: 'cloudinary',
+                        public_id: result.data.publicId
+                    }
+                });
+            } else {
+                console.error('Cloudinary service error:', result.message);
+                res.status(500).json({
+                    success: false,
+                    message: result.message || 'Upload failed'
+                });
+            }
+        } catch (error) {
+            console.error('Direct upload error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Internal server error during file upload',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
+        }
     }
 }
 
