@@ -14,6 +14,8 @@ router.use(authenticate);
 
 router.get('/stats', authorize('admin'), eventController.getEventStats);
 router.post('/:id/register', eventController.registerForEvent);
+router.delete('/:id/register', eventController.unregisterFromEvent);
+router.get('/my/registrations', eventController.getUserRegistrations);
 
 // Admin/Organizer routes
 router.post('/', authorize('admin'), validate(createEventSchema), eventController.createEvent);

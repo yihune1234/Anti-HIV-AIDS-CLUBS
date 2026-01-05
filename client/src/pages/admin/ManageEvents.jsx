@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import eventService from '../../services/eventService';
 import uploadService from '../../services/uploadService';
 
@@ -22,6 +22,8 @@ const ManageEvents = () => {
         eventType: 'other',
         startDate: '',
         endDate: '',
+        registrationOpenDate: '',
+        registrationCloseDate: '',
         locationVenue: '',
         imageUrl: ''
     });
@@ -96,6 +98,8 @@ const ManageEvents = () => {
             eventType: event.eventType || 'other',
             startDate: event.startDate ? new Date(event.startDate).toISOString().slice(0, 16) : '',
             endDate: event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : '',
+            registrationOpenDate: event.registrationOpenDate ? new Date(event.registrationOpenDate).toISOString().slice(0, 16) : '',
+            registrationCloseDate: event.registrationCloseDate ? new Date(event.registrationCloseDate).toISOString().slice(0, 16) : '',
             locationVenue: event.location?.venue || '',
             imageUrl: event.images && event.images.length > 0 ? event.images[0].url : ''
         });
@@ -110,6 +114,8 @@ const ManageEvents = () => {
             eventType: 'other',
             startDate: '',
             endDate: '',
+            registrationOpenDate: '',
+            registrationCloseDate: '',
             locationVenue: '',
             imageUrl: ''
         });
@@ -125,13 +131,20 @@ const ManageEvents = () => {
             eventType: formData.eventType,
             startDate: formData.startDate,
             endDate: formData.endDate || formData.startDate,
+            startTime: '09:00',
+            endTime: '17:00',
+            registrationOpenDate: formData.registrationOpenDate,
+            registrationCloseDate: formData.registrationCloseDate,
             location: {
                 venue: formData.locationVenue
             },
+            bannerImage: {
+                url: formData.imageUrl || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'
+            },
             images: formData.imageUrl ? [{ url: formData.imageUrl }] : [],
-            status: 'published',
+            status: 'upcoming',
             registrationRequired: true,
-            targetAudience: ['all'], // ← Changed to array
+            targetAudience: ['all'],
             isFeatured: false,
             isPublic: true
         };
@@ -188,7 +201,6 @@ const ManageEvents = () => {
                                 const eventDate = new Date(event.startDate);
                                 const now = new Date();
                                 const isUpcoming = eventDate > now;
-                                const isPast = eventDate < now;
                                 const isToday = eventDate.toDateString() === now.toDateString();
                                 
                                 return (
@@ -235,19 +247,6 @@ const ManageEvents = () => {
                                         }}>
                                             {isToday ? 'Today' : isUpcoming ? 'Upcoming' : 'Completed'}
                                         </span>
-                                    </td>
-                                    <td data-label="Event">
-                                        <div style={{ fontWeight: 'bold' }}>{event.title}</div>
-                                        <div style={{ fontSize: '0.85rem', color: '#777', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            {event.description}
-                                        </div>
-                                    </td>
-                                    <td data-label="Type">
-                                        <span style={{ textTransform: 'capitalize' }}>{event.eventType?.replace('_', ' ')}</span>
-                                    </td>
-                                    <td data-label="Date & Location">
-                                        <div>{new Date(event.startDate).toLocaleDateString()}</div>
-                                        <div style={{ fontSize: '0.85rem', color: '#777' }}>📍 {event.location?.venue}</div>
                                     </td>
                                     <td data-label="Registrations">
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -365,6 +364,27 @@ const ManageEvents = () => {
                                         value={formData.endDate}
                                         onChange={e => setFormData({ ...formData, endDate: e.target.value })}
                                     />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <div className="form-group" style={{ flex: 1 }}>
+                                    <label className="form-label">Registration Opens</label>
+                                    <input
+                                        type="datetime-local" className="form-control" required
+                                        value={formData.registrationOpenDate}
+                                        onChange={e => setFormData({ ...formData, registrationOpenDate: e.target.value })}
+                                    />
+                                    <small className="text-muted">When members can start registering</small>
+                                </div>
+                                <div className="form-group" style={{ flex: 1 }}>
+                                    <label className="form-label">Registration Closes</label>
+                                    <input
+                                        type="datetime-local" className="form-control" required
+                                        value={formData.registrationCloseDate}
+                                        onChange={e => setFormData({ ...formData, registrationCloseDate: e.target.value })}
+                                    />
+                                    <small className="text-muted">When registration ends</small>
                                 </div>
                             </div>
 

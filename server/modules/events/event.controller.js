@@ -3,9 +3,14 @@ const eventService = require('./event.service');
 class EventController {
     async createEvent(req, res) {
         try {
-            const event = await eventService.createEvent(req.body);
+            const eventData = {
+                ...req.body,
+                createdBy: req.user._id
+            };
+            const event = await eventService.createEvent(eventData);
             res.status(201).json({ success: true, message: 'Event created successfully', data: event });
         } catch (error) {
+            console.error('Create event error:', error);
             res.status(400).json({ success: false, message: error.message });
         }
     }
@@ -15,6 +20,7 @@ class EventController {
             const event = await eventService.getEventById(req.params.id);
             res.status(200).json({ success: true, data: event });
         } catch (error) {
+            console.error('Get event by ID error:', error);
             res.status(404).json({ success: false, message: error.message });
         }
     }
@@ -33,7 +39,8 @@ class EventController {
             const result = await eventService.getAllEvents(filters, parseInt(page), parseInt(limit));
             res.status(200).json({ success: true, data: result.events, pagination: result.pagination });
         } catch (error) {
-            res.status(400).json({ success: false, message: error.message });
+            console.error('Get all events error:', error);
+            res.status(500).json({ success: false, message: 'Failed to load events' });
         }
     }
 
@@ -42,6 +49,7 @@ class EventController {
             const event = await eventService.updateEvent(req.params.id, req.body);
             res.status(200).json({ success: true, message: 'Event updated successfully', data: event });
         } catch (error) {
+            console.error('Update event error:', error);
             res.status(400).json({ success: false, message: error.message });
         }
     }
@@ -51,15 +59,37 @@ class EventController {
             await eventService.deleteEvent(req.params.id);
             res.status(200).json({ success: true, message: 'Event deleted successfully' });
         } catch (error) {
+            console.error('Delete event error:', error);
             res.status(400).json({ success: false, message: error.message });
         }
     }
 
     async registerForEvent(req, res) {
         try {
-            const event = await eventService.registerForEvent(req.params.id, req.user.id);
+            const event = await eventService.registerForEvent(req.params.id, req.user._id);
             res.status(200).json({ success: true, message: 'Registered for event successfully', data: event });
         } catch (error) {
+            console.error('Register for event error:', error);
+            res.status(400).json({ success: false, message: error.message });
+        }
+    }
+
+    async unregisterFromEvent(req, res) {
+        try {
+            const event = await eventService.unregisterFromEvent(req.params.id, req.user._id);
+            res.status(200).json({ success: true, message: 'Unregistered from event successfully', data: event });
+        } catch (error) {
+            console.error('Unregister from event error:', error);
+            res.status(400).json({ success: false, message: error.message });
+        }
+    }
+
+    async getUserRegistrations(req, res) {
+        try {
+            const events = await eventService.getUserRegistrations(req.user._id);
+            res.status(200).json({ success: true, data: events });
+        } catch (error) {
+            console.error('Get user registrations error:', error);
             res.status(400).json({ success: false, message: error.message });
         }
     }
@@ -69,7 +99,8 @@ class EventController {
             const stats = await eventService.getEventStats();
             res.status(200).json({ success: true, data: stats });
         } catch (error) {
-            res.status(400).json({ success: false, message: error.message });
+            console.error('Get event stats error:', error);
+            res.status(500).json({ success: false, message: 'Failed to load event statistics' });
         }
     }
 }

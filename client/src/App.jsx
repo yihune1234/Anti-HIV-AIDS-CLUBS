@@ -18,6 +18,7 @@ import Events from './pages/member/Events';
 import Gallery from './pages/member/Gallery';
 import Stories from './pages/member/Stories';
 import Resources from './pages/member/Resources';
+import TrainingContent from './pages/member/TrainingContent';
 import Profile from './pages/member/Profile';
 import PeerEducationSessions from './pages/member/PeerEducationSessions';
 
@@ -30,6 +31,7 @@ import ManageEvents from './pages/admin/ManageEvents';
 import ManageGallery from './pages/admin/ManageGallery';
 import ManageResources from './pages/admin/ManageResources';
 import ManageStories from './pages/admin/ManageStories';
+import ManageTrainingContent from './pages/admin/ManageTrainingContent';
 import ManageFeedback from './pages/admin/ManageFeedback';
 import ManageQuestions from './pages/admin/ManageQuestions';
 import ContentApproval from './pages/admin/ContentApproval';
@@ -70,6 +72,7 @@ function App() {
             <Route path="/member/gallery" element={<Gallery />} />
             <Route path="/member/stories" element={<Stories />} />
             <Route path="/member/resources" element={<Resources />} />
+            <Route path="/member/training" element={<TrainingContent />} />
             <Route path="/member/sessions" element={<PeerEducationSessions />} />
             <Route path="/member/profile" element={<Profile />} />
           </Route>
@@ -83,6 +86,7 @@ function App() {
             <Route path="/admin/events" element={<ManageEvents />} />
             <Route path="/admin/gallery" element={<ManageGallery />} />
             <Route path="/admin/resources" element={<ManageResources />} />
+            <Route path="/admin/training" element={<ManageTrainingContent />} />
             <Route path="/admin/stories" element={<ManageStories />} />
             <Route path="/admin/feedback" element={<ManageFeedback />} />
             <Route path="/admin/sessions" element={<ManageSessions />} />

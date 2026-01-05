@@ -192,6 +192,12 @@ const eventSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  registrationOpenTime: {
+    type: Date
+  },
+  registrationCloseTime: {
+    type: Date
+  },
   allowCancellation: {
     type: Boolean,
     default: true
@@ -283,6 +289,25 @@ eventSchema.virtual('availableSlots').get(function () {
 eventSchema.virtual('durationHours').get(function () {
   if (!this.startDate || !this.endDate) return 0;
   return Math.abs(this.endDate - this.startDate) / 36e5;
+});
+
+// Virtual for registration status
+eventSchema.virtual('isRegistrationOpen').get(function () {
+  if (!this.registrationRequired) return false;
+  
+  const now = new Date();
+  
+  // Check if registration time window is set
+  if (this.registrationOpenTime && now < this.registrationOpenTime) return false;
+  if (this.registrationCloseTime && now > this.registrationCloseTime) return false;
+  
+  // Check if event has already started
+  if (this.startDate && now >= this.startDate) return false;
+  
+  // Check capacity
+  if (this.capacity && this.totalRegistrations >= this.capacity) return false;
+  
+  return true;
 });
 
 // Virtual for registration status

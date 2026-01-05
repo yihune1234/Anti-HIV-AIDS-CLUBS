@@ -79,16 +79,95 @@ class EventService {
         try {
             const event = await Event.findById(eventId);
             if (!event) throw new Error('Event not found');
-            if (event.registrations.some(r => r.user.toString() === userId)) {
+            
+            // Check if already registered
+            const existingRegistration = event.registrations.find(r => 
+                r.user && r.user.toString() === userId.toString()
+            );
+            if (existingRegistration) {
                 throw new Error('Already registered for this event');
             }
-            if (event.capacity && event.totalRegistrations >= event.capacity) {
+            
+            // Check if registration is required
+            if (!event.registrationRequired) {
+                throw new Error('Registration is not required for this event');
+            }
+            
+            // Check registration time window
+            const now = new Date();
+            if (event.registrationOpenTime && now < event.registrationOpenTime) {
+                throw new Error('Registration has not opened yet');
+            }
+            if (event.registrationCloseTime && now > event.registrationCloseTime) {
+                throw new Error('Registration has closed');
+            }
+            
+            // Check capacity
+            if (event.capacity && event.registrations.length >= event.capacity) {
                 throw new Error('Event is full');
             }
+            
+            // Check if event is in the future
+            if (new Date(event.startDate) <= new Date()) {
+                throw new Error('Cannot register for past events');
+            }
 
-            event.registrations.push({ user: userId });
+            event.registrations.push({ 
+                user: userId,
+                registrationDate: new Date()
+            });
+            
             await event.save();
+            await event.populate('registrations.user', 'firstName lastName email');
             return event;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async unregisterFromEvent(eventId, userId) {
+        try {
+            const event = await Event.findById(eventId);
+            if (!event) throw new Error('Event not found');
+            
+            // Check if user is registered
+            const registrationIndex = event.registrations.findIndex(r => 
+                r.user && r.user.toString() === userId.toString()
+            );
+            
+            if (registrationIndex === -1) {
+                throw new Error('Not registered for this event');
+            }
+            
+            // Check if cancellation is allowed
+            if (!event.allowCancellation) {
+                throw new Error('Cancellation not allowed for this event');
+            }
+            
+            // Check if registration period has ended
+            const now = new Date();
+            if (event.registrationCloseDate && now > new Date(event.registrationCloseDate)) {
+                throw new Error('Registration period has ended, cannot cancel');
+            }
+            
+            // Remove registration
+            event.registrations.splice(registrationIndex, 1);
+            await event.save();
+            
+            await event.populate('registrations.user', 'firstName lastName email');
+            return event;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getUserRegistrations(userId) {
+        try {
+            const events = await Event.find({
+                'registrations.user': userId
+            }).populate('organizers advisors');
+            
+            return events;
         } catch (error) {
             throw error;
         }
@@ -97,7 +176,7 @@ class EventService {
     async getEventStats() {
         try {
             const total = await Event.countDocuments();
-            const upcoming = await Event.countDocuments({ startDate: { $gte: new Date() }, status: 'published' });
+            const upcoming = await Event.countDocuments({ startDate: { $gte: new Date() }, status: 'upcoming' });
             const byType = await Event.aggregate([{ $group: { _id: '$eventType', count: { $sum: 1 } } }]);
             const byCategory = await Event.aggregate([{ $group: { _id: '$category', count: { $sum: 1 } } }]);
 

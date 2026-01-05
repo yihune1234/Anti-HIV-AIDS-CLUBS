@@ -180,6 +180,7 @@ const Navbar = () => {
                             <NavLink to="/member/gallery" onClick={closeMenu}>Gallery</NavLink>
                             <NavLink to="/member/stories" onClick={closeMenu}>Stories</NavLink>
                             <NavLink to="/member/resources" onClick={closeMenu}>Resources</NavLink>
+                            <NavLink to="/member/training" onClick={closeMenu}>Training</NavLink>
 
                             {/* Mobile Admin Link if not already at top */}
                             {(user.roles?.includes('admin') || user.roles?.includes('superadmin')) && (

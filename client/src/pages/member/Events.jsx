@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import eventService from '../../services/eventService';
 import { useAuth } from '../../context/AuthContext';
 
 const Events = () => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const { user } = useAuth();
     const [registering, setRegistering] = useState(null);
     const [hoveredEvent, setHoveredEvent] = useState(null);
@@ -24,8 +23,8 @@ const Events = () => {
                     setEvents([]);
                 }
             } catch (err) {
-                setError('Failed to load events.');
-                console.error(err);
+                console.error('Failed to load events:', err);
+                setEvents([]);
             } finally {
                 setLoading(false);
             }
@@ -76,6 +75,47 @@ const Events = () => {
         return registrations.some(r =>
             (r.user && (r.user === user._id || r.user._id === user._id))
         );
+    };
+
+    const getRegistrationStatus = (event) => {
+        if (!event.registrationRequired) {
+            return { canRegister: false, message: 'No registration required', status: 'info' };
+        }
+
+        const now = new Date();
+        const eventDate = new Date(event.startDate || event.date);
+        const registrationOpen = event.registrationOpenDate ? new Date(event.registrationOpenDate) : null;
+        const registrationClose = event.registrationCloseDate ? new Date(event.registrationCloseDate) : null;
+
+        // Check if event has passed
+        if (eventDate <= now) {
+            return { canRegister: false, message: 'Event has ended', status: 'ended' };
+        }
+
+        // Check if already registered
+        if (isRegistered(event)) {
+            return { canRegister: false, message: 'You\'re registered', status: 'registered' };
+        }
+
+        // Check registration time window
+        if (registrationOpen && now < registrationOpen) {
+            return { 
+                canRegister: false, 
+                message: `Registration opens ${registrationOpen.toLocaleDateString()} at ${registrationOpen.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`, 
+                status: 'not-open' 
+            };
+        }
+
+        if (registrationClose && now > registrationClose) {
+            return { canRegister: false, message: 'Registration has closed', status: 'closed' };
+        }
+
+        // Check capacity
+        if (event.capacity && (event.registrations?.length || 0) >= event.capacity) {
+            return { canRegister: false, message: 'Event is full', status: 'full' };
+        }
+
+        return { canRegister: true, message: 'Register now', status: 'open' };
     };
 
     if (loading) return (
@@ -144,11 +184,10 @@ const Events = () => {
                     animation: 'fadeInUp 1s ease 0.2s',
                     animationFillMode: 'both'
                 }}>
-                    {events.map((event, index) => {
+                    {events.map((event) => {
                         const imageUrl = (event.images && event.images.length > 0) ? event.images[0].url : (event.imageUrl || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
                         const eventDate = new Date(event.startDate || event.date);
                         const isUpcoming = eventDate > new Date();
-                        const registered = isRegistered(event);
                         const isHovered = hoveredEvent === event._id;
 
                         return (
@@ -297,7 +336,7 @@ const Events = () => {
 
                                     <div style={{ marginTop: 'auto' }}>
                                         {isUpcoming ? (
-                                            registered ? (
+                                            isRegistered(event) ? (
                                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                     <button
                                                         style={{
