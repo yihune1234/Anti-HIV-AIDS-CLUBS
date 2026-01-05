@@ -1,0 +1,20 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Handle React Router - redirect all non-API, non-file requests to index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule . /index.html [L]
+
+# Set proper MIME types
+AddType text/css .css
+AddType text/javascript .js
+AddType application/json .json
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>

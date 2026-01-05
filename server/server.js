@@ -133,6 +133,21 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/training-content', contentRoutes);
 app.use('/api/feedback', feedbackRoutes);
 
+// Serve static files from the React app in production
+if (constants.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../client/dist')));
+    
+    // SPA fallback - redirect all non-API routes to index.html
+    app.get('*', (req, res) => {
+        // Don't redirect API routes
+        if (req.path.startsWith('/api/')) {
+            return notFound(req, res);
+        }
+        
+        res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    });
+}
+
 // Welcome Route
 app.get('/', (req, res) => {
     res.status(200).json({
