@@ -10,7 +10,7 @@ cloudinary.config({
 class CloudinaryService {
     async uploadImage(file, folder = 'anti-hiv-club') {
         try {
-            const result = await cloudinary.uploader.upload(file.path || file.buffer, {
+            let uploadOptions = {
                 folder: folder,
                 resource_type: 'image',
                 transformation: [
@@ -18,7 +18,25 @@ class CloudinaryService {
                     { quality: 'auto' },
                     { fetch_format: 'auto' }
                 ]
-            });
+            };
+
+            let result;
+            
+            // Handle different file input types
+            if (file.buffer) {
+                // File from memory storage (multer)
+                result = await new Promise((resolve, reject) => {
+                    cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }).end(file.buffer);
+                });
+            } else if (file.path) {
+                // File from disk storage
+                result = await cloudinary.uploader.upload(file.path, uploadOptions);
+            } else {
+                throw new Error('Invalid file format - no buffer or path found');
+            }
 
             return {
                 success: true,
@@ -43,12 +61,30 @@ class CloudinaryService {
 
     async uploadDocument(file, folder = 'anti-hiv-club/documents') {
         try {
-            const result = await cloudinary.uploader.upload(file.path || file.buffer, {
+            let uploadOptions = {
                 folder: folder,
                 resource_type: 'raw',
                 use_filename: true,
                 unique_filename: true
-            });
+            };
+
+            let result;
+            
+            // Handle different file input types
+            if (file.buffer) {
+                // File from memory storage (multer)
+                result = await new Promise((resolve, reject) => {
+                    cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }).end(file.buffer);
+                });
+            } else if (file.path) {
+                // File from disk storage
+                result = await cloudinary.uploader.upload(file.path, uploadOptions);
+            } else {
+                throw new Error('Invalid file format - no buffer or path found');
+            }
 
             return {
                 success: true,

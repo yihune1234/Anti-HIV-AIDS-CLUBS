@@ -2,15 +2,36 @@ import api, { BASE_URL } from './api';
 
 const uploadService = {
     uploadFile: async (file) => {
-        const formData = new FormData();
-        formData.append('file', file);
+        try {
+            // First try the regular upload
+            const formData = new FormData();
+            formData.append('file', file);
 
-        const response = await api.post('/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+            const response = await api.post('/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.warn('Regular upload failed, trying direct upload:', error.message);
+            
+            // If regular upload fails, try direct upload
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await api.post('/upload/direct', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                return response.data;
+            } catch (directError) {
+                console.error('Both upload methods failed:', directError);
+                throw directError;
             }
-        });
-        return response.data;
+        }
     },
 
     getFileUrl: (filePath) => {

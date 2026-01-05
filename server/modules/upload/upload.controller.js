@@ -133,12 +133,29 @@ class UploadController {
     // Controller method to return the file URL
     handleUpload(req, res) {
         try {
+            console.log('=== UPLOAD DEBUG INFO ===');
+            console.log('File received:', !!req.file);
+            console.log('Cloudinary enabled:', useCloudinary);
+            console.log('Environment:', process.env.NODE_ENV);
+            
             if (!req.file) {
+                console.log('❌ No file in request');
                 return res.status(400).json({ success: false, message: 'No file uploaded' });
             }
 
             // Debug: log the uploaded file object to help diagnose storage provider response
-            console.log('Uploaded file object:', req.file);
+            console.log('Uploaded file object:', {
+                fieldname: req.file.fieldname,
+                originalname: req.file.originalname,
+                encoding: req.file.encoding,
+                mimetype: req.file.mimetype,
+                size: req.file.size,
+                filename: req.file.filename,
+                path: req.file.path,
+                public_id: req.file.public_id,
+                secure_url: req.file.secure_url,
+                url: req.file.url
+            });
 
             // Construct public URL robustly supporting Cloudinary and local disk
             const protocol = req.headers['x-forwarded-proto'] || req.protocol;
@@ -149,10 +166,13 @@ class UploadController {
             // Common Cloudinary/remote keys: path, url, secure_url
             if (req.file.path && typeof req.file.path === 'string' && req.file.path.match(/^https?:\/\//i)) {
                 fileUrl = req.file.path;
+                console.log('✅ Using file.path as URL:', fileUrl);
             } else if (req.file.secure_url && typeof req.file.secure_url === 'string') {
                 fileUrl = req.file.secure_url;
+                console.log('✅ Using file.secure_url as URL:', fileUrl);
             } else if (req.file.url && typeof req.file.url === 'string' && req.file.url.match(/^https?:\/\//i)) {
                 fileUrl = req.file.url;
+                console.log('✅ Using file.url as URL:', fileUrl);
             }
 
             // Fallback: if storage produced a filename (local disk) build a public URL
@@ -165,8 +185,15 @@ class UploadController {
                     } else {
                         fileUrl = `${protocol}://${host}/uploads/${filename}`;
                     }
+                    console.log('✅ Using local fallback URL:', fileUrl);
                 }
             }
+
+            if (!fileUrl) {
+                console.log('❌ Could not determine file URL');
+            }
+
+            console.log('=== END UPLOAD DEBUG ===');
 
             // Ensure we always return a URL field (if we failed to construct one, return null)
             res.status(200).json({
