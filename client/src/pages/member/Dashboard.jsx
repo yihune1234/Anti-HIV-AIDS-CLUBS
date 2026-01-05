@@ -3,14 +3,15 @@ import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import eventService from '../../services/eventService';
 import resourceService from '../../services/resourceService';
-import storyService from '../../services/storyService';
 
 const Dashboard = () => {
     const { user } = useAuth();
+    const [stats, setStats] = useState({
+        upcomingEvents: 0,
+        newResources: 0
+    });
     const [loading, setLoading] = useState(true);
-    const [upcomingEvents, setUpcomingEvents] = useState([]);
-    const [featuredResources, setFeaturedResources] = useState([]);
-    const [recentStories, setRecentStories] = useState([]);
+    const [nextEvent, setNextEvent] = useState(null);
     const [greeting, setGreeting] = useState('');
 
     useEffect(() => {
@@ -19,12 +20,11 @@ const Dashboard = () => {
         else if (hour < 18) setGreeting('Good Afternoon');
         else setGreeting('Good Evening');
 
-        const fetchWebsiteData = async () => {
+        const fetchDashboardData = async () => {
             try {
-                const [eventsRes, resourcesRes, storiesRes] = await Promise.all([
+                const [eventsRes, resourcesRes] = await Promise.all([
                     eventService.getAllEvents(),
-                    resourceService.getAllResources(),
-                    storyService.getAllStories({ limit: 3 })
+                    resourceService.getAllResources()
                 ]);
 
                 // Process Events
@@ -32,32 +32,27 @@ const Dashboard = () => {
                 const events = (eventsRes.data && (eventsRes.data.events || eventsRes.data)) || [];
                 const futureEvents = events
                     .filter(e => new Date(e.startDate || e.date) > now)
-                    .sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date))
-                    .slice(0, 3);
+                    .sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
 
                 // Process Resources
                 const resources = (resourcesRes.data && (resourcesRes.data.resources || resourcesRes.data)) || [];
-                const featured = resources
-                    .filter(r => r.isFeatured || r.status === 'published')
-                    .slice(0, 3);
 
-                // Process Stories
-                const stories = (storiesRes.data && (storiesRes.data.stories || storiesRes.data)) || [];
-                const recent = stories
-                    .filter(s => s.status === 'published')
-                    .slice(0, 3);
+                setStats({
+                    upcomingEvents: futureEvents.length,
+                    newResources: resources.length
+                });
 
-                setUpcomingEvents(futureEvents);
-                setFeaturedResources(featured);
-                setRecentStories(recent);
+                if (futureEvents.length > 0) {
+                    setNextEvent(futureEvents[0]);
+                }
             } catch (error) {
-                console.error("Failed to load website data", error);
+                console.error("Failed to load dashboard data", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchWebsiteData();
+        fetchDashboardData();
     }, []);
 
     if (loading) return (

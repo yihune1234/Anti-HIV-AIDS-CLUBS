@@ -138,7 +138,7 @@ if (constants.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../client/dist')));
     
     // SPA fallback - redirect all non-API routes to index.html
-    app.get('*', (req, res) => {
+    app.get('/*', (req, res) => {
         // Don't redirect API routes
         if (req.path.startsWith('/api/')) {
             return notFound(req, res);
