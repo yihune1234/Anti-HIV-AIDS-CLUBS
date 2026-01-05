@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { Link } from 'react-router-dom';
 import eventService from '../../services/eventService';
 import resourceService from '../../services/resourceService';
 
 const Dashboard = () => {
     const { user } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const [stats, setStats] = useState({
         upcomingEvents: 0,
         newResources: 0
@@ -13,6 +15,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [nextEvent, setNextEvent] = useState(null);
     const [greeting, setGreeting] = useState('');
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
         const hour = new Date().getHours();
@@ -55,6 +58,21 @@ const Dashboard = () => {
         fetchDashboardData();
     }, []);
 
+    const handleThemeToggle = () => {
+        setIsDarkMode(!isDarkMode);
+        if (toggleTheme) toggleTheme();
+    };
+
+    // Generate profile photo URL or use placeholder
+    const getProfilePhotoUrl = () => {
+        if (user?.profilePhoto) {
+            return user.profilePhoto;
+        }
+        // Generate a placeholder profile photo using user's initials
+        const initials = `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`;
+        return `https://ui-avatars.com/api/?name=${initials}&background=D32F2F&color=fff&size=200&font-size=0.6&bold=true`;
+    };
+
     if (loading) return (
         <div style={{ display: 'flex', height: '80vh', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
             <div className="spinner-border text-danger" role="status"></div>
@@ -82,97 +100,216 @@ const Dashboard = () => {
                 .action-btn:hover {
                     letter-spacing: 1px;
                 }
+                .theme-toggle {
+                    position: relative;
+                    width: 60px;
+                    height: 30px;
+                    background: ${isDarkMode ? '#D32F2F' : 'rgba(255,255,255,0.2)'};
+                    border-radius: 15px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    border: 1px solid rgba(255,255,255,0.3);
+                }
+                .theme-toggle::before {
+                    content: '';
+                    position: absolute;
+                    top: 2px;
+                    left: ${isDarkMode ? '32px' : '2px'};
+                    width: 26px;
+                    height: 26px;
+                    background: white;
+                    border-radius: 50%;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                }
+                .profile-photo {
+                    width: clamp(80px, 15vw, 120px);
+                    height: clamp(80px, 15vw, 120px);
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 4px solid rgba(255,255,255,0.2);
+                    box-shadow: 0 0 30px rgba(211, 47, 47, 0.3);
+                    transition: all 0.3s ease;
+                }
+                .profile-photo:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 0 40px rgba(211, 47, 47, 0.5);
+                }
+                .member-card {
+                    background: ${isDarkMode ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' : 'linear-gradient(135deg, #1e1e2f 0%, #111119 100%)'};
+                    transition: all 0.3s ease;
+                }
                 `}
             </style>
 
-            {/* Premium Header Section */}
-            <div style={{
-                background: 'linear-gradient(135deg, #1e1e2f 0%, #111119 100%)',
-                padding: 'clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem)',
-                borderRadius: 'clamp(16px, 4vw, 40px)',
+            {/* Enhanced Member Profile Card */}
+            <div className="member-card" style={{
+                padding: 'clamp(2rem, 5vw, 4rem)',
+                borderRadius: 'clamp(20px, 5vw, 50px)',
                 color: 'white',
-                marginBottom: 'clamp(1.5rem, 4vw, 3rem)',
+                marginBottom: 'clamp(2rem, 5vw, 4rem)',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: 'clamp(1rem, 3vw, 2rem)'
+                boxShadow: '0 40px 80px rgba(0,0,0,0.2)',
+                border: '1px solid rgba(255,255,255,0.1)'
             }}>
-                <div style={{ position: 'relative', zIndex: 2 }}>
-                    <span style={{
-                        color: '#D32F2F',
-                        fontWeight: '800',
-                        letterSpacing: '2px',
-                        textTransform: 'uppercase',
-                        fontSize: '0.8rem',
-                        display: 'block',
-                        marginBottom: '0.5rem'
-                    }}>
-                        {greeting}, Advocate
+                {/* Theme Toggle */}
+                <div style={{ position: 'absolute', top: '2rem', right: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '600', opacity: 0.7 }}>
+                        {isDarkMode ? '🌙' : '☀️'}
                     </span>
-                    <h1 style={{ color: 'white', fontSize: 'clamp(1.8rem, 6vw, 3.5rem)', fontWeight: '900', marginBottom: '1rem', letterSpacing: '-1px' }}>
-                        {user?.firstName} <span style={{ color: '#D32F2F' }}>{user?.middleName}</span>
-                    </h1>
-                    <p style={{ opacity: 0.7, fontSize: 'clamp(0.95rem, 2.5vw, 1.2rem)', maxWidth: 'clamp(280px, 80%, 500px)', lineHeight: '1.6' }}>
-                        Welcome to your central hub for advocacy, education, and community support. Together, we make a difference.
-                    </p>
+                    <div className="theme-toggle" onClick={handleThemeToggle}></div>
                 </div>
 
-                <div style={{
-                    zIndex: 2,
-                    background: 'rgba(255,255,255,0.05)',
-                    backdropFilter: 'blur(20px)',
-                    padding: 'clamp(1.5rem, 4vw, 2rem)',
-                    borderRadius: 'clamp(12px, 3vw, 30px)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    textAlign: 'center',
-                    minWidth: 'clamp(140px, 35vw, 200px)',
-                    flexShrink: 0
-                }}>
-                    <div style={{
-                        width: 'clamp(50px, 12vw, 80px)',
-                        height: 'clamp(50px, 12vw, 80px)',
-                        borderRadius: '50%',
-                        background: '#D32F2F',
-                        margin: '0 auto 1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 'clamp(1.2rem, 4vw, 2rem)',
-                        fontWeight: 'bold',
-                        boxShadow: '0 0 20px rgba(211, 47, 47, 0.4)'
-                    }}>
-                        {user?.firstName?.[0]}{user?.lastName?.[0]}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(2rem, 5vw, 4rem)', flexWrap: 'wrap' }}>
+                    {/* Profile Photo Section */}
+                    <div style={{ position: 'relative' }}>
+                        <img 
+                            src={getProfilePhotoUrl()}
+                            alt={`${user?.firstName} ${user?.lastName}`}
+                            className="profile-photo"
+                        />
+                        {/* Online Status Indicator */}
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            right: '8px',
+                            width: '20px',
+                            height: '20px',
+                            background: '#4CAF50',
+                            borderRadius: '50%',
+                            border: '3px solid white',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                        }}></div>
                     </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: '700' }}>{user?.idNumber || user?.studentId || 'Member ID'}</div>
-                    <div style={{ fontSize: '0.8rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>Active Member</div>
 
-                    {(user?.role === 'admin' || user?.role === 'superadmin' || user?.roles?.includes('admin') || user?.roles?.includes('superadmin')) && (
-                        <Link
-                            to="/admin"
-                            className="btn btn-primary"
-                            style={{
-                                fontSize: '0.75rem',
-                                padding: '0.5rem 1rem',
-                                width: '100%',
-                                borderRadius: '15px',
-                                background: 'white',
+                    {/* Member Information */}
+                    <div style={{ flex: 1, minWidth: '300px' }}>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <span style={{
                                 color: '#D32F2F',
-                                border: 'none',
-                                fontWeight: '800'
-                            }}
-                        >
-                            ADMIN PANEL
-                        </Link>
-                    )}
+                                fontWeight: '800',
+                                letterSpacing: '2px',
+                                textTransform: 'uppercase',
+                                fontSize: '0.8rem',
+                                display: 'block',
+                                marginBottom: '0.5rem'
+                            }}>
+                                {greeting}, Advocate
+                            </span>
+                            <h1 style={{ 
+                                fontSize: 'clamp(2rem, 6vw, 4rem)', 
+                                fontWeight: '900', 
+                                marginBottom: '0.5rem', 
+                                letterSpacing: '-1px',
+                                lineHeight: '1.1'
+                            }}>
+                                {user?.firstName} <span style={{ color: '#D32F2F' }}>{user?.lastName}</span>
+                            </h1>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <span style={{ 
+                                    fontSize: '1.1rem', 
+                                    fontWeight: '700',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '20px',
+                                    backdropFilter: 'blur(10px)'
+                                }}>
+                                    ID: {user?.idNumber || user?.studentId || 'N/A'}
+                                </span>
+                                <span style={{
+                                    fontSize: '0.8rem',
+                                    fontWeight: '800',
+                                    color: user?.isActive ? '#4CAF50' : '#FF9800',
+                                    background: user?.isActive ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 152, 0, 0.2)',
+                                    padding: '0.4rem 1rem',
+                                    borderRadius: '15px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1px'
+                                }}>
+                                    {user?.isActive ? '✓ Verified Member' : '⏳ Pending Verification'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <p style={{ 
+                            opacity: 0.8, 
+                            fontSize: 'clamp(1rem, 2.5vw, 1.2rem)', 
+                            lineHeight: '1.6',
+                            marginBottom: '2rem',
+                            maxWidth: '600px'
+                        }}>
+                            Welcome to your advocacy hub. Track your engagement, access resources, and connect with the community.
+                        </p>
+
+                        {/* Action Buttons */}
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                            {(user?.role === 'admin' || user?.role === 'superadmin' || user?.roles?.includes('admin') || user?.roles?.includes('superadmin')) && (
+                                <Link
+                                    to="/admin"
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        padding: '1rem 2rem',
+                                        background: 'linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)',
+                                        color: 'white',
+                                        borderRadius: '25px',
+                                        fontWeight: '800',
+                                        fontSize: '0.9rem',
+                                        textDecoration: 'none',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px',
+                                        boxShadow: '0 8px 20px rgba(211, 47, 47, 0.3)',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseOver={(e) => {
+                                        e.target.style.transform = 'translateY(-2px)';
+                                        e.target.style.boxShadow = '0 12px 30px rgba(211, 47, 47, 0.4)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = '0 8px 20px rgba(211, 47, 47, 0.3)';
+                                    }}
+                                >
+                                    ⚡ Admin Panel
+                                </Link>
+                            )}
+                            <Link
+                                to="/member/profile"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    padding: '1rem 2rem',
+                                    background: 'rgba(255,255,255,0.1)',
+                                    color: 'white',
+                                    borderRadius: '25px',
+                                    fontWeight: '700',
+                                    fontSize: '0.9rem',
+                                    textDecoration: 'none',
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    backdropFilter: 'blur(10px)',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.target.style.background = 'rgba(255,255,255,0.2)';
+                                    e.target.style.transform = 'translateY(-2px)';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.target.style.background = 'rgba(255,255,255,0.1)';
+                                    e.target.style.transform = 'translateY(0)';
+                                }}
+                            >
+                                👤 Edit Profile
+                            </Link>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Decorative background blobs */}
-                <div style={{ position: 'absolute', right: '-10%', top: '-20%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(211, 47, 47, 0.15) 0%, transparent 70%)', filter: 'blur(60px)' }}></div>
-                <div style={{ position: 'absolute', left: '10%', bottom: '-30%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(30, 136, 229, 0.1) 0%, transparent 70%)', filter: 'blur(50px)' }}></div>
+                {/* Decorative Elements */}
+                <div style={{ position: 'absolute', right: '-5%', top: '-10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(211, 47, 47, 0.15) 0%, transparent 70%)', filter: 'blur(60px)' }}></div>
+                <div style={{ position: 'absolute', left: '5%', bottom: '-15%', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(30, 136, 229, 0.1) 0%, transparent 70%)', filter: 'blur(50px)' }}></div>
             </div>
 
             {/* Dashboard Analytics Grid */}

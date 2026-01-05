@@ -20,7 +20,6 @@ const storyRoutes = require('./modules/stories/story.routes');
 const adminRoutes = require('./modules/admin/admin.routes');
 const uploadRoutes = require('./modules/upload/upload.routes');
 const sessionRoutes = require('./modules/peerEducationSessions/session.routes');
-const contentRoutes = require('./modules/trainingContent/content.routes');
 const feedbackRoutes = require('./modules/feedback/feedback.routes');
 
 // Load environment variables
@@ -130,7 +129,6 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/sessions', sessionRoutes);
-app.use('/api/training-content', contentRoutes);
 app.use('/api/feedback', feedbackRoutes);
 
 // Serve static files from the React app in production

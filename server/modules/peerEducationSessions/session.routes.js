@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const sessionController = require('./session.controller');
 const { authenticate, authorize } = require('../../middleware/auth.middleware');
-const { validate, createSessionSchema, updateSessionSchema, markAttendanceSchema } = require('./session.validation');
+const { validate } = require('../../middleware/validate.middleware');
+const { createSessionSchema, updateSessionSchema, markAttendanceSchema } = require('./session.validation');
 
 // Public routes - NONE (sessions only visible to logged-in members)
 

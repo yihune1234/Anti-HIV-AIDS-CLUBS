@@ -52,6 +52,24 @@ const Events = () => {
         }
     };
 
+    const handleUnregister = async (eventId) => {
+        setRegistering(eventId);
+        try {
+            await eventService.unregisterFromEvent(eventId);
+            alert("Successfully unregistered from the event!");
+            setEvents(prev => prev.map(ev =>
+                ev._id === eventId
+                    ? { ...ev, registrations: (ev.registrations || []).filter(r => r.user !== user?._id && r.user?._id !== user?._id) }
+                    : ev
+            ));
+        } catch (err) {
+            console.error(err);
+            alert(err.response?.data?.message || "Failed to unregister from event.");
+        } finally {
+            setRegistering(null);
+        }
+    };
+
     const isRegistered = (event) => {
         const registrations = event.registrations || [];
         if (!user) return false;
@@ -279,27 +297,67 @@ const Events = () => {
 
                                     <div style={{ marginTop: 'auto' }}>
                                         {isUpcoming ? (
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); !registered && handleRegister(event._id); }}
-                                                style={{
-                                                    width: '100%',
-                                                    borderRadius: '100px',
-                                                    padding: '1.2rem',
-                                                    fontWeight: '800',
-                                                    fontSize: '0.9rem',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '1px',
-                                                    transition: 'all 0.3s ease',
-                                                    background: registered ? '#e8f5e9' : '#D32F2F',
-                                                    color: registered ? '#2e7d32' : 'white',
-                                                    border: registered ? '1px solid #c8e6c9' : 'none',
-                                                    cursor: registered ? 'default' : 'pointer',
-                                                    boxShadow: registered ? 'none' : '0 10px 20px rgba(211, 47, 47, 0.2)'
-                                                }}
-                                                disabled={registering === event._id || registered}
-                                            >
-                                                {registering === event._id ? 'Securing your spot...' : (registered ? '✓ You\'re on the list' : 'Join this activity')}
-                                            </button>
+                                            registered ? (
+                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    <button
+                                                        style={{
+                                                            flex: 1,
+                                                            borderRadius: '100px',
+                                                            padding: '1rem',
+                                                            fontWeight: '800',
+                                                            fontSize: '0.8rem',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: '1px',
+                                                            background: '#e8f5e9',
+                                                            color: '#2e7d32',
+                                                            border: '1px solid #c8e6c9',
+                                                            cursor: 'default'
+                                                        }}
+                                                        disabled
+                                                    >
+                                                        ✓ Registered
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleUnregister(event._id); }}
+                                                        style={{
+                                                            borderRadius: '100px',
+                                                            padding: '1rem',
+                                                            fontWeight: '700',
+                                                            fontSize: '0.8rem',
+                                                            background: 'transparent',
+                                                            color: '#d32f2f',
+                                                            border: '1px solid #d32f2f',
+                                                            cursor: 'pointer',
+                                                            minWidth: '100px'
+                                                        }}
+                                                        disabled={registering === event._id}
+                                                    >
+                                                        {registering === event._id ? '...' : 'Leave'}
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleRegister(event._id); }}
+                                                    style={{
+                                                        width: '100%',
+                                                        borderRadius: '100px',
+                                                        padding: '1.2rem',
+                                                        fontWeight: '800',
+                                                        fontSize: '0.9rem',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '1px',
+                                                        transition: 'all 0.3s ease',
+                                                        background: '#D32F2F',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        boxShadow: '0 10px 20px rgba(211, 47, 47, 0.2)'
+                                                    }}
+                                                    disabled={registering === event._id}
+                                                >
+                                                    {registering === event._id ? 'Securing your spot...' : 'Join this activity'}
+                                                </button>
+                                            )
                                         ) : (
                                             <button
                                                 variant="outline"

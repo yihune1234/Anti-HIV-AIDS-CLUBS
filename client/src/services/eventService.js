@@ -13,6 +13,16 @@ const eventService = {
         const response = await api.post(`/events/${id}/register`);
         return response.data;
     },
+
+    unregisterFromEvent: async (id) => {
+        const response = await api.delete(`/events/${id}/register`);
+        return response.data;
+    },
+
+    getUserRegistrations: async () => {
+        const response = await api.get('/events/my/registrations');
+        return response.data;
+    },
     // Admin: Get Event Stats
     getEventStats: async () => {
         try {

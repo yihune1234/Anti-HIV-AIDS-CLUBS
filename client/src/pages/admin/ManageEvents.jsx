@@ -178,13 +178,64 @@ const ManageEvents = () => {
                                 <th>Event</th>
                                 <th>Type</th>
                                 <th>Date & Location</th>
+                                <th>Status</th>
                                 <th>Registrations</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {events.map(event => (
+                            {events.map(event => {
+                                const eventDate = new Date(event.startDate);
+                                const now = new Date();
+                                const isUpcoming = eventDate > now;
+                                const isPast = eventDate < now;
+                                const isToday = eventDate.toDateString() === now.toDateString();
+                                
+                                return (
                                 <tr key={event._id}>
+                                    <td data-label="Event">
+                                        <div style={{ fontWeight: 'bold' }}>{event.title}</div>
+                                        <div style={{ fontSize: '0.85rem', color: '#777', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {event.description}
+                                        </div>
+                                    </td>
+                                    <td data-label="Type">
+                                        <span style={{ 
+                                            textTransform: 'capitalize',
+                                            background: '#f0f0f0',
+                                            padding: '0.2rem 0.5rem',
+                                            borderRadius: '12px',
+                                            fontSize: '0.8rem'
+                                        }}>
+                                            {event.eventType?.replace('_', ' ')}
+                                        </span>
+                                    </td>
+                                    <td data-label="Date & Location">
+                                        <div style={{ fontWeight: '600' }}>
+                                            {eventDate.toLocaleDateString('en-US', { 
+                                                weekday: 'short', 
+                                                month: 'short', 
+                                                day: 'numeric' 
+                                            })}
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                                            {eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                        <div style={{ fontSize: '0.85rem', color: '#777' }}>📍 {event.location?.venue}</div>
+                                    </td>
+                                    <td data-label="Status">
+                                        <span style={{
+                                            padding: '0.3rem 0.8rem',
+                                            borderRadius: '15px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '700',
+                                            textTransform: 'uppercase',
+                                            background: isToday ? '#fff3cd' : isUpcoming ? '#d4edda' : '#f8d7da',
+                                            color: isToday ? '#856404' : isUpcoming ? '#155724' : '#721c24'
+                                        }}>
+                                            {isToday ? 'Today' : isUpcoming ? 'Upcoming' : 'Completed'}
+                                        </span>
+                                    </td>
                                     <td data-label="Event">
                                         <div style={{ fontWeight: 'bold' }}>{event.title}</div>
                                         <div style={{ fontSize: '0.85rem', color: '#777', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -199,7 +250,41 @@ const ManageEvents = () => {
                                         <div style={{ fontSize: '0.85rem', color: '#777' }}>📍 {event.location?.venue}</div>
                                     </td>
                                     <td data-label="Registrations">
-                                        {event.totalRegistrations || (event.registrations ? event.registrations.length : 0)} registered
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <span style={{ fontWeight: 'bold', color: '#D32F2F' }}>
+                                                {event.totalRegistrations || (event.registrations ? event.registrations.length : 0)}
+                                            </span>
+                                            <span style={{ color: '#666' }}>registered</span>
+                                            {event.capacity && (
+                                                <span style={{ fontSize: '0.8rem', color: '#999' }}>
+                                                    / {event.capacity} max
+                                                </span>
+                                            )}
+                                        </div>
+                                        {(event.registrations && event.registrations.length > 0) && (
+                                            <button
+                                                style={{
+                                                    background: 'none',
+                                                    border: '1px solid #ddd',
+                                                    borderRadius: '4px',
+                                                    padding: '0.2rem 0.5rem',
+                                                    fontSize: '0.7rem',
+                                                    color: '#666',
+                                                    cursor: 'pointer',
+                                                    marginTop: '0.3rem'
+                                                }}
+                                                onClick={() => {
+                                                    const registrants = event.registrations.map(r => 
+                                                        r.user?.firstName && r.user?.lastName 
+                                                            ? `${r.user.firstName} ${r.user.lastName}` 
+                                                            : r.user?.email || 'Unknown User'
+                                                    ).join('\n');
+                                                    alert(`Registered Members:\n\n${registrants || 'No registrations yet'}`);
+                                                }}
+                                            >
+                                                View List
+                                            </button>
+                                        )}
                                     </td>
                                     <td data-label="Actions">
                                         <button
@@ -218,7 +303,8 @@ const ManageEvents = () => {
                                         </button>
                                     </td>
                                 </tr>
-                            ))}
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
